@@ -31,6 +31,6 @@ ENV IP2REGION_XDB_PATH=/app/ip2region.xdb
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-    CMD curl -fsS http://127.0.0.1:8080/api/settings/banners >/dev/null || exit 1
+    CMD curl -fsS "http://127.0.0.1:${SERVER_PORT:-8080}/api/settings/banners" >/dev/null || exit 1
 
 ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS:-} -jar /app/app.jar"]

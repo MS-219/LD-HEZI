@@ -9,6 +9,7 @@ services:
     restart: unless-stopped
     environment:
       TZ: "Asia/Shanghai"
+      SERVER_PORT: "${SERVER_PORT:-8080}"
       JAVA_OPTS: "${JAVA_OPTS:-}"
       SPRING_DATASOURCE_URL: "${SPRING_DATASOURCE_URL:-jdbc:mysql://127.0.0.1:3307/juxinsuanli?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false}"
       SPRING_DATASOURCE_USERNAME: "${SPRING_DATASOURCE_USERNAME:-juxinsuanli}"

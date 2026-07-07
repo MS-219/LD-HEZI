@@ -93,6 +93,7 @@ start_backend() {
         --restart unless-stopped \
         --network host \
         -e TZ=Asia/Shanghai \
+        -e SERVER_PORT="${SERVER_PORT:-8080}" \
         -e JAVA_OPTS="${JAVA_OPTS:-}" \
         -e SPRING_DATASOURCE_URL="${SPRING_DATASOURCE_URL:-jdbc:mysql://127.0.0.1:3307/juxinsuanli?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false}" \
         -e SPRING_DATASOURCE_USERNAME="${SPRING_DATASOURCE_USERNAME:-juxinsuanli}" \
@@ -102,7 +103,7 @@ start_backend() {
         -e SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT="${SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT:-10000}" \
         -e SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD="${SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD:-20000}" \
         -e IP2REGION_XDB_PATH=/app/ip2region.xdb \
-        -e CORS_ALLOWED_ORIGINS="${CORS_ALLOWED_ORIGINS:-https://juxinsuanli.cn,https://www.juxinsuanli.cn,https://ld.juxinsuanli.cn,https://api.juxinsuanli.cn}" \
+        -e CORS_ALLOWED_ORIGINS="${CORS_ALLOWED_ORIGINS:-https://hz.shandongliandong.com,https://juxinsuanli.cn,https://www.juxinsuanli.cn,https://ld.juxinsuanli.cn,https://api.juxinsuanli.cn}" \
         -v "$SCRIPT_DIR/backend/uploads:/app/uploads" \
         -v "$SCRIPT_DIR/device_agent:/device_agent:ro" \
         "$BACKEND_IMAGE" >/dev/null
@@ -111,7 +112,7 @@ start_backend() {
 wait_backend() {
     info "等待后端健康检查"
     for _ in $(seq 1 40); do
-        if curl -fsS http://127.0.0.1:8080/api/settings/banners >/dev/null 2>&1; then
+        if curl -fsS "http://127.0.0.1:${SERVER_PORT:-8080}/api/settings/banners" >/dev/null 2>&1; then
             info "后端已就绪"
             return 0
         fi
