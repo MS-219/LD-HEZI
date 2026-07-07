@@ -3,8 +3,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    image: ld-ai-backend:${IMAGE_TAG:-latest}
-    container_name: ld-ai-backend
+    image: qqyzs-backend:${IMAGE_TAG:-latest}
+    container_name: qqyzs-backend
     network_mode: host
     restart: unless-stopped
     environment:

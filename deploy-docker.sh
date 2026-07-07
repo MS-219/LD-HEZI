@@ -2,8 +2,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BACKEND_IMAGE="${BACKEND_IMAGE:-ld-ai-backend:latest}"
-BACKEND_CONTAINER="${BACKEND_CONTAINER:-ld-ai-backend}"
+BACKEND_IMAGE="${BACKEND_IMAGE:-qqyzs-backend:latest}"
+BACKEND_CONTAINER="${BACKEND_CONTAINER:-qqyzs-backend}"
 NODE_IMAGE="${NODE_IMAGE:-node:20-alpine}"
 NPM_REGISTRY="${NPM_REGISTRY:-https://registry.npmmirror.com}"
 
@@ -135,7 +135,7 @@ deploy() {
 
 status() {
     docker ps --filter "name=$BACKEND_CONTAINER" --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
-    curl -fsS http://127.0.0.1:8080/api/settings/banners >/dev/null \
+    curl -fsS "http://127.0.0.1:${SERVER_PORT:-8080}/api/settings/banners" >/dev/null \
         && info "API 本机健康检查通过" \
         || warn "API 本机健康检查失败"
 }
@@ -185,7 +185,7 @@ case "${1:-help}" in
         ;;
     *)
         cat <<'USAGE'
-LD-AI Docker 部署脚本
+全球云智算（LD-HEZI）Docker 部署脚本
 
 用法:
   ./deploy-docker.sh deploy         构建后端镜像和前端 dist，成功后切换后端容器
