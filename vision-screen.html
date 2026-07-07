@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聚芯算力 (LD-AI) | 全球算力指挥中心 PRO</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Noto+Sans+SC:wght@300;400;700&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #01040a;
+            --primary-color: #00f2ff;
+            --primary-dim: rgba(0, 242, 255, 0.2);
+            --secondary-color: #7000ff;
+            --accent-green: #00ff9d;
+            --accent-yellow: #ffcc00;
+            --accent-red: #ff3e3e;
+            --text-color: #e0e6f0;
+            --panel-bg: rgba(6, 12, 26, 0.95);
+            --border-color: rgba(0, 242, 255, 0.15);
+        }
+
+        /* 修复：允许页面滑动 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Noto Sans SC', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            /* 允许下滑 */
+            background-image:
+                radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.03) 0%, transparent 80%),
+                linear-gradient(rgba(10, 20, 40, 0.5) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(10, 20, 40, 0.5) 1px, transparent 1px);
+            background-size: cover, 30px 30px, 30px 30px;
+            scroll-behavior: smooth;
+        }
+
+        /* 顶部扫描线和杂色 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.01));
+            z-index: 1000;
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .marquee-top {
+            height: 28px;
+            background: rgba(0, 242, 255, 0.08);
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            font-size: 0.75rem;
+            color: var(--primary-color);
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+            backdrop-filter: blur(10px);
+        }
+
+        .marquee-content {
+            display: flex;
+            animation: marquee 40s linear infinite;
+            white-space: nowrap;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(100%);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        header {
+            height: 80px;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(180deg, rgba(0, 242, 255, 0.12) 0%, transparent 100%);
+            border-bottom: 2px solid var(--border-color);
+            position: sticky;
+            top: 28px;
+            z-index: 1000;
+            backdrop-filter: blur(15px);
+        }
+
+        .header-main {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-viz {
+            width: 45px;
+            height: 45px;
+            border: 2px solid var(--primary-color);
+            rotate: 45deg;
+            background: rgba(0, 242, 255, 0.05);
+        }
+
+        .title-box h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            letter-spacing: 5px;
+            color: var(--primary-color);
+            text-shadow: 0 0 20px var(--primary-dim);
+        }
+
+        .title-box p {
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+            opacity: 0.7;
+            color: var(--primary-color);
+            margin-top: -2px;
+        }
+
+        .header-metrics {
+            display: flex;
+            gap: 40px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.95rem;
+        }
+
+        .m-item .value {
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+
+        /* 核心布局 - 允许高度自适应 */
+        main {
+            display: grid;
+            grid-template-columns: 420px 1fr 420px;
+            grid-template-rows: auto auto;
+            gap: 15px;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.2);
+            width: 100%;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            position: relative;
+            backdrop-filter: blur(15px);
+            display: flex;
+            flex-direction: column;
+            padding: 18px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            margin-bottom: 10px;
+        }
+
+        .panel-corner {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border-color: var(--primary-color);
+            border-style: solid;
+        }
+
+        .pc-tl {
+            top: -2px;
+            left: -2px;
+            border-width: 3px 0 0 3px;
+        }
+
+        .pc-br {
+            bottom: -2px;
+            right: -2px;
+            border-width: 0 3px 3px 0;
+        }
+
+        .panel-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 18px;
+            border-left: 5px solid var(--primary-color);
+            padding-left: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 资源统计 */
+        .resource-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .res-card {
+            background: rgba(0, 242, 255, 0.05);
+            border: 1px solid rgba(0, 242, 255, 0.1);
+            padding: 15px;
+            text-align: center;
+            border-radius: 4px;
+        }
+
+        .res-val {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+        }
+
+        .res-lbl {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 6px;
+        }
+
+        /* 下发任务控制中心 - 新增功能 */
+        .dispatch-form {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 0.75rem;
+            opacity: 0.6;
+            color: var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .dispatch-input,
+        .dispatch-select {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 10px;
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 0.85rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .dispatch-input:focus,
+        .dispatch-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px var(--primary-dim);
+        }
+
+        .dispatch-btn {
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            border: none;
+            color: #fff;
+            padding: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dispatch-btn:hover {
+            transform: scale(1.02);
+            filter: brightness(1.2);
+            box-shadow: 0 0 20px var(--primary-dim);
+        }
+
+        .dispatch-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* 渲染进度反馈 */
+        #dispatch-loader {
+            display: none;
+            text-align: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent-green);
+            margin-top: 10px;
+        }
+
+        /* 中央区域：地图 */
+        .center-box {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .map-area {
+            min-height: 560px;
+            background: #000;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .map-svg-real {
+            width: 100%;
+            height: 100%;
+        }
+
+        .continent-path {
+            fill: #0b1424;
+            stroke: rgba(0, 242, 255, 0.1);
+        }
+
+        .china-detailed {
+            fill: #122542;
+            stroke: var(--primary-color);
+            stroke-width: 1;
+        }
+
+        .map-node {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            cursor: help;
+        }
+
+        .node-pulse {
+            width: 12px;
+            height: 12px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--accent-green);
+            position: relative;
+        }
+
+        .node-pulse::after {
+            content: "";
+            position: absolute;
+            inset: -4px;
+            border: 1px solid var(--accent-green);
+            border-radius: 50%;
+            animation: pulse-node 2s infinite;
+        }
+
+        @keyframes pulse-node {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        .node-text {
+            position: absolute;
+            left: 18px;
+            top: -5px;
+            white-space: nowrap;
+            font-size: 0.8rem;
+            color: #fff;
+            text-shadow: 0 0 8px #000;
+        }
+
+        .fly-wire {
+            fill: none;
+            stroke: var(--primary-color);
+            stroke-width: 1.5;
+            stroke-dasharray: 6, 6;
+            opacity: 0.3;
+        }
+
+        .fly-dot {
+            fill: var(--primary-color);
+            filter: blur(1.5px);
+            animation: fly 4s infinite linear;
+        }
+
+        /* 趋势卡片 */
+        .trend-area {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            height: 180px;
+        }
+
+        .trend-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .trend-val {
+            font-family: 'Orbitron', 'Share Tech Mono', monospace;
+            font-size: 1.6rem;
+            color: var(--primary-color);
+        }
+
+        /* 任务矩阵项增强 */
+        .matrix-list {
+            flex: 1;
+            min-height: 500px;
+            overflow-y: visible;
+        }
+
+        .matrix-item {
+            background: rgba(0, 242, 255, 0.05);
+            border: 1px solid rgba(0, 242, 255, 0.1);
+            padding: 18px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .matrix-item.completed {
+            border-color: var(--accent-green) !important;
+            background: rgba(0, 255, 157, 0.08) !important;
+            box-shadow: inset 0 0 15px rgba(0, 255, 157, 0.1);
+        }
+
+        .matrix-item.completed .m-pct,
+        .matrix-item.completed .m-title {
+            color: var(--accent-green) !important;
+        }
+
+        .matrix-item.completed::before {
+            content: "√ COMPLETED";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.6rem;
+            color: var(--accent-green);
+            background: rgba(0, 255, 157, 0.2);
+            padding: 2px 6px;
+            border-radius: 2px;
+        }
+
+        .matrix-item:hover {
+            border-color: var(--primary-color);
+            transform: translateX(-5px);
+            background: rgba(0, 242, 255, 0.1);
+        }
+
+        .m-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .m-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .m-pct {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary-color);
+        }
+
+        .bar-bg {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: var(--primary-color);
+            box-shadow: 0 0 10px var(--primary-dim);
+            transition: width 1s linear;
+        }
+
+        .matrix-item.completed .bar-fill {
+            background: var(--accent-green);
+        }
+
+        .m-sub-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 8px;
+            font-size: 0.72rem;
+            opacity: 0.6;
+            line-height: 1.6;
+        }
+
+        .m-eta {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--accent-yellow);
+            font-weight: bold;
+        }
+
+        .log-box {
+            height: 200px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 255, 157, 0.1);
+            padding: 12px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent-green);
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        /* 全屏弹窗细节 */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(1, 4, 10, 0.98);
+            z-index: 2000;
+            padding: 40px;
+            backdrop-filter: blur(25px);
+        }
+
+        .overlay-box {
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--primary-color);
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            background: #000;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .overlay-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: var(--accent-red);
+            cursor: pointer;
+            border: 1px solid var(--accent-red);
+            padding: 5px 15px;
+            z-index: 10;
+            font-family: Orbitron;
+        }
+
+        /* ==================== 响应式适配 (Mobile Responsive) ==================== */
+        @media (max-width: 1200px) {
+            main {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .side-col:last-child {
+                grid-column: 1 / 3;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                height: auto;
+                flex-direction: column;
+                padding: 15px;
+                text-align: center;
+                position: static;
+            }
+
+            .header-main {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .header-metrics {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+                font-size: 0.8rem;
+            }
+
+            main {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+
+            .side-col:last-child {
+                grid-column: auto;
+            }
+
+            .map-area {
+                min-height: 350px;
+            }
+
+            .trend-area {
+                grid-template-columns: 1fr 1fr;
+                height: auto;
+                gap: 10px;
+            }
+
+            .overlay {
+                padding: 10px;
+            }
+
+            .overlay-box {
+                grid-template-columns: 1fr;
+                overflow-y: auto;
+            }
+
+            .overlay-box>div:last-child {
+                width: 100% !important;
+                border-left: none;
+                border-top: 1px solid rgba(0, 242, 255, 0.1);
+                padding: 20px !important;
+            }
+
+            #modal-pct {
+                font-size: 3.5rem;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-dim);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="marquee-top">
+        <div class="marquee-content">
+            🛰️ [实时同步] 聚芯 JX-Series 设备已完成北美 H-Zone 资源挂载 ··· ⚡ [跨境调度] 东南亚 S-Cluster 算力出口流量峰值 124Gbps，链路延迟稳定 32ms ··· 🧠
+            [任务动态] 万亿级参数大模型预训练任务同步进度 61.4%，Epoch 112 校验通过 ··· 🛡️ [安全状态] 全球算力出口专线隧道加密等级提升至 AES-4096 ··· 🌍 [全球拓扑] 新增欧洲
+            A-Point 算力池并网，当前总算力突破 2.1 EH/s ···
+        </div>
+    </div>
+
+    <header>
+        <div class="header-main">
+            <div class="logo-viz"></div>
+            <div class="title-box">
+                <h1>聚芯算力全球指挥中心</h1>
+                <p>Global Distributed Computing Hub & Automated Task Dispatcher</p>
+            </div>
+        </div>
+        <div class="header-metrics">
+            <div class="m-item">
+                <div class="label">出口状态</div>
+                <div class="value">通道已建立</div>
+            </div>
+            <div class="m-item">
+                <div class="label">主控节点</div>
+                <div class="value">East-C-01</div>
+            </div>
+            <div id="clock" style="font-size: 1.5rem; color: var(--primary-color);">21:40:00</div>
+        </div>
+    </header>
+
+    <main>
+        <!-- 左侧面板 -->
+        <div class="side-col">
+            <section class="panel">
+                <div class="pc-tl panel-corner"></div>
+                <div class="panel-title">自有设备实时资源 <span>PROPRIETARY</span></div>
+                <div class="resource-grid">
+                    <div class="res-card">
+                        <div class="res-val" id="hash-val">1.94</div>
+                        <div class="res-lbl">算力出口 (EH/s)</div>
+                    </div>
+                    <div class="res-card">
+                        <div class="res-val" id="node-val">94,128</div>
+                        <div class="res-lbl">所属终端 Nodes</div>
+                    </div>
+                </div>
+
+                <!-- 新增：任务下发功能 -->
+                <div class="panel-title" style="margin-top:10px;">任务下发控制台 <span>DISPATCH HUB</span></div>
+                <div class="dispatch-form">
+                    <div class="form-group">
+                        <label class="form-label">选择调度任务类型</label>
+                        <select class="dispatch-select" id="task-type">
+                            <option>万亿级参数全网预训练</option>
+                            <option>跨境多模态语义对齐</option>
+                            <option>实时渲染导出 (4K/120FPS)</option>
+                            <option>大规模逻辑推理演算</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">调用设备规模 (Nodes) <span id="node-range-val">10,240</span></label>
+                        <input type="range" min="100" max="50000" value="10240" step="100"
+                            style="accent-color:var(--primary-color)" oninput="updateRange(this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">指定出口区域</label>
+                        <select class="dispatch-select" id="region-target">
+                            <option>北美出口 (North Am)</option>
+                            <option>东南亚枢纽 (SE Asia)</option>
+                            <option>欧洲算力池 (Europe)</option>
+                        </select>
+                    </div>
+                    <button class="dispatch-btn" onclick="executeDispatch()">执行任务下发 [ENTER]</button>
+                    <div id="dispatch-loader">正在通过专线广播指令... 进度: <span id="d-pct">0</span>%</div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-title">核心算力负载监控 <span>SYSTEM LOAD</span></div>
+                <div class="gpu-pool">
+                    <div class="gpu-item">
+                        <div class="gpu-info"><span>旗舰终端 (JX-Alpha)</span><span>88%</span></div>
+                        <div class="gpu-bar-bg">
+                            <div class="gpu-bar-fill" style="width: 88%"></div>
+                        </div>
+                    </div>
+                    <div class="gpu-item">
+                        <div class="gpu-info"><span>进阶节点 (JX-Beta)</span><span>72%</span></div>
+                        <div class="gpu-bar-bg">
+                            <div class="gpu-bar-fill" style="width: 72%; background: var(--secondary-color)"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- 中间面板 -->
+        <div class="center-box">
+            <section class="map-area">
+                <svg class="map-svg-real" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice">
+                    <g opacity="0.1">
+                        <path d="M0,100 L1000,100 M0,200 L1000,200 M0,300 L1000,300 M0,400 L1000,400 M0,500 L1000,500"
+                            stroke="#00f2ff" />
+                        <path d="M200,0 L200,600 M400,0 L400,600 M600,0 L600,600 M800,0 L800,600" stroke="#00f2ff" />
+                    </g>
+                    <path class="continent-path"
+                        d="M100,220 C150,180 250,220 300,250 C350,280 450,200 550,230 C650,260 750,220 850,240 C950,260 980,350 900,450 C820,550 700,520 600,550 C500,580 400,540 300,510 C200,480 100,420 80,320 Z" />
+                    <path class="china-detailed"
+                        d="M720,280 L740,260 L780,265 L820,240 L850,260 L860,300 L840,340 L800,380 L760,400 L720,380 L700,340 Z" />
+                    <path d="M780,320 Q850,250 880,240" id="r1" class="fly-wire" />
+                    <path d="M780,320 Q750,450 820,500" id="r2" class="fly-wire" />
+                    <path d="M780,320 Q500,200 400,230" id="r3" class="fly-wire" />
+                    <circle r="4" class="fly-dot">
+                        <animateMotion dur="4s" repeatCount="indefinite">
+                            <mpath xlink:href="#r1" />
+                        </animateMotion>
+                    </circle>
+                    <circle r="4" class="fly-dot">
+                        <animateMotion dur="5s" repeatCount="indefinite">
+                            <mpath xlink:href="#r2" />
+                        </animateMotion>
+                    </circle>
+                    <circle r="4" class="fly-dot">
+                        <animateMotion dur="6s" repeatCount="indefinite">
+                            <mpath xlink:href="#r3" />
+                        </animateMotion>
+                    </circle>
+                </svg>
+                <div class="map-node" style="top:53%; left:78%;">
+                    <div class="node-pulse"></div>
+                    <div class="node-text">聚芯核心总机</div>
+                </div>
+                <div class="map-node" style="top:40%; left:88%;">
+                    <div class="node-pulse"></div>
+                    <div class="node-text">NA出口站</div>
+                </div>
+                <div class="map-node" style="top:83%; left:82%;">
+                    <div class="node-pulse"></div>
+                    <div class="node-text">SEA枢纽</div>
+                </div>
+            </section>
+
+            <div class="trend-area">
+                <div class="trend-card">
+                    <div class="trend-title"><span>24H 出口分成收益</span></div>
+                    <div class="trend-val" id="val-income">￥2,142,912</div>
+                    <svg style="width:100%; height:40px;">
+                        <path d="M0,35 Q20,10 40,25 T80,15 T160,5" fill="none" stroke="var(--primary-color)"
+                            stroke-width="2" />
+                    </svg>
+                </div>
+                <div class="trend-card">
+                    <div class="trend-title"><span>全网活跃并行线程</span></div>
+                    <div class="trend-val">84,102</div>
+                    <svg style="width:100%; height:40px;">
+                        <path d="M0,25 L30,28 L60,10 L90,15 L150,8" fill="none" stroke="var(--secondary-color)"
+                            stroke-width="2" />
+                    </svg>
+                </div>
+                <div class="trend-card">
+                    <div class="trend-title"><span>算力存储吞吐率</span></div>
+                    <div class="trend-val">99.2%</div>
+                </div>
+                <div class="trend-card">
+                    <div class="trend-title"><span>指挥中心防御等级</span></div>
+                    <div class="trend-val" style="color:var(--accent-green)">AAA+</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧面板 -->
+        <div class="side-col">
+            <section class="panel">
+                <div class="pc-br panel-corner"></div>
+                <div class="panel-title">实时任务池 <span>ACTIVE TASKS</span></div>
+                <div class="matrix-list" id="task-matrix">
+                    <!-- JS 渲染 -->
+                </div>
+
+                <div class="panel-title" style="margin-top:20px;">全局调度日志 <span>COMMAND LOGS</span></div>
+                <div class="log-box" id="log-panel">
+                    <!-- 日志 -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- 弹窗部分 -->
+    <div class="overlay" id="task-modal">
+        <div class="overlay-box">
+            <div class="overlay-close" onclick="closeModal()">EXIT TERMINAL [ESC]</div>
+            <div style="flex:1; display:flex; flex-direction:column; padding:30px;">
+                <h2 id="modal-title" style="font-family:Orbitron; color:var(--primary-color);">TASK OVERVIEW</h2>
+                <div
+                    style="flex:1; border:1px solid rgba(0,242,255,0.1); background:#000; position:relative; overflow:hidden;">
+                    <div id="modal-progress"
+                        style="position:absolute; bottom:0; width:100%; background:rgba(0,242,255,0.2); height:0; transition:height 0.5s;">
+                    </div>
+                    <div
+                        style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column;">
+                        <div style="font-size:5rem; font-family:Orbitron; color:var(--primary-color);" id="modal-pct">0%
+                        </div>
+                        <div id="modal-status" style="color:var(--accent-green)">正在同步自有集群梯度...</div>
+                    </div>
+                </div>
+            </div>
+            <div
+                style="width:450px; padding:30px; border-left:1px solid rgba(0,242,255,0.1); display:flex; flex-direction:column; gap:20px;">
+                <div class="res-card" style="text-align:left;">
+                    <div class="res-lbl">所属任务名称</div>
+                    <div class="res-val" id="modal-task-name" style="font-size:1.1rem; color:#fff;">-</div>
+                </div>
+                <div class="log-box" id="modal-logs" style="flex:1; height:auto;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 时间处理
+        function tick() { const now = new Date(); document.getElementById('clock').innerText = now.toTimeString().split(' ')[0]; }
+        setInterval(tick, 1000); tick();
+
+        function updateRange(v) { document.getElementById('node-range-val').innerText = parseInt(v).toLocaleString(); }
+
+        // 核心任务数据
+        let taskData = [
+            { id: "JX-T-9811", name: "万亿级参数全网预训练", pct: 81.4, nodes: 20480, region: "North Am", era: "1h 42m", totalTime: null },
+            { id: "JX-T-4202", name: "跨境多模态数据对齐", pct: 54.2, nodes: 12800, region: "SE Asia", era: "45m", totalTime: null },
+            { id: "JX-T-1109", name: "全局算力出口调度优化", pct: 92.8, nodes: 9500, region: "Europe", era: "12m", totalTime: null },
+            { id: "JX-T-6638", name: "分布式视觉生成训练", pct: 32.5, nodes: 25600, region: "SE Asia", era: "3h 15m", totalTime: null },
+            { id: "JX-T-0091", name: "中端负载语义微调", pct: 100, nodes: 8400, region: "North Am", era: "已完成", totalTime: "22h 15m" }
+        ];
+
+        function renderTasks() {
+            const container = document.getElementById('task-matrix');
+            container.innerHTML = taskData.map((t, i) => {
+                const isDone = t.pct >= 100;
+                return `
+                <div class="matrix-item ${isDone ? 'completed' : ''}" onclick="openModal('${t.id}', '${t.name}')">
+                    <div class="m-header">
+                        <div class="m-title">${t.name}</div>
+                        <div class="m-pct">${isDone ? 'COMPLETED' : t.pct.toFixed(1) + '%'}</div>
+                    </div>
+                    <div class="bar-bg"><div class="bar-fill" style="width:${t.pct}%"></div></div>
+                    <div class="m-sub-grid">
+                        <span>ID: ${t.id} <br> 节点: ${t.nodes.toLocaleString()} Nodes</span>
+                        <div style="text-align:right">
+                            <div class="m-eta">${isDone ? '总计耗时' : '预计剩余'}: ${isDone ? (t.totalTime || '0m') : t.era}</div>
+                            <span>区域: ${t.region}</span>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+        renderTasks();
+
+        // 模拟任务进度与耗时更新
+        function simulateProgress() {
+            taskData.forEach(t => {
+                if (t.pct < 100) {
+                    t.pct += Math.random() * 0.4;
+                    if (t.pct >= 100) {
+                        t.pct = 100;
+                        t.totalTime = t.era === "已完成" ? "22h 15m" : (Math.floor(Math.random() * 24 + 1) + "h " + Math.floor(Math.random() * 60) + "m");
+                    }
+
+                    if (t.pct % 5 < 0.5 && t.pct < 100) {
+                        const minsMatch = t.era.match(/(\d+)m/);
+                        if (minsMatch) {
+                            let mins = parseInt(minsMatch[1]);
+                            if (mins > 1) t.era = t.era.replace(minsMatch[0], (mins - 1) + "m");
+                        }
+                    }
+                }
+            });
+            renderTasks();
+        }
+        setInterval(simulateProgress, 3000);
+
+        // 执行任务下发
+        function executeDispatch() {
+            const type = document.getElementById('task-type').value;
+            const nodes = parseInt(document.getElementById('node-range-val').innerText.replace(',', ''));
+            const region = document.getElementById('region-target').value;
+            const loader = document.getElementById('dispatch-loader');
+            const pctSpan = document.getElementById('d-pct');
+
+            loader.style.display = 'block';
+            let p = 0;
+            const int = setInterval(() => {
+                p += Math.floor(Math.random() * 15) + 5;
+                if (p >= 100) {
+                    p = 100;
+                    clearInterval(int);
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                        const newId = "JX-" + Math.floor(Math.random() * 9000 + 1000);
+                        // 生成随机预计时间
+                        const randomEta = Math.floor(Math.random() * 5 + 1) + "h " + Math.floor(Math.random() * 60) + "m";
+                        taskData.unshift({ id: newId, name: type, pct: 0, nodes: nodes, region: region, era: randomEta });
+                        if (taskData.length > 5) taskData.pop();
+                        renderTasks();
+                        addLog(`广播指令下发成功: [${newId}] ${type} 已对齐。`);
+                    }, 500);
+                }
+                pctSpan.innerText = p;
+            }, 200);
+        }
+
+        // 弹窗逻辑
+        let mInt = null;
+        function openModal(id, name) {
+            const task = taskData.find(t => t.id === id);
+            if (!task) return;
+
+            document.getElementById('task-modal').style.display = 'block';
+            document.getElementById('modal-title').innerText = `NODE CONTROL: ${id}`;
+            document.getElementById('modal-task-name').innerText = name;
+
+            const logsBox = document.getElementById('modal-logs');
+            logsBox.innerHTML = "";
+
+            const isDone = task.pct >= 100;
+            let p = isDone ? 100 : task.pct;
+
+            // 更新弹窗 UI 状态
+            document.getElementById('modal-pct').innerText = Math.floor(p) + '%';
+            document.getElementById('modal-progress').style.height = p + '%';
+            document.getElementById('modal-status').innerText = isDone ? "任务已完成 (ARCHIVED)" : "正在同步自有集群梯度...";
+            document.getElementById('modal-status').style.color = isDone ? "var(--accent-green)" : "var(--accent-green)";
+
+            // 增加详细参数展示区
+            const paramHtml = `
+                <div style="border-top: 1px solid rgba(0,242,255,0.1); padding-top:15px; margin-top:10px;">
+                    <div class="m-sub-grid" style="opacity:1; font-size:0.8rem;">
+                        <span>处理带宽: <b style="color:var(--primary-color)">${isDone ? '0' : (40 + Math.random() * 20).toFixed(1)} Gbps</b></span>
+                        <span style="text-align:right">集群功耗: <b style="color:var(--accent-yellow)">${isDone ? '0.2' : (140 + Math.random() * 40).toFixed(1)} kW</b></span>
+                        <span>丢包率: <b style="color:var(--accent-green)">0.0001%</b></span>
+                        <span style="text-align:right">当前状态: <b style="color:${isDone ? 'var(--accent-green)' : 'var(--primary-color)'}">${isDone ? '已归档' : '运行中'}</b></span>
+                    </div>
+                </div>
+            `;
+            const headerBox = document.querySelector('#task-modal .res-card');
+            // 清除旧的参数区并添加新的
+            const existingParam = headerBox.querySelector('.dynamic-params');
+            if (existingParam) existingParam.remove();
+            const paramDiv = document.createElement('div');
+            paramDiv.className = 'dynamic-params';
+            paramDiv.innerHTML = paramHtml;
+            headerBox.appendChild(paramDiv);
+
+            if (mInt) clearInterval(mInt);
+
+            if (isDone) {
+                // 已完成任务直接展示结果
+                addModalLog("正在读取历史快照...", logsBox);
+                addModalLog("校验 Checkpoint 完整性: 100% OK", logsBox);
+                addModalLog("总计训练耗时: " + task.era.replace('已完成', '') + " (已结束)", logsBox);
+                addModalLog("最终 Loss 收敛值: 0.0421", logsBox);
+            } else {
+                // 运行中任务继续模拟
+                mInt = setInterval(() => {
+                    const currentTask = taskData.find(t => t.id === id);
+                    if (!currentTask) return;
+
+                    p = currentTask.pct;
+                    document.getElementById('modal-pct').innerText = Math.floor(p) + '%';
+                    document.getElementById('modal-progress').style.height = p + '%';
+
+                    if (p >= 100) {
+                        document.getElementById('modal-status').innerText = "任务已完成 (ARCHIVED)";
+                        document.getElementById('modal-status').style.color = "var(--accent-green)";
+                        clearInterval(mInt);
+                    }
+
+                    if (Math.random() > 0.6) {
+                        const logs = ["正在校验自有 P-Bus 数据链路", "参数服务器响应成功", "梯度聚合完成", "存储带宽占用极化中", "心跳包同步成功"];
+                        addModalLog(logs[Math.floor(Math.random() * logs.length)], logsBox);
+                    }
+                }, 1000);
+            }
+        }
+
+        function addModalLog(msg, box) {
+            const l = document.createElement('div');
+            l.className = 'log-line';
+            l.innerHTML = `<span class="log-time">[${new Date().toLocaleTimeString().split(' ')[0]}]</span><span>${msg}</span>`;
+            box.prepend(l);
+            if (box.children.length > 25) box.removeChild(box.lastChild);
+        }
+        function closeModal() { document.getElementById('task-modal').style.display = 'none'; clearInterval(mInt); }
+        window.onkeydown = (e) => { if (e.key === 'Escape') closeModal(); };
+
+        // 日志
+        function addLog(msg) {
+            const box = document.getElementById('log-panel');
+            const l = document.createElement('div');
+            l.style.marginBottom = '4px';
+            l.innerHTML = `<span style="opacity:0.5;">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
+            box.prepend(l);
+            if (box.children.length > 20) box.removeChild(box.lastChild);
+        }
+        addLog("系统会话已激活...");
+        addLog("跨境算力专线已对齐。");
+
+        // 动态数值
+        setInterval(() => {
+            document.getElementById('hash-val').innerText = (1.92 + Math.random() * 0.05).toFixed(2);
+            document.getElementById('val-income').innerText = '￥' + (2142912 + Math.floor(Math.random() * 500)).toLocaleString();
+        }, 2000);
+    </script>
+</body>
+
+</html>

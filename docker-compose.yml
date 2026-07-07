@@ -1,0 +1,24 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: ld-ai-backend:${IMAGE_TAG:-latest}
+    container_name: ld-ai-backend
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      TZ: "Asia/Shanghai"
+      JAVA_OPTS: "${JAVA_OPTS:-}"
+      SPRING_DATASOURCE_URL: "${SPRING_DATASOURCE_URL:-jdbc:mysql://127.0.0.1:3307/juxinsuanli?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false}"
+      SPRING_DATASOURCE_USERNAME: "${SPRING_DATASOURCE_USERNAME:-juxinsuanli}"
+      SPRING_DATASOURCE_PASSWORD: "${SPRING_DATASOURCE_PASSWORD:-juxinsuanli}"
+      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:-80}"
+      SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE:-10}"
+      SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: "${SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT:-10000}"
+      SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD: "${SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD:-20000}"
+      IP2REGION_XDB_PATH: "/app/ip2region.xdb"
+      CORS_ALLOWED_ORIGINS: "${CORS_ALLOWED_ORIGINS:-https://hz.shandongliandong.com,https://juxinsuanli.cn,https://www.juxinsuanli.cn,https://ld.juxinsuanli.cn,https://api.juxinsuanli.cn}"
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./device_agent:/device_agent:ro

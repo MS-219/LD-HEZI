@@ -1,0 +1,38 @@
+/营业执照
+# Java编译产物
+backend/target/
+**/target/
+
+# Node依赖
+node_modules/
+dist/
+**/node_modules/
+**/dist/
+
+# Python/Go/系统缓存
+__pycache__/
+**/__pycache__/
+*.pyc
+.DS_Store
+_agents
+*.exe
+*.tar.gz
+# 设备端发布产物需要进仓库（服务器 clone 后直接供设备下载/升级）
+!device_agent/device_agent.exe
+!device_agent/jx-agent-linux.tar.gz
+
+# 本地资料，不进仓库
+截屏*.png
+*.pdf
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# 本地环境与密钥
+.env
+.env.*
+!.env.example
+*.key
+*.pem

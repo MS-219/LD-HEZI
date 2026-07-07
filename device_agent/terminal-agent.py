@@ -1,0 +1,96 @@
+import os
+import pty
+import select
+import threading
+import time
+
+import websocket
+
+
+SN_FILE = os.getenv("LD_AI_SN_FILE", "/etc/ld-ai-sn")
+WS_BASE = os.getenv("LD_AI_TERMINAL_WS", "wss://hz.shandongliandong.com/ws/device/")
+
+
+def load_sn():
+    if os.path.exists(SN_FILE):
+        with open(SN_FILE, "r", encoding="utf-8") as f:
+            return f.read().strip()
+    return "JX-UNKNOWN"
+
+
+class TerminalGuard:
+    def __init__(self, base_url, sn):
+        self.url = base_url if base_url.endswith("/") else base_url + "/"
+        self.url += sn
+        self.sn = sn
+        self.ws = None
+        self.master_fd = None
+
+    def start_shell(self):
+        if self.master_fd is not None:
+            return
+        try:
+            pid, fd = pty.fork()
+            if pid == 0:
+                os.environ["TERM"] = "xterm-256color"
+                try:
+                    os.execv("/bin/bash", ["/bin/bash"])
+                except Exception:
+                    os.execv("/bin/sh", ["/bin/sh"])
+            else:
+                self.master_fd = fd
+                threading.Thread(target=self.pipe_output, daemon=True).start()
+        except Exception:
+            self.master_fd = None
+
+    def pipe_output(self):
+        while self.master_fd is not None:
+            try:
+                ready, _, _ = select.select([self.master_fd], [], [], 0.1)
+                if ready:
+                    data = os.read(self.master_fd, 4096)
+                    if not data:
+                        break
+                    if self.ws and self.ws.sock and self.ws.sock.connected:
+                        self.ws.send(data.decode("utf-8", errors="replace"))
+            except Exception:
+                break
+        self.master_fd = None
+
+    def on_message(self, ws, message):
+        if message == "INIT_SHELL":
+            self.start_shell()
+            return
+        if self.master_fd is not None:
+            try:
+                os.write(self.master_fd, message.encode("utf-8"))
+            except Exception:
+                pass
+
+    def on_error(self, ws, error):
+        pass
+
+    def on_close(self, ws, close_status_code, close_msg):
+        self.ws = None
+
+    def on_open(self, ws):
+        self.ws = ws
+
+    def run(self):
+        while True:
+            try:
+                self.ws = websocket.WebSocketApp(
+                    self.url,
+                    on_open=self.on_open,
+                    on_message=self.on_message,
+                    on_error=self.on_error,
+                    on_close=self.on_close,
+                )
+                self.ws.run_forever()
+            except Exception:
+                pass
+            time.sleep(5)
+
+
+if __name__ == "__main__":
+    TerminalGuard(WS_BASE, load_sn()).run()

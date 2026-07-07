@@ -1,0 +1,9 @@
+service ldai_agent /system/bin/ldai_agent
+    class main
+    user root
+    group root system
+    disabled
+    oneshot
+
+on property:sys.boot_completed=1
+    start ldai_agent

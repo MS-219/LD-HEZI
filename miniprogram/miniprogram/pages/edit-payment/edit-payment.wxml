@@ -1,0 +1,42 @@
+<view class="container">
+    <view class="custom-nav" style="padding-top: {{navBarTop}}px;">
+        <view class="nav-back" bindtap="goBack">
+            <text class="back-icon">‹</text>
+        </view>
+        <text class="nav-title">收款设置</text>
+    </view>
+    <!-- 顶部卡片 -->
+    <view class="hero-card">
+        <view class="hero-icon-wrap">
+            <text class="hero-icon">🏦</text>
+        </view>
+        <view class="hero-text">
+            <text class="hero-name">{{currentInfo.realName || '未设置'}}</text>
+            <text class="hero-card-no">{{currentInfo.bankCardNoMask || '暂无银行卡'}}</text>
+        </view>
+    </view>
+
+    <!-- 修改银行卡 -->
+    <view class="section">
+        <view class="section-header">
+            <text class="section-icon">💳</text>
+            <text class="section-title">修改银行卡</text>
+        </view>
+        <view class="input-card">
+            <text class="input-label">新银行卡号</text>
+            <input class="card-input" type="number" placeholder="请输入15-19位银行卡号" value="{{form.cardNo}}" bindinput="onCardNoInput" maxlength="19" />
+        </view>
+        <button class="primary-btn {{!canSubmit ? 'btn-disabled' : ''}}" bindtap="submitChange" loading="{{submitting}}" disabled="{{!canSubmit || submitting}}">
+            {{submitting ? '提交中...' : '确认修改'}}
+        </button>
+        <view class="tips-row">
+            <text class="tip-item">• 请确保银行卡与收款人姓名一致</text>
+            <text class="tip-item">• 修改后将用于后续所有提现打款</text>
+        </view>
+    </view>
+    <!-- 底部安全提示 -->
+    <view class="safe-footer">
+        <text class="safe-icon">🔒</text>
+        <text class="safe-text">您的信息已加密保护</text>
+    </view>
+</view>

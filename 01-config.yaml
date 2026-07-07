@@ -1,0 +1,18 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    all-en:
+      match:
+        name: "en*"
+      dhcp4: true
+      nameservers:
+        addresses: [8.8.8.8, 114.114.114.114]
+      optional: true
+    all-eth:
+      match:
+        name: "eth*"
+      dhcp4: true
+      nameservers:
+        addresses: [8.8.8.8, 114.114.114.114]
+      optional: true

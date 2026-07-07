@@ -1,0 +1,72 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/juxinsuanli?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${SPRING_DATASOURCE_USERNAME:juxinsuanli}
+    password: ${SPRING_DATASOURCE_PASSWORD:juxinsuanli}
+    hikari:
+      maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:80}
+      minimum-idle: ${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE:10}
+      connection-timeout: ${SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT:10000}
+      idle-timeout: ${SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT:600000}
+      max-lifetime: ${SPRING_DATASOURCE_HIKARI_MAX_LIFETIME:1800000}
+      leak-detection-threshold: ${SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD:20000}
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+ip:
+  location:
+    xdb-path: ${IP2REGION_XDB_PATH:/www/wwwroot/LD-HeZi/ip2region.xdb}
+
+# 微信小程序配置
+wechat:
+  miniapp:
+    appid: ${WECHAT_MINIAPP_APPID:}
+    secret: ${WECHAT_MINIAPP_SECRET:}
+
+# AI 创作服务配置
+ai:
+  # 算力消耗配置
+  cost:
+    video-base: 10      # 视频基础消耗
+    image-base: 2       # 图片基础消耗
+    # 视频时长额外叠加消耗
+    video-extra:
+      d4: 0
+      d10: 5
+      d15: 10
+      d25: 20
+
+  # Vidu 视频生成 - 使用灵芽 AI
+  # 文档: ./vidu-video.md
+  vidu:
+    api-key: ${LINGYA_API_KEY:${ai.gemini.api-key}}
+    base-url: https://api.lingyaai.cn/v1
+    model: viduq3-turbo
+  # GPT-Image-2 图片生成 - 使用灵芽 AI
+  # 文档: ./gpt-image-2.md
+  gpt-image:
+    api-key: ${LINGYA_API_KEY:${ai.gemini.api-key}}
+    base-url: https://api.lingyaai.cn/v1
+    model: gpt-image-2
+  # Gemini AI 文案生成 - 使用灵芽 AI
+  # 文档: https://api.lingyaai.cn/doc/#/coding/gemini
+  gemini:
+    api-key: ${LINGYA_API_KEY:}
+    base-url: ${GEMINI_BASE_URL:https://api.lingyaai.cn/v1beta}
+    model: ${GEMINI_MODEL:gemini-3-pro-preview-thinking}
