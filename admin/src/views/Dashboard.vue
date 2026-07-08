@@ -99,7 +99,7 @@ import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import { 
   DataAnalysis, Monitor, User, ArrowDown, Bell, Wallet,
-  Money, Setting, Lock, SwitchButton, FullScreen, MagicStick, Message, List, UserFilled, Connection, Document, Box, ShoppingCart, Postcard
+  Money, Setting, Lock, SwitchButton, FullScreen, Message, List, UserFilled, Postcard
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
@@ -134,21 +134,15 @@ const userAvatarText = computed(() => (isFactoryUser.value ? '厂' : 'A'))
 const menuItems = [
   { index: '/statistics', label: '数据统计', icon: DataAnalysis, adminOnly: true },
   { index: '/device', label: '设备管理', factoryLabel: '设备二维码', icon: Monitor, adminOnly: true, factory: true },
-  { index: '/image-licenses', label: '镜像管理', icon: Lock, adminOnly: true },
   { index: '/user', label: '用户管理', icon: User, adminOnly: true },
   { index: '/notice', label: '公告管理', icon: Bell, adminOnly: true },
   { index: '/withdraw', label: '提现管理', icon: Wallet, adminOnly: true },
   { index: '/payment-apply', label: '账户变更审核', icon: Postcard, badge: true, adminOnly: true },
   { index: '/earnings', label: '收益管理', icon: Money, adminOnly: true },
-  { index: '/ai-tasks', label: 'AI创作管理', icon: MagicStick, adminOnly: true },
   { index: '/feedback', label: '意见反馈', icon: Message, adminOnly: true },
   { index: '/reward', label: '分润流水', icon: List, adminOnly: true },
   { index: '/settings', label: '系统设置', icon: Setting, adminOnly: true },
   { index: '/team', label: '团队管理', icon: UserFilled, adminOnly: true },
-  { index: '/merchant', label: '接口商户', icon: Connection, adminOnly: true },
-  { index: '/api-doc', label: 'API文档', icon: Document, adminOnly: true },
-  { index: '/exchange-products', label: '兑换商品', icon: Box, adminOnly: true },
-  { index: '/exchange-orders', label: '兑换订单', icon: ShoppingCart, adminOnly: true }
 ]
 
 const visibleMenus = computed(() => {

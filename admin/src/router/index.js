@@ -8,17 +8,11 @@ import NoticeList from '../views/NoticeList.vue'
 import WithdrawList from '../views/WithdrawList.vue'
 import PaymentApplyList from '../views/PaymentApplyList.vue'
 import EarningsList from '../views/EarningsList.vue'
-import AiTaskList from '../views/AiTaskList.vue'
 import FeedbackList from '../views/FeedbackList.vue'
 import RewardList from '../views/RewardList.vue'
 import Settings from '../views/Settings.vue'
 import TeamList from '../views/TeamList.vue'
-import MerchantList from '../views/MerchantList.vue'
-import ApiDoc from '../views/ApiDoc.vue'
 import DeviceTerminal from '../views/DeviceTerminal.vue'
-import ExchangeProductList from '../views/ExchangeProductList.vue'
-import ExchangeOrderList from '../views/ExchangeOrderList.vue'
-import ImageLicenseList from '../views/ImageLicenseList.vue'
 
 const routes = [
     {
@@ -55,12 +49,6 @@ const routes = [
                 meta: { title: '设备管理' }
             },
             {
-                path: 'image-licenses',
-                name: 'ImageLicenseList',
-                component: ImageLicenseList,
-                meta: { title: '镜像管理' }
-            },
-            {
                 path: 'user',
                 name: 'UserList',
                 component: UserList,
@@ -91,12 +79,6 @@ const routes = [
                 meta: { title: '收益管理' }
             },
             {
-                path: 'ai-tasks',
-                name: 'AiTaskList',
-                component: AiTaskList,
-                meta: { title: 'AI创作管理' }
-            },
-            {
                 path: 'feedback',
                 name: 'FeedbackList',
                 component: FeedbackList,
@@ -120,30 +102,6 @@ const routes = [
                 component: TeamList,
                 meta: { title: '团队管理' }
             },
-            {
-                path: 'merchant',
-                name: 'MerchantList',
-                component: MerchantList,
-                meta: { title: '接口商户' }
-            },
-            {
-                path: 'api-doc',
-                name: 'ApiDoc',
-                component: ApiDoc,
-                meta: { title: 'API文档' }
-            },
-            {
-                path: 'exchange-products',
-                name: 'ExchangeProductList',
-                component: ExchangeProductList,
-                meta: { title: '兑换商品' }
-            },
-            {
-                path: 'exchange-orders',
-                name: 'ExchangeOrderList',
-                component: ExchangeOrderList,
-                meta: { title: '兑换订单' }
-            }
         ]
     }
 ]

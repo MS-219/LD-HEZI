@@ -1,108 +1,123 @@
 <template>
   <div class="statistics-page">
-    <!-- 顶部数据看板 -->
-    <el-row :gutter="20" class="stat-row">
-      <el-col :span="6" v-for="item in statCards" :key="item.label">
-        <div class="stat-card" :class="item.type">
-          <div class="card-content">
-            <div class="card-title">{{ item.label }}</div>
-            <div class="card-value">{{ item.value }}</div>
-            <div class="card-subtext" v-if="item.subtext">
-              <span :class="item.subClass">{{ item.subtext }}</span>
-            </div>
-          </div>
-          <div class="card-icon">{{ item.icon }}</div>
-          <div class="card-bg-icon">{{ item.icon }}</div>
+    <!-- 顶部指挥舱横幅：日期 + 四项核心指标 -->
+    <div class="hero-band">
+      <div class="hero-left">
+        <div class="hero-caption">GLOBAL CLOUD · OVERVIEW</div>
+        <div class="hero-title">运营总览</div>
+        <div class="hero-date">{{ todayText }}</div>
+      </div>
+      <div class="hero-metrics">
+        <div class="metric" v-for="item in statCards" :key="item.label">
+          <div class="metric-label">{{ item.label }}</div>
+          <div class="metric-value">{{ item.value }}</div>
+          <div class="metric-sub">{{ item.subtext }}</div>
         </div>
-      </el-col>
-    </el-row>
+      </div>
+    </div>
 
-    <!-- 中部图表：趋势分析 -->
-    <el-row :gutter="20" class="chart-row">
-      <el-col :span="16">
-        <el-card class="glass-card chart-card main-trend">
-          <template #header>
-            <div class="card-header">
-              <span class="header-title">📈 数据趋势分析 (14日)</span>
-              <el-radio-group v-model="trendType" size="small" @change="updateTrendChart">
-                <el-radio-button label="earnings">收益</el-radio-button>
-                <el-radio-button label="users">用户</el-radio-button>
-                <el-radio-button label="devices">设备</el-radio-button>
-              </el-radio-group>
-            </div>
-          </template>
-          <div ref="trendChartRef" class="chart-container"></div>
-        </el-card>
-      </el-col>
-      <el-col :span="8">
-        <el-card class="glass-card chart-card side-dist">
-          <template #header>
-            <span class="header-title">🎯 设备状态分布</span>
-          </template>
-          <div ref="distChartRef" class="chart-container"></div>
-        </el-card>
-      </el-col>
-    </el-row>
+    <!-- 图表区 -->
+    <div class="panel-row">
+      <div class="panel trend-panel">
+        <div class="panel-head">
+          <span class="panel-title">数据趋势 · 近 14 日</span>
+          <el-radio-group v-model="trendType" size="small" @change="updateTrendChart">
+            <el-radio-button label="earnings">收益</el-radio-button>
+            <el-radio-button label="users">用户</el-radio-button>
+            <el-radio-button label="devices">设备</el-radio-button>
+          </el-radio-group>
+        </div>
+        <div ref="trendChartRef" class="chart-container"></div>
+      </div>
 
-    <!-- 底部：详细信息与操作 -->
-    <el-row :gutter="20" class="bottom-row">
-      <el-col :span="16">
-        <el-card class="glass-card detail-card">
-          <template #header>
-            <span class="header-title">🚀 系统快速操作</span>
-          </template>
-          <div class="quick-actions">
-            <div class="action-item" @click="$router.push('/user')">
-              <div class="action-icon user">👤</div>
-              <span>管理用户</span>
+      <div class="panel dist-panel">
+        <div class="panel-head">
+          <span class="panel-title">设备状态</span>
+        </div>
+        <div ref="distChartRef" class="dist-chart"></div>
+        <ul class="dist-list">
+          <li>
+            <span class="dot online"></span>在线
+            <b>{{ stats.device?.online || 0 }}</b>
+          </li>
+          <li>
+            <span class="dot offline"></span>离线
+            <b>{{ stats.device?.offline || 0 }}</b>
+          </li>
+          <li>
+            <span class="dot unbound"></span>未绑定
+            <b>{{ unboundCount }}</b>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 运营入口 + 服务状态 -->
+    <div class="panel-row">
+      <div class="panel nav-panel">
+        <div class="panel-head">
+          <span class="panel-title">运营入口</span>
+        </div>
+        <div class="nav-list">
+          <div class="nav-item" @click="$router.push('/user')">
+            <div class="nav-text">
+              <div class="nav-name">用户管理</div>
+              <div class="nav-desc">账户资料 · 余额与等级</div>
             </div>
-            <div class="action-item" @click="$router.push('/device')">
-              <div class="action-icon device">💻</div>
-              <span>设备监控</span>
-            </div>
-            <div class="action-item" @click="$router.push('/earnings')">
-              <div class="action-icon earnings">💰</div>
-              <span>收益审计</span>
-            </div>
-            <div class="action-item" @click="$router.push('/settings')">
-              <div class="action-icon settings">⚙️</div>
-              <span>系统配置</span>
-            </div>
+            <span class="nav-arrow">→</span>
           </div>
-        </el-card>
-      </el-col>
-      <el-col :span="8">
-        <el-card class="glass-card info-card">
-          <template #header>
-            <span class="header-title">🛡️ 系统服务状态</span>
-          </template>
-          <div class="info-body">
-            <div class="status-item">
-              <span class="label">后台服务:</span>
-              <el-tag :type="backendOnline ? 'success' : 'danger'" effect="dark" round size="small">
-                {{ backendOnline ? 'RUNNING' : 'STOPPED' }}
-              </el-tag>
+          <div class="nav-item" @click="$router.push('/device')">
+            <div class="nav-text">
+              <div class="nav-name">设备管理</div>
+              <div class="nav-desc">节点监控 · 绑定与指令</div>
             </div>
-            <div class="status-item">
-              <span class="label">系统版本:</span>
-              <span class="value">v1.2.5 PRO</span>
-            </div>
-            <div class="status-item">
-              <span class="label">上次同步:</span>
-              <span class="value">{{ lastUpdate }}</span>
-            </div>
-            <el-button 
-              type="primary" 
-              class="refresh-btn" 
-              :loading="loading" 
-              @click="initData"
-            >
-              🔄 立即同步最新数据
-            </el-button>
+            <span class="nav-arrow">→</span>
           </div>
-        </el-card>
-      </el-col>
-    </el-row>
+          <div class="nav-item" @click="$router.push('/withdraw')">
+            <div class="nav-text">
+              <div class="nav-name">提现审核</div>
+              <div class="nav-desc">打款处理 · 审核记录</div>
+            </div>
+            <span class="nav-arrow">→</span>
+          </div>
+          <div class="nav-item" @click="$router.push('/earnings')">
+            <div class="nav-text">
+              <div class="nav-name">收益管理</div>
+              <div class="nav-desc">结算流水 · 收益审计</div>
+            </div>
+            <span class="nav-arrow">→</span>
+          </div>
+          <div class="nav-item" @click="$router.push('/settings')">
+            <div class="nav-text">
+              <div class="nav-name">系统设置</div>
+              <div class="nav-desc">参数配置 · 客服信息</div>
+            </div>
+            <span class="nav-arrow">→</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel status-panel">
+        <div class="panel-head">
+          <span class="panel-title">服务状态</span>
+        </div>
+        <div class="status-body">
+          <div class="status-line">
+            <span class="k">后台服务</span>
+            <span class="v" :class="backendOnline ? 'ok' : 'bad'">
+              {{ backendOnline ? '● RUNNING' : '● STOPPED' }}
+            </span>
+          </div>
+          <div class="status-line">
+            <span class="k">上次同步</span>
+            <span class="v">{{ lastUpdate }}</span>
+          </div>
+          <el-button class="sync-btn" :loading="loading" @click="initData">
+            同步最新数据
+          </el-button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -122,38 +137,35 @@ const distChartRef = ref(null)
 let trendChart = null
 let distChart = null
 
+const todayText = new Date().toLocaleDateString('zh-CN', {
+  year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
+})
+
+const unboundCount = computed(() => {
+  const device = stats.value.device || {}
+  return Math.max((device.total || 0) - (device.bound || 0), 0)
+})
+
 const statCards = computed(() => [
-  { 
-    label: '设备总数', 
-    value: stats.value.device?.total || 0, 
-    icon: '📱', 
-    type: 'blue',
-    subtext: `● ${stats.value.device?.online || 0} 在线`,
-    subClass: 'online-text'
+  {
+    label: '设备总数',
+    value: stats.value.device?.total || 0,
+    subtext: `${stats.value.device?.online || 0} 台在线`
   },
-  { 
-    label: '注册用户', 
-    value: stats.value.user?.total || 0, 
-    icon: '👥', 
-    type: 'purple',
-    subtext: '活跃用户稳定增长',
-    subClass: ''
+  {
+    label: '注册用户',
+    value: stats.value.user?.total || 0,
+    subtext: `今日新增 ${stats.value.user?.today || 0}`
   },
-  { 
-    label: '累计收益', 
-    value: `¥${stats.value.earnings?.total || '0.00'}`, 
-    icon: '💰', 
-    type: 'green',
-    subtext: `昨日: ¥${stats.value.earnings?.yesterday || '0.00'}`,
-    subClass: ''
+  {
+    label: '累计收益',
+    value: `¥${stats.value.earnings?.total || '0.00'}`,
+    subtext: `昨日 ¥${stats.value.earnings?.yesterday || '0.00'}`
   },
-  { 
-    label: '总算力值', 
-    value: stats.value.hashrate?.total || 0, 
-    icon: '⚡', 
-    type: 'orange',
-    subtext: '系统负载正常',
-    subClass: ''
+  {
+    label: '总算力值',
+    value: stats.value.hashrate?.total || 0,
+    subtext: '全网累计'
   }
 ])
 
@@ -164,13 +176,13 @@ const initData = async () => {
       axios.get('/api/statistics/dashboard'),
       axios.get('/api/statistics/trend?days=14')
     ])
-    
+
     if (dashRes.data.code === 200) {
       stats.value = dashRes.data.data
       backendOnline.value = true
       lastUpdate.value = new Date().toLocaleTimeString()
     }
-    
+
     if (trendRes.data.code === 200) {
       trendData.value = trendRes.data.data
     }
@@ -178,7 +190,6 @@ const initData = async () => {
     nextTick(() => {
       renderCharts()
     })
-
   } catch (e) {
     console.error(e)
     backendOnline.value = false
@@ -202,43 +213,46 @@ const initTrendChart = () => {
 
 const updateTrendChart = () => {
   if (!trendChart || !trendData.value.dates) return
-  
+
   const typeMap = {
-    earnings: { name: '收益 (¥)', data: trendData.value.earnings, color: '#10b981' },
-    users: { name: '新增用户', data: trendData.value.users, color: '#8b5cf6' },
-    devices: { name: '新增设备', data: trendData.value.devices, color: '#3b82f6' }
+    earnings: { name: '收益 (¥)', data: trendData.value.earnings },
+    users: { name: '新增用户', data: trendData.value.users },
+    devices: { name: '新增设备', data: trendData.value.devices }
   }
-  
+
   const current = typeMap[trendType.value]
-  
+  const color = '#0e7bd4'
+
   const option = {
     tooltip: { trigger: 'axis' },
-    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+    grid: { left: '3%', right: '4%', top: 24, bottom: '3%', containLabel: true },
     xAxis: {
       type: 'category',
       boundaryGap: false,
       data: trendData.value.dates,
-      axisLine: { lineStyle: { color: '#e5e7eb' } },
-      axisLabel: { color: '#9ca3af' }
+      axisLine: { lineStyle: { color: '#dbe4f0' } },
+      axisLabel: { color: '#8296b3' }
     },
     yAxis: {
       type: 'value',
-      splitLine: { lineStyle: { type: 'dashed', color: '#f3f4f6' } },
-      axisLabel: { color: '#9ca3af' }
+      splitLine: { lineStyle: { type: 'dashed', color: '#edf1f7' } },
+      axisLabel: { color: '#8296b3' }
     },
     series: [{
       name: current.name,
       type: 'line',
-      smooth: true,
+      smooth: false,
+      symbol: 'circle',
+      symbolSize: 5,
       data: current.data,
-      itemStyle: { color: current.color },
+      itemStyle: { color },
       areaStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          { offset: 0, color: `${current.color}44` },
-          { offset: 1, color: `${current.color}00` }
+          { offset: 0, color: 'rgba(14, 123, 212, 0.22)' },
+          { offset: 1, color: 'rgba(34, 211, 238, 0)' }
         ])
       },
-      lineStyle: { width: 3 }
+      lineStyle: { width: 2.5 }
     }]
   }
   trendChart.setOption(option)
@@ -249,24 +263,23 @@ const initDistChart = () => {
   if (!distChart) {
     distChart = echarts.init(distChartRef.value)
   }
-  
+
   const device = stats.value.device || {}
+  const online = device.online || 0
+  const offline = device.offline || 0
+  const unbound = unboundCount.value
+
+  // 横向堆叠条：与母版的圆环图完全区分
   const option = {
-    tooltip: { trigger: 'item' },
-    legend: { bottom: '5%', left: 'center', textStyle: { color: '#6b7280' } },
-    series: [{
-      name: '设备状态',
-      type: 'pie',
-      radius: ['40%', '70%'],
-      avoidLabelOverlap: false,
-      itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
-      label: { show: false },
-      data: [
-        { value: device.online || 0, name: '在线', itemStyle: { color: '#10b981' } },
-        { value: device.offline || 0, name: '离线', itemStyle: { color: '#9ca3af' } },
-        { value: (device.total || 0) - (device.bound || 0), name: '未绑定', itemStyle: { color: '#f59e0b' } }
-      ]
-    }]
+    tooltip: { trigger: 'axis', axisPointer: { type: 'none' } },
+    grid: { left: 0, right: 0, top: 8, bottom: 0 },
+    xAxis: { type: 'value', show: false },
+    yAxis: { type: 'category', show: false, data: ['设备'] },
+    series: [
+      { name: '在线', type: 'bar', stack: 's', data: [online], itemStyle: { color: '#14b8a6', borderRadius: [6, 0, 0, 6] }, barWidth: 26 },
+      { name: '离线', type: 'bar', stack: 's', data: [offline], itemStyle: { color: '#c3ceda' } },
+      { name: '未绑定', type: 'bar', stack: 's', data: [unbound], itemStyle: { color: '#f59e0b', borderRadius: [0, 6, 6, 0] } }
+    ]
   }
   distChart.setOption(option)
 }
@@ -292,239 +305,240 @@ onUnmounted(() => {
 .statistics-page {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
+  padding-bottom: 60px;
 }
 
-/* 顶部统计卡片 */
-.stat-row {
-  margin-bottom: 0;
-}
-
-.stat-card {
-  height: 150px;
-  border-radius: 24px;
-  padding: 28px;
-  position: relative;
-  overflow: hidden;
+/* ── 顶部指挥舱横幅 ─────────────────────── */
+.hero-band {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: #fff;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  border: none;
+  align-items: stretch;
+  gap: 40px;
+  border-radius: 14px;
+  padding: 26px 32px;
+  color: #eaf6ff;
+  background:
+    radial-gradient(700px 300px at 105% -30%, rgba(34, 211, 238, 0.2), transparent 60%),
+    linear-gradient(120deg, #0b1f4b 0%, #123a7c 70%, #0e2f68 100%);
 }
 
-.stat-card:hover {
-  transform: translateY(-10px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-}
-
-.stat-card.blue { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3); }
-.stat-card.purple { background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%); box-shadow: 0 10px 25px rgba(168, 85, 247, 0.3); }
-.stat-card.green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); }
-.stat-card.orange { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3); }
-
-.card-content {
-  position: relative;
-  z-index: 2;
+.hero-left {
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  justify-content: center;
+  padding-right: 40px;
+  border-right: 1px solid rgba(122, 190, 255, 0.18);
 }
 
-.card-title {
-  font-size: 15px;
-  opacity: 0.9;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+.hero-caption {
+  font-family: 'SF Mono', 'Consolas', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: rgba(148, 208, 255, 0.55);
+  margin-bottom: 6px;
 }
 
-.card-value {
-  font-size: 36px;
+.hero-title {
+  font-size: 24px;
   font-weight: 800;
-  letter-spacing: -1px;
+  letter-spacing: 2px;
 }
 
-.card-subtext {
-  margin-top: 12px;
-  font-size: 13px;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(4px);
-  padding: 4px 12px;
-  border-radius: 20px;
-  width: fit-content;
-  font-weight: 500;
+.hero-date {
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgba(214, 236, 255, 0.6);
 }
 
-.online-text {
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.card-icon {
-  font-size: 56px;
-  opacity: 0.25;
-  position: relative;
-  z-index: 2;
-  transition: all 0.3s ease;
-}
-
-.stat-card:hover .card-icon {
-  transform: scale(1.2) rotate(10deg);
-  opacity: 0.5;
-}
-
-.card-bg-icon {
-  position: absolute;
-  right: -30px;
-  bottom: -30px;
-  font-size: 160px;
-  opacity: 0.12;
-  transform: rotate(-15deg);
-  z-index: 1;
-}
-
-/* 图表布局 */
-.chart-row {
-  margin-bottom: 0;
-}
-
-.glass-card {
-  background: rgba(255, 255, 255, 0.9) !important;
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-}
-
-.chart-card {
-  height: 450px;
-}
-
-:deep(.el-card__header) {
-  padding: 24px 28px;
-  border-bottom: 1px solid #f1f5f9;
-  background: #fff;
-}
-
-.header-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #1e293b;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.chart-container {
-  height: 340px;
-  width: 100%;
-  padding: 10px;
-}
-
-/* 下部功能区 */
-.bottom-row {
-  margin-bottom: 0;
-}
-
-.quick-actions {
+.hero-metrics {
+  flex: 1;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
-  padding: 10px;
+  align-items: center;
 }
 
-.action-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.metric-label {
+  font-size: 13px;
+  color: rgba(174, 216, 255, 0.7);
+  margin-bottom: 6px;
+}
+
+.metric-value {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-sub {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #4dd6f0;
+}
+
+/* ── 面板通用 ───────────────────────────── */
+.panel-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
   gap: 16px;
-  cursor: pointer;
-  padding: 24px 16px;
-  border-radius: 20px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.action-item:hover {
-  background: #fff;
-  transform: translateY(-8px);
-  box-shadow: 0 15px 30px rgba(99, 102, 241, 0.1);
-  border-color: #6366f1;
+.panel {
+  background: #ffffff;
+  border: 1px solid #e3e9f2;
+  border-radius: 14px;
+  padding: 20px 22px;
 }
 
-.action-icon {
-  width: 72px;
-  height: 72px;
-  border-radius: 22px;
+.panel-head {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  transition: all 0.3s;
+  justify-content: space-between;
+  margin-bottom: 14px;
 }
 
-.action-item:hover .action-icon {
-  transform: scale(1.1);
-}
-
-.action-icon.user { background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); color: #4338ca; }
-.action-icon.device { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); color: #15803d; }
-.action-icon.earnings { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #b45309; }
-.action-icon.settings { background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); color: #475569; }
-
-.action-item span {
+.panel-title {
   font-size: 15px;
   font-weight: 700;
-  color: #334155;
+  color: #12294f;
+  padding-left: 10px;
+  border-left: 3px solid #22d3ee;
+  line-height: 1.2;
 }
 
-/* 服务状态卡片 */
-.status-item {
+/* 趋势图 */
+.chart-container {
+  height: 320px;
+  width: 100%;
+}
+
+/* 设备状态 */
+.dist-chart {
+  height: 70px;
+  width: 100%;
+}
+
+.dist-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dist-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #51637f;
+  padding: 10px 14px;
+  background: #f7fafd;
+  border-radius: 8px;
+}
+
+.dist-list b {
+  margin-left: auto;
+  color: #12294f;
+  font-size: 15px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.dot.online { background: #14b8a6; }
+.dot.offline { background: #c3ceda; }
+.dot.unbound { background: #f59e0b; }
+
+/* 运营入口：清单式 */
+.nav-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border: 1px solid #e3e9f2;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.nav-item:hover {
+  border-color: #0e7bd4;
+  background: #f4faff;
+}
+
+.nav-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #12294f;
+}
+
+.nav-desc {
+  margin-top: 3px;
+  font-size: 12px;
+  color: #8296b3;
+}
+
+.nav-arrow {
+  color: #0e7bd4;
+  font-size: 16px;
+}
+
+/* 服务状态 */
+.status-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.status-line {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  background: #f8fafc;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-}
-
-.status-item .label {
-  color: #64748b;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.status-item .value {
-  color: #1e293b;
-  font-weight: 700;
+  padding: 12px 14px;
+  background: #f7fafd;
+  border-radius: 8px;
   font-size: 14px;
 }
 
-.refresh-btn {
-  margin-top: 16px;
-  height: 52px;
-  border-radius: 16px;
+.status-line .k { color: #51637f; }
+.status-line .v { color: #12294f; font-weight: 700; font-variant-numeric: tabular-nums; }
+.status-line .v.ok { color: #14b8a6; }
+.status-line .v.bad { color: #ef4444; }
+
+.sync-btn {
+  margin-top: 6px;
+  height: 42px;
+  border-radius: 8px;
   font-weight: 700;
-  font-size: 15px;
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   border: none;
-  box-shadow: 0 8px 16px rgba(99, 102, 241, 0.2);
-  transition: all 0.3s;
+  color: #fff;
+  background: linear-gradient(90deg, #123a7c 0%, #0e7bd4 100%);
 }
 
-.refresh-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(99, 102, 241, 0.4);
+.sync-btn:hover {
+  opacity: 0.92;
+  color: #fff;
 }
 
-/* 底部缓冲 Padding */
-.statistics-page {
-  padding-bottom: 80px;
+/* 窄屏降级 */
+@media (max-width: 1200px) {
+  .hero-band { flex-direction: column; gap: 20px; }
+  .hero-left { border-right: none; padding-right: 0; }
+  .hero-metrics { grid-template-columns: repeat(2, 1fr); }
+  .panel-row { grid-template-columns: 1fr; }
 }
 </style>

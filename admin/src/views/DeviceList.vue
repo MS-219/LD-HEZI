@@ -164,7 +164,6 @@
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="unbind">批量解绑</el-dropdown-item>
-                  <el-dropdown-item command="release">批量退回商户</el-dropdown-item>
                   <el-dropdown-item command="delete" divided>批量删除</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
@@ -204,15 +203,6 @@
               <el-tag :type="row.status === 1 ? 'success' : 'info'" effect="dark" round>
                 {{ row.status === 1 ? '在线' : '离线' }}
               </el-tag>
-              <el-tag v-if="row.merchantId" type="primary" size="small" style="margin-left: 4px;">商户设备</el-tag>
-              <el-tag
-                v-if="row.merchantId"
-                :type="row.userId ? 'success' : 'warning'"
-                size="small"
-                style="margin-left: 4px;"
-              >
-                {{ row.userId ? '已分配' : '未分配' }}
-              </el-tag>
             </template>
           </el-table-column>
           <el-table-column label="设备类型" width="105">
@@ -224,14 +214,7 @@
           </el-table-column>
           <el-table-column label="归属主体" width="190">
             <template #default="{ row }">
-              <div class="merchant-info-cell" v-if="row.merchantId">
-                <div class="merchant-badge">商</div>
-                <div class="merchant-detail">
-                  <div class="merchant-name">{{ row.merchantName || '接口商户' }}</div>
-                  <div class="merchant-id">商户ID: {{ row.merchantId }}</div>
-                </div>
-              </div>
-              <div class="user-info-cell" v-else-if="row.userId">
+              <div class="user-info-cell" v-if="row.userId">
                 <el-avatar :size="28" :src="row.avatarUrl || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" />
                 <div class="user-detail">
                   <div class="user-name">{{ row.nickname || '未知用户' }}</div>
@@ -257,9 +240,8 @@
               <el-button size="small" @click="viewDevice(row)">详情</el-button>
               <el-button size="small" type="primary" plain @click="openTerminal(row)">远程终端</el-button>
               <el-button size="small" type="primary" @click="editDevice(row)">编辑</el-button>
-              <el-button size="small" type="danger" v-if="row.userId && !row.merchantId" @click="unbindDevice(row)">解绑</el-button>
-              <el-button size="small" type="warning" v-if="row.merchantId" @click="releaseMerchantDevice(row)">退回商户</el-button>
-              <el-button size="small" type="danger" v-if="!row.userId && !row.merchantId" @click="deleteDevice(row)">删除</el-button>
+              <el-button size="small" type="danger" v-if="row.userId" @click="unbindDevice(row)">解绑</el-button>
+              <el-button size="small" type="danger" v-if="!row.userId" @click="deleteDevice(row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -309,8 +291,8 @@
           <div class="info-card">
             <div class="card-icon">👤</div>
             <div class="card-data">
-              <span class="card-value">{{ currentDevice.merchantId ? (currentDevice.merchantName || '接口商户') : (currentDevice.userId || '未绑定') }}</span>
-              <span class="card-label">{{ currentDevice.merchantId ? '所属商户' : '绑定用户ID' }}</span>
+              <span class="card-value">{{ currentDevice.userId || '未绑定' }}</span>
+              <span class="card-label">绑定用户ID</span>
             </div>
           </div>
           <div class="info-card">
@@ -778,19 +760,15 @@ const handleBatchCommand = (command) => {
     batchUnbindDevices()
     return
   }
-  if (command === 'release') {
-    batchReleaseMerchantDevices()
-    return
-  }
   if (command === 'delete') {
     batchDeleteDevices()
   }
 }
 
 const batchUnbindDevices = async () => {
-  const targets = selectedDevices.value.filter(device => device.userId && !device.merchantId)
+  const targets = selectedDevices.value.filter(device => device.userId)
   if (targets.length === 0) {
-    ElMessage.warning('请选择已绑定用户且不属于商户的设备')
+    ElMessage.warning('请选择已绑定用户的设备')
     return
   }
 
@@ -820,43 +798,10 @@ const batchUnbindDevices = async () => {
   }
 }
 
-const batchReleaseMerchantDevices = async () => {
-  const targets = selectedDevices.value.filter(device => device.merchantId)
-  if (targets.length === 0) {
-    ElMessage.warning('请选择商户设备')
-    return
-  }
-
-  try {
-    await ElMessageBox.confirm(
-      `确定批量退回 ${targets.length} 台商户设备吗？退回后会清除商户归属和当前用户绑定。`,
-      '批量退回商户',
-      {
-        confirmButtonText: '确认退回',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
-    )
-
-    const res = await axios.post('/api/device/batch-release-merchant', {
-      ids: targets.map(device => device.id)
-    })
-    if (res.data.code === 200) {
-      ElMessage.success(res.data.data || '批量退回成功')
-      clearDeviceSelection()
-      fetchDevices()
-    } else {
-      ElMessage.error(res.data.msg || '批量退回失败')
-    }
-  } catch (e) {
-    if (e !== 'cancel') ElMessage.error('操作失败')
-  }
-}
-
 const batchDeleteDevices = async () => {
-  const targets = selectedDevices.value.filter(device => !device.userId && !device.merchantId)
+  const targets = selectedDevices.value.filter(device => !device.userId)
   if (targets.length === 0) {
-    ElMessage.warning('请选择未绑定且不属于商户的设备')
+    ElMessage.warning('请选择未绑定的设备')
     return
   }
 
@@ -1104,33 +1049,6 @@ const unbindDevice = async (row) => {
       fetchDevices()
     } else {
       ElMessage.error(res.data.msg || '解绑失败')
-    }
-  } catch (e) {
-    if (e !== 'cancel') ElMessage.error('操作失败')
-  }
-}
-
-// 退回商户设备
-const releaseMerchantDevice = async (row) => {
-  const deviceCode = row.bindCode || row.sn
-  const merchantName = row.merchantName || `商户ID ${row.merchantId}`
-  try {
-    await ElMessageBox.confirm(
-      `确定将设备 ${deviceCode} 从 ${merchantName} 退回吗？退回后会清除商户归属和当前用户绑定，设备可被其他用户或商户重新绑定。`,
-      '退回商户设备',
-      {
-        type: 'warning',
-        confirmButtonText: '确认退回',
-        cancelButtonText: '取消'
-      }
-    )
-
-    const res = await axios.post('/api/device/release-merchant', { id: row.id })
-    if (res.data.code === 200) {
-      ElMessage.success(res.data.data || '设备已退回')
-      fetchDevices()
-    } else {
-      ElMessage.error(res.data.msg || '退回失败')
     }
   } catch (e) {
     if (e !== 'cancel') ElMessage.error('操作失败')
@@ -1627,48 +1545,6 @@ onMounted(() => {
 .user-id {
   font-size: 11px;
   color: #7c3aed;
-  font-weight: 500;
-}
-
-.merchant-info-cell {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 10px;
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  border-radius: 8px;
-  border: 1px solid #bfdbfe;
-}
-
-.merchant-badge {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  flex-shrink: 0;
-}
-
-.merchant-detail {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.3;
-}
-
-.merchant-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #1e3a8a;
-}
-
-.merchant-id {
-  font-size: 11px;
-  color: #2563eb;
   font-weight: 500;
 }
 

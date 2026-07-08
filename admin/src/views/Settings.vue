@@ -153,54 +153,9 @@
         </el-card>
       </el-col>
 
-      <!-- AI功能收费 -->
       <el-col :span="12" style="margin-top: 24px;">
-        <el-card class="setting-card">
-          <template #header>
-            <span class="card-title">🤖 AI功能收费标准</span>
-          </template>
-          <el-form :model="aiPricingSettings" label-width="140px">
-            <el-form-item label="图片生成">
-              <el-input-number v-model="aiPricingSettings.imageGenCost" :min="1" :precision="0" :step="1" />
-              <span class="unit">算力值/次</span>
-            </el-form-item>
-            <el-form-item label="图生视频">
-              <el-input-number v-model="aiPricingSettings.imageToVideoCost" :min="1" :precision="0" :step="10" />
-              <span class="unit">算力值/次</span>
-            </el-form-item>
-            <el-form-item label="视频生成">
-              <el-input-number v-model="aiPricingSettings.videoGenCost" :min="0" :precision="0" :step="10" />
-              <span class="unit">基础算力/次</span>
-              <div class="hint">视频生成的基础消耗</div>
-            </el-form-item>
-            <el-form-item label="4秒额外消耗">
-              <el-input-number v-model="aiPricingSettings.videoExtra4s" :min="0" :precision="0" :step="5" />
-              <span class="unit">算力值</span>
-            </el-form-item>
-            <el-form-item label="10秒额外消耗">
-              <el-input-number v-model="aiPricingSettings.videoExtra10s" :min="0" :precision="0" :step="5" />
-              <span class="unit">算力值</span>
-            </el-form-item>
-            <el-form-item label="15秒额外消耗">
-              <el-input-number v-model="aiPricingSettings.videoExtra15s" :min="0" :precision="0" :step="10" />
-              <span class="unit">算力值</span>
-            </el-form-item>
-            <el-form-item label="25秒额外消耗">
-              <el-input-number v-model="aiPricingSettings.videoExtra25s" :min="0" :precision="0" :step="20" />
-              <span class="unit">算力值</span>
-            </el-form-item>
-            <el-form-item label="AI对话">
-              <el-input-number v-model="aiPricingSettings.chatCost" :min="0" :precision="0" :step="1" />
-              <span class="unit">算力值/次</span>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="saveAiPricingSettings">保存设置</el-button>
-            </el-form-item>
-          </el-form>
-        </el-card>
-
         <!-- 轮播图设置 -->
-        <el-card class="setting-card" style="margin-top: 24px;">
+        <el-card class="setting-card">
           <template #header>
             <div class="card-header-flex">
               <span class="card-title">🖼️ 首页轮播图</span>
@@ -288,17 +243,6 @@ const inviteLevels = reactive([
   { index: 5, name: '核心合伙人', threshold: 500, ratePercent: 50 }
 ])
 
-const aiPricingSettings = reactive({
-  imageGenCost: 2,
-  imageToVideoCost: 10,
-  videoGenCost: 10,
-  videoExtra4s: 0,
-  videoExtra10s: 5,
-  videoExtra15s: 10,
-  videoExtra25s: 20,
-  chatCost: 1
-})
-
 const deviceSettings = reactive({
   heartbeatTimeout: 120,
   offlineThreshold: 120,
@@ -343,10 +287,6 @@ const loadSettings = async () => {
       // 收益设置
       if (data.earnings) {
         Object.assign(earningsSettings, data.earnings)
-      }
-      // AI功能收费
-      if (data.aiPricing) {
-        Object.assign(aiPricingSettings, data.aiPricing)
       }
       // 设备设置
       if (data.device) {
@@ -423,19 +363,6 @@ const saveSystemSettings = async () => {
     const res = await axios.post('/api/settings/system', systemSettings)
     if (res.data.code === 200) {
       ElMessage.success('系统设置已保存')
-    } else {
-      ElMessage.error(res.data.msg || '保存失败')
-    }
-  } catch (e) {
-    ElMessage.error('保存失败')
-  }
-}
-
-const saveAiPricingSettings = async () => {
-  try {
-    const res = await axios.post('/api/settings/ai-pricing', aiPricingSettings)
-    if (res.data.code === 200) {
-      ElMessage.success('AI功能收费标准已保存')
     } else {
       ElMessage.error(res.data.msg || '保存失败')
     }
