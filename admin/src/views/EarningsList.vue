@@ -617,9 +617,9 @@ onMounted(() => {
   align-items: center;
   gap: 10px;
   padding: 4px 8px;
-  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  background: linear-gradient(135deg, #f4f9ff 0%, #e7f2fb 100%);
   border-radius: 8px;
-  border: 1px solid #e9d5ff;
+  border: 1px solid #cfe4f6;
 }
 
 .user-detail {
@@ -674,7 +674,7 @@ onMounted(() => {
 }
 
 :deep(.el-table__row:hover) {
-  background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 100%) !important;
+  background: #f0f7ff !important;
 }
 
 :deep(.el-tag--success) {
@@ -694,7 +694,7 @@ code {
   font-family: 'SF Mono', 'Monaco', monospace;
   font-size: 12px;
   color: #0b62aa;
-  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+  background: #eaf3fc;
   padding: 2px 6px;
   border-radius: 4px;
 }

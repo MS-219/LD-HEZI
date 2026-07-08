@@ -649,7 +649,7 @@ onMounted(async () => {
 
 .banner-img-preview:hover {
   border-color: #0e7bd4;
-  background: #f5f3ff;
+  background: #eef5fc;
 }
 
 .preview-img {

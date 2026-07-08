@@ -888,8 +888,8 @@ onMounted(() => {
 }
 
 .stat-card.quota {
-  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
-  border-color: #c4b5fd;
+  background: linear-gradient(135deg, #e7f2fb 0%, #cfe4f6 100%);
+  border-color: #b7d7f2;
 }
 
 .stat-icon {
@@ -965,9 +965,9 @@ onMounted(() => {
   align-items: center;
   gap: 8px;
   padding: 4px 8px;
-  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  background: linear-gradient(135deg, #f4f9ff 0%, #e7f2fb 100%);
   border-radius: 6px;
-  border: 1px solid #e9d5ff;
+  border: 1px solid #cfe4f6;
 }
 
 .user-name {
@@ -1020,7 +1020,7 @@ onMounted(() => {
 }
 
 :deep(.el-table__row:hover) {
-  background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 100%) !important;
+  background: #f0f7ff !important;
 }
 
 /* 详情弹窗样式 */
@@ -1033,7 +1033,7 @@ onMounted(() => {
   align-items: center;
   gap: 24px;
   padding: 20px;
-  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+  background: #eaf3fc;
   border-radius: 12px;
   margin-bottom: 20px;
 }
@@ -1109,10 +1109,10 @@ onMounted(() => {
   font-family: 'SF Mono', 'Monaco', monospace;
   font-size: 12px;
   color: #0b62aa;
-  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+  background: #eaf3fc;
   padding: 3px 8px;
   border-radius: 4px;
-  border: 1px solid #c4b5fd;
+  border: 1px solid #b7d7f2;
 }
 
 .device-earnings {
@@ -1124,7 +1124,7 @@ code {
   font-family: 'SF Mono', 'Monaco', monospace;
   font-size: 12px;
   color: #0b62aa;
-  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+  background: #eaf3fc;
   padding: 3px 8px;
   border-radius: 4px;
 }
@@ -1262,7 +1262,7 @@ code {
   margin-top: 8px;
   text-align: center;
   color: #0e7bd4;
-  background: #f5f3ff;
+  background: #eef5fc;
   padding: 4px;
   border-radius: 4px;
   font-size: 12px;

@@ -1291,7 +1291,7 @@ const exportQrCodes = async () => {
       border: none; border-radius: 5px; cursor: pointer; 
       z-index: 100;
     }
-    .print-btn:hover { background: #6d28d9; }
+    .print-btn:hover { background: #0b62aa; }
     .summary { display: flex; gap: 20px; justify-content: center; margin-top: 10px; }
     .summary-item { padding: 5px 15px; border-radius: 20px; font-size: 14px; }
     .summary-item.bound { background: #d1fae5; color: #059669; }
@@ -1525,9 +1525,9 @@ onMounted(() => {
   align-items: center;
   gap: 10px;
   padding: 6px 10px;
-  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+  background: linear-gradient(135deg, #f4f9ff 0%, #e7f2fb 100%);
   border-radius: 8px;
-  border: 1px solid #e9d5ff;
+  border: 1px solid #cfe4f6;
 }
 
 .user-detail {
@@ -1554,7 +1554,7 @@ onMounted(() => {
 }
 
 :deep(.el-table__row:hover) {
-  background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 100%) !important;
+  background: #f0f7ff !important;
 }
 
 /* 状态标签样式增强 */
@@ -1737,7 +1737,7 @@ onMounted(() => {
   max-width: 100%;
   font-size: 17px;
   font-weight: 700;
-  color: #4c1d95;
+  color: #0f2a5c;
   word-break: break-all;
 }
 
@@ -1797,7 +1797,7 @@ onMounted(() => {
   font-family: 'SF Mono', 'Monaco', monospace;
   font-size: 13px;
   color: #0b62aa;
-  background: #f5f3ff;
+  background: #eef5fc;
   padding: 2px 8px;
   border-radius: 4px;
 }
