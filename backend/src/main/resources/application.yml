@@ -4,9 +4,9 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/juxinsuanli?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false}
-    username: ${SPRING_DATASOURCE_USERNAME:juxinsuanli}
-    password: ${SPRING_DATASOURCE_PASSWORD:juxinsuanli}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/ldhezi?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${SPRING_DATASOURCE_USERNAME:ldhezi}
+    password: ${SPRING_DATASOURCE_PASSWORD:ldhezi}
     hikari:
       maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:80}
       minimum-idle: ${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE:10}

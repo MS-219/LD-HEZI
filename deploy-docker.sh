@@ -95,9 +95,9 @@ start_backend() {
         -e TZ=Asia/Shanghai \
         -e SERVER_PORT="${SERVER_PORT:-8080}" \
         -e JAVA_OPTS="${JAVA_OPTS:-}" \
-        -e SPRING_DATASOURCE_URL="${SPRING_DATASOURCE_URL:-jdbc:mysql://127.0.0.1:3307/juxinsuanli?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false}" \
-        -e SPRING_DATASOURCE_USERNAME="${SPRING_DATASOURCE_USERNAME:-juxinsuanli}" \
-        -e SPRING_DATASOURCE_PASSWORD="${SPRING_DATASOURCE_PASSWORD:-juxinsuanli}" \
+        -e SPRING_DATASOURCE_URL="${SPRING_DATASOURCE_URL:-jdbc:mysql://127.0.0.1:3307/ldhezi?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false}" \
+        -e SPRING_DATASOURCE_USERNAME="${SPRING_DATASOURCE_USERNAME:-ldhezi}" \
+        -e SPRING_DATASOURCE_PASSWORD="${SPRING_DATASOURCE_PASSWORD:-ldhezi}" \
         -e SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE="${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:-80}" \
         -e SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE="${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE:-10}" \
         -e SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT="${SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT:-10000}" \
