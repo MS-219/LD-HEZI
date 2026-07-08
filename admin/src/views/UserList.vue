@@ -1014,19 +1014,6 @@ onMounted(() => {
   border-top: 1px solid #e2e8f0;
 }
 
-/* 表格头部样式 */
-:deep(.el-table__header-wrapper th) {
-  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%) !important;
-  color: #4c1d95 !important;
-  font-weight: 600;
-  font-size: 13px;
-  border-bottom: 2px solid #a78bfa !important;
-}
-
-:deep(.el-table__header-wrapper .cell) {
-  color: #4c1d95 !important;
-}
-
 /* 表格行hover */
 :deep(.el-table__row) {
   transition: all 0.2s ease;

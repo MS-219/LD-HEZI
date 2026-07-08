@@ -1557,19 +1557,6 @@ onMounted(() => {
   background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 100%) !important;
 }
 
-/* 表格头部样式 - 柔和的浅紫色 */
-:deep(.el-table__header-wrapper th) {
-  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%) !important;
-  color: #4c1d95 !important;
-  font-weight: 600;
-  font-size: 13px;
-  border-bottom: 2px solid #a78bfa !important;
-}
-
-:deep(.el-table__header-wrapper .cell) {
-  color: #4c1d95 !important;
-}
-
 /* 状态标签样式增强 */
 :deep(.el-tag--success) {
   background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);

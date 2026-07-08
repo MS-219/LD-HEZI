@@ -669,14 +669,6 @@ onMounted(() => {
   font-weight: 700;
 }
 
-:deep(.el-table__header-wrapper th) {
-  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%) !important;
-  color: #4c1d95 !important;
-  font-weight: 600;
-  font-size: 13px;
-  border-bottom: 2px solid #a78bfa !important;
-}
-
 :deep(.el-table__row) {
   transition: all 0.2s ease;
 }

@@ -126,9 +126,20 @@
 
 .el-table th.el-table__cell {
   background: var(--qq-navy) !important;
-  color: #d8e6f8 !important;
+  color: #ffffff !important;
   font-weight: 600;
   letter-spacing: 0.5px;
+  border-bottom: none !important;
+}
+
+.el-table th.el-table__cell .cell {
+  color: #ffffff !important;
+}
+
+/* 表头里的全选框 */
+.el-table th.el-table__cell .el-checkbox__inner {
+  background: transparent;
+  border-color: #8fb2dd;
 }
 
 .el-table .el-table__row:hover {
