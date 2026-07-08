@@ -69,7 +69,7 @@
     <view class="wallet-card" wx:if="{{isLoggedIn}}">
         <view class="wallet-header">
             <view class="wallet-title-wrap">
-                <view class="wallet-title-icon">¥</view>
+                <view class="wallet-title-icon">U</view>
                 <text class="wallet-title">我的钱包</text>
             </view>
             <view class="wallet-detail" bindtap="onWalletDetail">
@@ -81,13 +81,13 @@
             <!-- 第一层：双列金额 -->
             <view class="wallet-row-top">
                 <view class="wallet-item-mini" bindtap="onWithdraw">
-                    <text class="mini-label">可提现余额 (元)</text>
-                    <text class="mini-value">¥{{walletInfo.balance}}</text>
+                    <text class="mini-label">可提现余额 (U)</text>
+                    <text class="mini-value">{{walletInfo.balance}} U</text>
                 </view>
                 <view class="item-divider-v"></view>
                 <view class="wallet-item-mini">
-                    <text class="mini-label">累计收益 (元)</text>
-                    <text class="mini-value">¥{{walletInfo.totalEarnings}}</text>
+                    <text class="mini-label">累计收益 (U)</text>
+                    <text class="mini-value">{{walletInfo.totalEarnings}} U</text>
                 </view>
             </view>
             <!-- 第二层：独立宽屏算力值 -->

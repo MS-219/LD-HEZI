@@ -951,7 +951,7 @@ const initChart = async () => {
         title: { text: '近7天收益收益趋势' },
         tooltip: { trigger: 'axis' },
         xAxis: { type: 'category', data: data.dates },
-        yAxis: { type: 'value', name: '收益 (元)' },
+        yAxis: { type: 'value', name: '收益 (U)' },
         series: [{
           data: data.earnings,
           type: 'line',

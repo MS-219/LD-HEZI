@@ -20,7 +20,7 @@
                 <text class="record-time">{{item.createTime}}</text>
             </view>
             <view class="record-right">
-                <text class="record-amount">-¥{{item.amount}}</text>
+                <text class="record-amount">-{{item.amount}} U</text>
                 <view class="record-status {{item.status === 0 ? 'pending' : item.status === 1 ? 'approved' : item.status === 2 ? 'rejected' : item.status === 4 ? 'failed' : 'paid'}}">
                     {{item.status === 0 ? '审核中' : item.status === 1 ? '待打款' : item.status === 2 ? '已拒绝' : item.status === 4 ? '打款失败' : '已到账'}}
                 </view>

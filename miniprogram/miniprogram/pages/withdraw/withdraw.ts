@@ -339,7 +339,7 @@ Page({
 
         // 表单验证
         if (amount < 10) {
-            wx.showToast({ title: '最低提现金额为10元', icon: 'none' });
+            wx.showToast({ title: '最低提现金额为10U', icon: 'none' });
             return;
         }
 

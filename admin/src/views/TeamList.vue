@@ -102,7 +102,7 @@
         </el-table-column>
         <el-table-column prop="balance" label="余额" width="100">
           <template #default="{ row }">
-            ¥{{ row.balance || '0.00' }}
+            {{ row.balance || '0.00'}} U
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="注册时间" width="170">

@@ -24,7 +24,7 @@
         <div class="stat-card balance">
           <div class="stat-icon">💰</div>
           <div class="stat-info">
-            <div class="stat-value">¥{{ stats.totalBalance || '0.00' }}</div>
+            <div class="stat-value">{{ stats.totalBalance || '0.00'}} U</div>
             <div class="stat-label">总余额</div>
           </div>
         </div>
@@ -107,7 +107,7 @@
         </el-table-column>
         <el-table-column label="余额" width="100">
           <template #default="{ row }">
-            <span class="balance">¥{{ row.balance || '0.00' }}</span>
+            <span class="balance">{{ row.balance || '0.00'}} U</span>
           </template>
         </el-table-column>
         <el-table-column label="算力值" width="90">
@@ -211,7 +211,7 @@
           </div>
           <div class="header-stats">
             <div class="stat-item">
-              <div class="stat-num balance">¥{{ currentUser.balance || '0.00' }}</div>
+              <div class="stat-num balance">{{ currentUser.balance || '0.00'}} U</div>
               <div class="stat-text">余额</div>
             </div>
             <div class="stat-item">
@@ -219,7 +219,7 @@
               <div class="stat-text">算力值</div>
             </div>
             <div class="stat-item">
-              <div class="stat-num">¥{{ currentUser.totalEarnings || '0.00' }}</div>
+              <div class="stat-num">{{ currentUser.totalEarnings || '0.00'}} U</div>
               <div class="stat-text">总收益</div>
             </div>
           </div>
@@ -271,7 +271,7 @@
             </el-table-column>
             <el-table-column label="设备收益" width="120">
               <template #default="{ row }">
-                <span class="device-earnings">¥{{ row.earnings || '0.00' }}</span>
+                <span class="device-earnings">{{ row.earnings || '0.00'}} U</span>
               </template>
             </el-table-column>
             <el-table-column prop="lastHeartbeatTime" label="最后心跳">
@@ -357,7 +357,7 @@
               <el-col :span="12">
                 <el-form-item label="账户余额">
                   <el-input-number v-model="editForm.balance" :precision="2" :min="0" :max="999999" style="width: 100%" disabled />
-                  <div class="unit-text">元</div>
+                  <div class="unit-text">U</div>
                 </el-form-item>
               </el-col>
               <el-col :span="12">

@@ -224,7 +224,7 @@ export default function DeviceScreen() {
             </Pressable>
             <Text style={styles.deviceMeta}>绑定日期：{item.bindDate}</Text>
             <Text style={styles.deviceMeta}>
-              今日收益：<Text style={styles.earning}>¥{item.earnings}</Text>
+              今日收益：<Text style={styles.earning}>{item.earnings} U</Text>
             </Text>
             <View style={styles.actions}>
               <Button

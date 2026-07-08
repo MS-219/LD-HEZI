@@ -11,9 +11,9 @@ CREATE TABLE IF NOT EXISTS `system_config` (
 
 -- 插入默认配置
 INSERT INTO `system_config` (`config_key`, `config_value`, `description`) VALUES
-('earnings.hourlyRate', '2.4', '每小时收益（元）'),
-('earnings.hashratePerYuan', '100', '算力兑换比例（多少算力值=1元）'),
-('earnings.minWithdraw', '10', '最低提现金额（元）'),
+('earnings.hourlyRate', '2.4', '每小时收益（U）'),
+('earnings.hashratePerYuan', '100', '算力兑换比例（多少算力值=1U）'),
+('earnings.minWithdraw', '10', '最低提现金额（U）'),
 ('earnings.withdrawFee', '1', '提现手续费（%）'),
 ('ai.imageGenCost', '10', '图片生成消耗算力值'),
 ('ai.imageToVideoCost', '100', '图生视频消耗算力值'),

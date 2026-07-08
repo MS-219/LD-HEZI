@@ -77,7 +77,7 @@ export default function WithdrawRecordScreen() {
           return (
             <Card>
               <View style={styles.row}>
-                <Text style={styles.amount}>¥{item.amount}</Text>
+                <Text style={styles.amount}>{item.amount} U</Text>
                 <Badge text={status.text} color={status.color} />
               </View>
               <Text style={styles.meta}>方式：{typeNames[item.type] || '--'}</Text>

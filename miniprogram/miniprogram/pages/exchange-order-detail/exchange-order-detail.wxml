@@ -80,7 +80,7 @@
         </view>
         <view class="info-row">
             <text class="info-label">等值金额</text>
-            <text class="info-value">¥{{order.totalPrice}}</text>
+            <text class="info-value">{{order.totalPrice}} U</text>
         </view>
         <view class="info-row">
             <text class="info-label">下单时间</text>

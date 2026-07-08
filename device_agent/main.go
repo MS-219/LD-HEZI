@@ -179,23 +179,25 @@ func generateBindCode(sn string) string {
 
 func drawUI() {
 	fmt.Print("\033[H\033[J")
-	fmt.Println("\033[1;33m================= [ LD-AI DEVICE AGENT V3.1 ] =================\033[0m")
+	fmt.Println("\033[1;36m---------------------- HEZI NODE CONSOLE / V3.1 ----------------------\033[0m")
 	fmt.Println()
-	fmt.Printf("  DEVICE SN:      \033[1;32m%s\033[0m\n", deviceSN)
-	fmt.Printf("  BINDING CODE:   \033[1;35m%s\033[0m\n", bindCode)
-	fmt.Printf("  LOCAL NETWORK:  \033[1;34m%s\033[0m\n", deviceIP)
+	fmt.Println("\033[1;30mNODE IDENTITY\033[0m")
+	fmt.Printf("  serial     \033[1;37m%s\033[0m\n", deviceSN)
+	fmt.Printf("  pair key   \033[1;35m%s\033[0m\n", bindCode)
+	fmt.Printf("  network    \033[1;34m%s\033[0m\n", deviceIP)
 
-	statusStr := "\033[1;32m[ONLINE / OK]\033[0m"
+	statusStr := "\033[1;32mONLINE\033[0m"
 	if !isOnline {
-		statusStr = fmt.Sprintf("\033[1;31m[OFFLINE: %s]\033[0m", lastErr)
+		statusStr = fmt.Sprintf("\033[1;31mOFFLINE\033[0m  %s", lastErr)
 	}
-	fmt.Printf("  SYSTEM STATUS:  %s\n", statusStr)
 	fmt.Println()
-	fmt.Println("\033[1;37m  Please enter BINDING CODE in Mini-Program to activate device.\033[0m")
+	fmt.Println("\033[1;30mCONTROL LINK\033[0m")
+	fmt.Printf("  state      %s\n", statusStr)
+	fmt.Println("  action     enter pair key in the client app")
 	fmt.Println()
-	fmt.Println("\033[1;36m---------------------- [ REAL-TIME SYSTEM LOGS ] ----------------------\033[0m")
+	fmt.Println("\033[1;30m--------------------------- EVENT STREAM ---------------------------\033[0m")
 	for _, log := range logBuffer {
-		fmt.Println(" " + log)
+		fmt.Println("\033[1;32m  >\033[0m " + log)
 	}
 }
 

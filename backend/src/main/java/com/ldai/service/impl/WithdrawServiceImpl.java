@@ -42,7 +42,7 @@ public class WithdrawServiceImpl extends ServiceImpl<WithdrawMapper, Withdraw> i
 
         // 校验最低提现金额
         if (amount.compareTo(minWithdraw) < 0) {
-            return "最低提现金额为 " + minWithdraw + " 元";
+            return "最低提现金额为 " + minWithdraw + " U";
         }
 
         // 获取用户并校验余额

@@ -94,8 +94,8 @@ export default function DeviceDetailScreen() {
           <InfoRow label="绑定码" value={device.bindCode} />
           <InfoRow label="绑定时间" value={formatTime(device.bindTime)} />
           <InfoRow label="最后心跳" value={formatTime(device.lastHeartbeat)} />
-          <InfoRow label="今日收益" value={`¥${device.todayEarnings ?? device.earnings ?? '0.00'}`} valueColor={colors.orange} />
-          <InfoRow label="累计收益" value={`¥${device.totalEarnings ?? '0.00'}`} valueColor={colors.green} />
+          <InfoRow label="今日收益" value={`${device.todayEarnings ?? device.earnings ?? '0.00'} U`} valueColor={colors.orange} />
+          <InfoRow label="累计收益" value={`${device.totalEarnings ?? '0.00'} U`} valueColor={colors.green} />
           {!!device.sn && (
             <Button title="复制设备号" type="secondary" style={{ marginTop: 10 }} onPress={() => copyText(device.sn)} />
           )}

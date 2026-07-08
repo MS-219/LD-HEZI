@@ -34,13 +34,13 @@
             <span class="card-title">收益设置</span>
           </template>
           <el-form :model="earningsSettings" label-width="140px">
-            <el-form-item label="每小时收益 (￥)">
+            <el-form-item label="每小时收益 (U)">
               <el-input-number v-model="earningsSettings.hourlyRate" :min="0" :precision="2" :step="0.1" />
-              <span class="unit">元 / 小时</span>
+              <span class="unit">U / 小时</span>
             </el-form-item>
             <el-form-item label="最小提现额度">
               <el-input-number v-model="earningsSettings.minWithdraw" :min="1" :precision="0" />
-              <span class="unit">元</span>
+              <span class="unit">U</span>
             </el-form-item>
             <el-form-item label="提现手续费">
               <el-input-number v-model="earningsSettings.withdrawFee" :min="0" :max="100" :precision="1" :step="0.5" />
@@ -48,8 +48,8 @@
             </el-form-item>
             <el-form-item label="算力兑换比例">
               <el-input-number v-model="earningsSettings.hashratePerYuan" :min="1" :precision="0" :step="10" />
-              <span class="unit">算力值 = 1元</span>
-              <div class="hint">配置多少算力值兑换1元人民币</div>
+              <span class="unit">算力值 = 1U</span>
+              <div class="hint">配置多少算力值兑换1U</div>
             </el-form-item>
 
             <!-- 动态邀请等级设置 -->
@@ -232,7 +232,7 @@ const earningsSettings = reactive({
   hourlyRate: 2.4,
   minWithdraw: 10,
   withdrawFee: 1,
-  hashratePerYuan: 100  // 多少算力值=1元
+  hashratePerYuan: 100  // 多少算力值=1U
 })
 
 const inviteLevels = reactive([

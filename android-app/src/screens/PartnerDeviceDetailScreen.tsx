@@ -57,8 +57,8 @@ export default function PartnerDeviceDetailScreen() {
           <InfoRow label="归属人" value={device.ownerNickname} />
           <InfoRow label="绑定时间" value={formatTime(device.bindTime, 10)} />
           <InfoRow label="最后心跳" value={formatTime(device.lastHeartbeat)} />
-          <InfoRow label="今日收益" value={`¥${device.todayEarnings ?? '0.00'}`} valueColor={colors.orange} />
-          <InfoRow label="累计收益" value={`¥${device.totalEarnings ?? '0.00'}`} valueColor={colors.green} />
+          <InfoRow label="今日收益" value={`${device.todayEarnings ?? '0.00'} U`} valueColor={colors.orange} />
+          <InfoRow label="累计收益" value={`${device.totalEarnings ?? '0.00'} U`} valueColor={colors.green} />
         </Card>
       </ScrollView>
     </View>

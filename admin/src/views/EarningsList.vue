@@ -6,7 +6,7 @@
         <div class="stat-card income-total">
           <div class="stat-icon-wrapper">💰</div>
           <div class="stat-info">
-            <div class="stat-value">¥{{ stats.totalEarnings || '0.00' }}</div>
+            <div class="stat-value">{{ stats.totalEarnings || '0.00'}} U</div>
             <div class="stat-label">累计收益</div>
           </div>
         </div>
@@ -15,7 +15,7 @@
         <div class="stat-card income-today">
           <div class="stat-icon-wrapper">📅</div>
           <div class="stat-info">
-            <div class="stat-value">¥{{ stats.todayEarnings || '0.00' }}</div>
+            <div class="stat-value">{{ stats.todayEarnings || '0.00'}} U</div>
             <div class="stat-label">今日收益</div>
           </div>
         </div>
@@ -24,7 +24,7 @@
         <div class="stat-card income-month">
           <div class="stat-icon-wrapper">📈</div>
           <div class="stat-info">
-            <div class="stat-value">¥{{ stats.monthEarnings || '0.00' }}</div>
+            <div class="stat-value">{{ stats.monthEarnings || '0.00'}} U</div>
             <div class="stat-label">本月收益</div>
           </div>
         </div>
@@ -89,7 +89,7 @@
               <div class="result-label">生成记录数</div>
             </div>
             <div class="result-item">
-              <div class="result-value">¥{{ compensateResult.totalAmount }}</div>
+              <div class="result-value">{{ compensateResult.totalAmount}} U</div>
               <div class="result-label">补偿总金额</div>
             </div>
             <div class="result-item">
@@ -140,7 +140,7 @@
             </el-table-column>
             <el-table-column label="结算收益" width="120">
               <template #default="{ row }">
-                <span class="amount-text">¥{{ row.amount }}</span>
+                <span class="amount-text">{{ row.amount}} U</span>
               </template>
             </el-table-column>
             <el-table-column prop="createTime" label="结算时间" width="180">
@@ -187,7 +187,7 @@
             </el-table-column>
             <el-table-column prop="totalAmount" label="累计收益" width="150" sortable>
               <template #default="{ row }">
-                <span class="sum-amount">¥{{ Number(row.totalAmount || 0).toFixed(2) }}</span>
+                <span class="sum-amount">{{ Number(row.totalAmount || 0).toFixed(2)}} U</span>
               </template>
             </el-table-column>
             <el-table-column prop="recordCount" label="结算笔数" width="120" align="center" />
@@ -219,7 +219,7 @@
             <el-table-column prop="bindCode" label="绑定位" width="120" />
             <el-table-column prop="totalAmount" label="累计产出" width="150" sortable>
               <template #default="{ row }">
-                <span class="sum-amount">¥{{ Number(row.totalAmount || 0).toFixed(2) }}</span>
+                <span class="sum-amount">{{ Number(row.totalAmount || 0).toFixed(2)}} U</span>
               </template>
             </el-table-column>
             <el-table-column prop="recordCount" label="运行时长(h)" width="130" align="center" />
@@ -322,7 +322,7 @@
                 </el-col>
                 <el-col :span="6">
                   <div class="result-stat-item highlight">
-                    <div class="result-stat-value">¥{{ compensateResult.totalAmount }}</div>
+                    <div class="result-stat-value">{{ compensateResult.totalAmount}} U</div>
                     <div class="result-stat-label">补偿总金额</div>
                   </div>
                 </el-col>

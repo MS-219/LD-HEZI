@@ -8,7 +8,7 @@
     <!-- 收益概览 -->
     <view class="overview-card">
         <view class="overview-main">
-            <text class="overview-label">累计收益（元）</text>
+            <text class="overview-label">累计收益（U）</text>
             <text class="overview-amount">{{totalEarnings}}</text>
         </view>
         <view class="overview-stats">
@@ -67,7 +67,7 @@
                     {{subFilter === 'device' ? item.deviceCount : item.rewardDeviceCount}}
                 </text>
                 <text class="td amount-col">
-                    ¥{{subFilter === 'device' ? (item.deviceAmount || item.totalAmount) : (item.rewardAmount || '0.00')}}
+                    {{subFilter === 'device' ? (item.deviceAmount || item.totalAmount) : (item.rewardAmount || '0.00')}} U
                 </text>
             </view>
         </block>
@@ -93,7 +93,7 @@
                     </block>
                 </view>
                 <text class="td amount-col">
-                    ¥{{subFilter === 'device' ? (item.deviceAmount || item.amount) : (item.rewardAmount || '0.00')}}
+                    {{subFilter === 'device' ? (item.deviceAmount || item.amount) : (item.rewardAmount || '0.00')}} U
                 </text>
             </view>
         </block>
@@ -112,7 +112,7 @@
                         </view>
                     </view>
                     <view class="item-right">
-                        <text class="item-amount">+¥{{item.earnings || item.amount}}</text>
+                        <text class="item-amount">+{{item.earnings || item.amount}} U</text>
                         <text class="item-time">
                             发放: {{item.createTimeFormatted || item.earningsDate || item.date}}
                         </text>
@@ -135,7 +135,7 @@
                         </view>
                     </view>
                     <view class="item-right">
-                        <text class="item-amount reward-color">+¥{{item.reward}}</text>
+                        <text class="item-amount reward-color">+{{item.reward}} U</text>
                         <text class="item-time">{{item.createTime}}</text>
                     </view>
                 </view>

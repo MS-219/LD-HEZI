@@ -44,10 +44,10 @@ public class ExchangeOrder {
     /** 数量 */
     private Integer quantity;
 
-    /** 单价(元) */
+    /** 单价(U) */
     private BigDecimal unitPrice;
 
-    /** 总价(元) */
+    /** 总价(U) */
     private BigDecimal totalPrice;
 
     /** 消耗算力值(展示用) */
@@ -92,7 +92,7 @@ public class ExchangeOrder {
     /** 邀请人等级 */
     private Integer inviterLevel;
 
-    /** 邀请人分润金额(元) = 用户拿货价 - 邀请人拿货价 */
+    /** 邀请人分润金额(U) = 用户拿货价 - 邀请人拿货价 */
     private BigDecimal inviterProfit;
 
     private LocalDateTime createTime;

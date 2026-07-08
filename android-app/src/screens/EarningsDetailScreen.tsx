@@ -160,16 +160,16 @@ export default function EarningsDetailScreen() {
           <View>
             <Card style={styles.overviewCard}>
               <View style={styles.overviewMain}>
-                <Text style={styles.overviewLabel}>累计收益（元）</Text>
-                <Text style={styles.overviewTotal}>¥{overview.total}</Text>
+                <Text style={styles.overviewLabel}>累计收益（U）</Text>
+                <Text style={styles.overviewTotal}>{overview.total} U</Text>
               </View>
               <View style={styles.overviewRow}>
                 <View style={styles.overviewItem}>
-                  <Text style={styles.overviewValue}>¥{overview.yesterday}</Text>
+                  <Text style={styles.overviewValue}>{overview.yesterday} U</Text>
                   <Text style={styles.overviewMeta}>昨日收益</Text>
                 </View>
                 <View style={styles.overviewItem}>
-                  <Text style={styles.overviewValue}>¥{overview.month}</Text>
+                  <Text style={styles.overviewValue}>{overview.month} U</Text>
                   <Text style={styles.overviewMeta}>本月收益</Text>
                 </View>
                 <View style={styles.overviewItem}>
@@ -207,7 +207,7 @@ export default function EarningsDetailScreen() {
               <Card>
                 <View style={styles.recordRow}>
                   <Text style={styles.recordTitle}>{item.month || item.date}</Text>
-                  <Text style={styles.recordAmount}>+¥{item.amount ?? item.total ?? '0.00'}</Text>
+                  <Text style={styles.recordAmount}>+{item.amount ?? item.total ?? '0.00'} U</Text>
                 </View>
               </Card>
             );
@@ -217,7 +217,7 @@ export default function EarningsDetailScreen() {
               <Card>
                 <View style={styles.recordRow}>
                   <Text style={styles.recordTitle}>{item.date || item.day}</Text>
-                  <Text style={styles.recordAmount}>+¥{item.amount ?? item.total ?? '0.00'}</Text>
+                  <Text style={styles.recordAmount}>+{item.amount ?? item.total ?? '0.00'} U</Text>
                 </View>
               </Card>
             );
@@ -230,7 +230,7 @@ export default function EarningsDetailScreen() {
                     <Text style={styles.recordTitle}>{item.remark || item.sourceNickname || '团队分润'}</Text>
                     <Text style={styles.recordMeta}>{item.createTime}</Text>
                   </View>
-                  <Text style={[styles.recordAmount, { color: colors.blue }]}>+¥{item.amount ?? '0.00'}</Text>
+                  <Text style={[styles.recordAmount, { color: colors.blue }]}>+{item.amount ?? '0.00'} U</Text>
                 </View>
               </Card>
             );
@@ -242,7 +242,7 @@ export default function EarningsDetailScreen() {
                   <Text style={styles.recordTitle}>{item.deviceName || item.deviceSn || '设备收益'}</Text>
                   <Text style={styles.recordMeta}>{item.createTimeFormatted}</Text>
                 </View>
-                <Text style={styles.recordAmount}>+¥{item.amount ?? '0.00'}</Text>
+                <Text style={styles.recordAmount}>+{item.amount ?? '0.00'} U</Text>
               </View>
             </Card>
           );

@@ -15,7 +15,7 @@
             <text class="detail-price-icon">⚡</text>
             <text class="detail-price-value">{{product.userHashratePrice}}</text>
             <text class="detail-price-unit">算力值</text>
-            <text class="detail-price-yuan">≈ ¥{{product.userPrice}}</text>
+            <text class="detail-price-yuan">≈ {{product.userPrice}} U</text>
         </view>
         <text class="detail-desc" wx:if="{{product.description}}">{{product.description}}</text>
     </view>

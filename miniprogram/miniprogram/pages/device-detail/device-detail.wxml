@@ -48,7 +48,7 @@
                 <text class="card-title">收益趋势</text>
                 <text class="card-desc">近 7 日收益统计</text>
             </view>
-            <text class="card-subtitle">单位：元</text>
+            <text class="card-subtitle">单位：U</text>
         </view>
         <view class="chart-wrapper">
             <canvas type="2d" id="earningsChart" class="chart-canvas"></canvas>

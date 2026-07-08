@@ -252,11 +252,11 @@ export default function MyScreen() {
       <Card style={styles.walletCard}>
         <View style={styles.walletRow}>
           <View style={styles.walletItem}>
-            <Text style={[styles.walletValue, styles.onDark]}>¥{wallet.balance}</Text>
+            <Text style={[styles.walletValue, styles.onDark]}>{wallet.balance} U</Text>
             <Text style={[styles.walletLabel, styles.onDarkMuted]}>可提现余额</Text>
           </View>
           <View style={styles.walletItem}>
-            <Text style={[styles.walletValue, styles.onDark]}>¥{wallet.totalEarnings}</Text>
+            <Text style={[styles.walletValue, styles.onDark]}>{wallet.totalEarnings} U</Text>
             <Text style={[styles.walletLabel, styles.onDarkMuted]}>累计收益</Text>
           </View>
           <View style={styles.walletItem}>

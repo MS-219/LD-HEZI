@@ -37,7 +37,7 @@
                         <text class="price-value">{{item.userHashratePrice}}</text>
                         <text class="price-unit">算力值</text>
                     </view>
-                    <text class="price-yuan">≈ ¥{{item.userPrice}}</text>
+                    <text class="price-yuan">≈ {{item.userPrice}} U</text>
                 </view>
                 <view class="product-stock" wx:if="{{item.stock !== null && item.stock !== undefined}}">
                     <text class="stock-text">库存: {{item.stock}}</text>

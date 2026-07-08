@@ -171,7 +171,7 @@ export default function InviteScreen() {
               <Text style={styles.statLabel}>已邀请</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: colors.orange }]}>¥{stats.totalReward}</Text>
+              <Text style={[styles.statValue, { color: colors.orange }]}>{stats.totalReward} U</Text>
               <Text style={styles.statLabel}>累计奖励</Text>
             </View>
             <View style={styles.statItem}>
@@ -225,7 +225,7 @@ export default function InviteScreen() {
               </View>
               <View style={{ alignItems: 'flex-end' }}>
                 <Badge text={`${user.deviceCount} 台设备`} color={colors.blue} />
-                <Text style={styles.userReward}>奖励 ¥{user.reward}</Text>
+                <Text style={styles.userReward}>奖励 {user.reward} U</Text>
               </View>
             </View>
           </Card>

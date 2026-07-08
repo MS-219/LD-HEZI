@@ -370,7 +370,7 @@ public class DeviceEarningsServiceImpl extends ServiceImpl<DeviceEarningsMapper,
         result.put("totalAmount", totalAmount.setScale(2, java.math.RoundingMode.HALF_UP));
         result.put("hours", hours);
 
-        log.info("========== 补偿收益任务完成: 成功={}台, 失败={}台, 记录={}条, 总金额=¥{} ==========",
+        log.info("========== 补偿收益任务完成: 成功={}台, 失败={}台, 记录={}条, 总金额={} ==========",
                 successCount, failCount, totalRecords, totalAmount);
 
         return result;

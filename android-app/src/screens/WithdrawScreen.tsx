@@ -161,7 +161,7 @@ export default function WithdrawScreen() {
     const amount = parseFloat(form.amount) || 0;
     const available = parseFloat(wallet.available) || 0;
     if (amount < minWithdraw) {
-      Alert.alert('提示', `最低提现金额为${minWithdraw}元`);
+      Alert.alert('提示', `最低提现金额为${minWithdraw}U`);
       return;
     }
     if (amount > available) {
@@ -217,12 +217,12 @@ export default function WithdrawScreen() {
       >
         {/* 钱包概览 */}
         <Card style={styles.walletCard}>
-          <Text style={styles.walletLabel}>可提现余额（元）</Text>
-          <Text style={styles.walletBalance}>¥{wallet.available}</Text>
+          <Text style={styles.walletLabel}>可提现余额（U）</Text>
+          <Text style={styles.walletBalance}>{wallet.available} U</Text>
           <View style={styles.walletMetaRow}>
             <Text style={styles.walletMeta}>算力值 {wallet.hashrateBalance}</Text>
-            <Text style={styles.walletMeta}>待审核 ¥{wallet.pending}</Text>
-            <Text style={styles.walletMeta}>已提现 ¥{wallet.withdrawn}</Text>
+            <Text style={styles.walletMeta}>待审核 {wallet.pending} U</Text>
+            <Text style={styles.walletMeta}>已提现 {wallet.withdrawn} U</Text>
           </View>
         </Card>
 
@@ -250,7 +250,7 @@ export default function WithdrawScreen() {
             })}
           </View>
 
-          <Text style={styles.fieldLabel}>提现金额（最低 {minWithdraw} 元）</Text>
+          <Text style={styles.fieldLabel}>提现金额（最低 {minWithdraw} U）</Text>
           <TextInput
             value={form.amount}
             onChangeText={(text) => setForm((prev) => ({ ...prev, amount: text }))}
@@ -262,7 +262,7 @@ export default function WithdrawScreen() {
           <View style={styles.amountQuick}>
             {[50, 100, 200].map((v) => (
               <Pressable key={v} style={styles.quickItem} onPress={() => setForm((p) => ({ ...p, amount: String(v) }))}>
-                <Text style={styles.quickText}>{v}元</Text>
+                <Text style={styles.quickText}>{v}U</Text>
               </Pressable>
             ))}
             <Pressable style={styles.quickItem} onPress={() => setForm((p) => ({ ...p, amount: wallet.available }))}>
@@ -309,7 +309,7 @@ export default function WithdrawScreen() {
         </Card>
 
         <Button
-          title={submitting ? '提交中...' : `确认提现 ¥${(parseFloat(form.amount) || 0).toFixed(2)}`}
+          title={submitting ? '提交中...' : `确认提现 ${(parseFloat(form.amount) || 0).toFixed(2)} U`}
           type="success"
           disabled={submitting || !canWithdraw}
           onPress={submit}

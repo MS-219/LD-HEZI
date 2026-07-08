@@ -12,8 +12,9 @@ STATUS_FILE = os.getenv("LD_AI_STATUS_FILE", "/opt/ld-ai/runtime/status.json")
 SN_FILE = os.getenv("LD_AI_SN_FILE", "/etc/ld-ai-sn")
 APP_VERSION = "V4.0"
 FRAME = 0
-ROLLING_LOGS = deque(maxlen=18)
+ROLLING_LOGS = deque(maxlen=24)
 LAST_IMPORTED_LOGS = []
+SCREEN_NAME = "HEZI NODE CONSOLE"
 
 
 def load_sn():
@@ -68,6 +69,23 @@ def fit(text, width):
     return text[: width - 3] + "..."
 
 
+def pad(text, width):
+    text = fit(text, width)
+    return text + " " * max(0, width - len(text))
+
+
+def line(width, left="", right=""):
+    if not left and not right:
+        return "-" * width
+    middle = max(2, width - len(left) - len(right) - 2)
+    return f"{left}{'-' * middle}{right}"
+
+
+def metric_card(label, value, width, accent="1;36"):
+    body = f"{label:<11} {value}"
+    return color(pad(body, width), accent)
+
+
 def sanitize_log(text):
     text = "" if text is None else str(text)
     text = re.sub(r"https?://[^\s]+", "[REDACTED]", text)
@@ -79,34 +97,49 @@ def sanitize_log(text):
 
 
 def build_fake_log(sn, frame):
-    tasks = ["BLOCK", "HASH ", "SYNC ", "NODE ", "CALC ", "SIG  ", "QUEUE", "ROUTE", "MESH ", "PULSE"]
+    tasks = ["BOOT ", "SCAN ", "TRACE", "FLOW ", "AUTH ", "QUEUE", "ROUTE", "LOAD ", "TASK ", "SYNC "]
     task = tasks[frame % len(tasks)]
     target = sn[3:11].replace("-", "") if len(sn) >= 11 else sn.replace("-", "")
-    return f"[{time.strftime('%H:%M:%S')}] {task} 0x{(frame * 1103515245) & 0xFFFFFFFF:08X} -> {target} STATUS: OK"
+    return f"{time.strftime('%H:%M:%S')} | {task} | lane={target:<8} | seq={(frame * 1103515245) & 0xFFFF:04X} | accepted"
 
 
 def build_matrix_line(sn, frame):
     core = sn[3:11].replace("-", "") if len(sn) >= 11 else sn.replace("-", "")
     left = f"{(frame * 2654435761) & 0xFFFFFFFF:08X}"
     right = f"{(frame * 40503 + 97) & 0xFFFFFF:06X}"
-    tags = ["EDGE", "CORE", "GRID", "LINK", "NODE", "FLOW"]
-    return f"[{time.strftime('%H:%M:%S')}] {tags[frame % len(tags)]} :: {left} => {core} => {right}"
+    tags = ["UPLK", "CTRL", "SPAN", "WORK", "NODE", "MESH"]
+    return f"{time.strftime('%H:%M:%S')} | {tags[frame % len(tags)]} | {left[:6]}:{core}:{right[-4:]} | telemetry"
 
 
 def build_activity_lines(sn, frame):
     core = sn[3:11].replace("-", "") if len(sn) >= 11 else sn.replace("-", "")
     values = [
-        ("PULSE", 30 + (frame * 7) % 68),
-        ("SYNC ", 25 + (frame * 11) % 72),
-        ("ROUTE", 20 + (frame * 13) % 74),
-        ("CACHE", 18 + (frame * 17) % 76),
+        ("uplink", 30 + (frame * 7) % 68),
+        ("queue ", 25 + (frame * 11) % 72),
+        ("route ", 20 + (frame * 13) % 74),
+        ("cache ", 18 + (frame * 17) % 76),
     ]
     lines = []
     for label, pct in values:
-        bars = int(pct / 5)
-        bar = "#" * bars + "-" * (20 - bars)
-        lines.append(f"  {label}: [{bar}] {pct:>3}%   0x{(frame * 4099 + pct) & 0xFFFF:04X} -> {core}")
+        bars = int(pct / 4)
+        bar = "=" * bars + "." * (25 - bars)
+        lines.append(f"{label} [{bar}] {pct:>3}%  bus:{(frame * 4099 + pct) & 0xFFFF:04X}  node:{core}")
     return lines
+
+
+def build_signal_rows(frame, online):
+    seed = frame if online else 0
+    rows = [
+        ("cpu lane", 35 + (seed * 9) % 55),
+        ("net io", 20 + (seed * 13) % 70),
+        ("job ring", 18 + (seed * 17) % 75),
+    ]
+    rendered = []
+    for name, pct in rows:
+        bars = int(pct / 10)
+        meter = "|" * bars + "." * (10 - bars)
+        rendered.append(f"{name:<8} {meter} {pct:>3}%")
+    return rendered
 
 
 def refresh_logs(status, sn, frame, online):
@@ -127,11 +160,73 @@ def refresh_logs(status, sn, frame, online):
             ROLLING_LOGS.append(build_matrix_line(sn, frame))
         if frame % 5 == 0:
             ROLLING_LOGS.append(
-                f"[{time.strftime('%H:%M:%S')}] TASK  status={status.get('currentTask', 'IDLE')} result={status.get('lastTaskStatus', 'WAITING')}"
+                f"{time.strftime('%H:%M:%S')} | TASK  | now={status.get('currentTask', 'IDLE')} | last={status.get('lastTaskStatus', 'WAITING')}"
             )
 
 
+def render_header(width, online):
+    pulse = ("ON " if online else "STBY") if FRAME % 2 else ("RUN" if online else "IDLE")
+    title = f" {SCREEN_NAME} "
+    right = f" {APP_VERSION} / {pulse} "
+    print(color(line(width, title, right), "1;36"))
+
+
+def render_identity(width, sn, bind_code, ip, online, last_error):
+    left_width = min(54, max(42, width // 2 - 3))
+    right_width = width - left_width - 3
+    state = "ONLINE" if online else "OFFLINE"
+    state_color = "1;32" if online else "1;31"
+    reason = "ready" if online else fit(last_error, right_width - 18)
+    left_rows = [
+        metric_card("serial", sn, left_width, "1;37"),
+        metric_card("pair key", bind_code, left_width, "1;35"),
+        metric_card("network", ip, left_width, "1;34"),
+    ]
+    right_rows = [
+        f"{color('state', '0;37'):<17} {color(state, state_color)}",
+        f"{color('message', '0;37'):<17} {fit(reason, right_width - 13)}",
+        f"{color('action', '0;37'):<17} enter pair key in the client app",
+    ]
+    print(color("NODE IDENTITY", "1;30") + "   " + color("CONTROL LINK", "1;30"))
+    for left, right in zip(left_rows, right_rows):
+        print(f"{left}   {fit(right, right_width)}")
+
+
+def render_logs(width, visible_logs):
+    print()
+    print(color(line(width, " EVENT STREAM ", ""), "1;30"))
+    if not visible_logs:
+        visible_logs = [f"{time.strftime('%H:%M:%S')} | BOOT  | waiting for first heartbeat"]
+    for line_text in visible_logs[-10:]:
+        print(color("  >", "1;32") + " " + fit(line_text, width - 5))
+    for _ in range(max(0, 10 - len(visible_logs[-10:]))):
+        print(" ")
+
+
+def render_runtime(width, status, sn, frame, online):
+    task_line = status.get("currentTask") or "IDLE"
+    result_line = status.get("lastTaskStatus") or "WAITING"
+    heartbeat_line = status.get("lastHeartbeatTime") or "-"
+    version_line = status.get("agentVersion", APP_VERSION)
+    print()
+    print(color(line(width, " WORKLOAD TELEMETRY ", ""), "1;30"))
+    activity_lines = build_activity_lines(sn, frame if online else 0)
+    signal_rows = build_signal_rows(frame, online)
+    left_width = min(62, max(46, width - 36))
+    right_width = width - left_width - 3
+    for index, activity in enumerate(activity_lines):
+        right = signal_rows[index] if index < len(signal_rows) else ""
+        print(f"  {color(pad(activity, left_width), '0;36')}   {color(fit(right, right_width), '0;32')}")
+    print()
+    print(color(line(width, " SESSION SNAPSHOT ", ""), "1;30"))
+    result_color = "1;32" if result_line == "COMPLETED" else "1;37"
+    print(f"  task      {color(fit(task_line, 34), '1;33')}   result {color(fit(result_line, 24), result_color)}")
+    print(f"  heartbeat {fit(heartbeat_line, 34)}   build  {color(version_line, '1;35')}")
+
+
 def render(frame):
+    global FRAME
+    FRAME = frame
 
     status = load_status()
     sn = status.get("sn") or load_sn()
@@ -142,46 +237,16 @@ def render(frame):
 
     width = max(96, shutil.get_terminal_size((120, 32)).columns)
     refresh_logs(status, sn, frame, online)
-    visible_logs = list(ROLLING_LOGS)[-12:]
+    visible_logs = list(ROLLING_LOGS)[-10:]
 
     clear()
-    print(color(f"================= [ LD-AI DEVICE AGENT {APP_VERSION} ] =================", "1;33"))
+    render_header(width, online)
     print()
-    print(f"  DEVICE SN:      {color(sn, '1;32')}")
-    print(f"  BINDING CODE:   {color(bind_code, '1;35')}")
-    print(f"  LOCAL NETWORK:  {color(ip, '1;34')}")
-
-    if online:
-        status_str = color("[ONLINE / OK]", "1;32")
-    else:
-        status_str = color(f"[OFFLINE: {fit(last_error, 48)}]", "1;31")
-
-    print(f"  SYSTEM STATUS:  {status_str}")
+    render_identity(width, sn, bind_code, ip, online, last_error)
+    render_logs(width, visible_logs)
+    render_runtime(width, status, sn, frame, online)
     print()
-    print(color("  Please enter BINDING CODE in Mini-Program to activate device.", "1;37"))
-    print()
-    print(color("---------------------- [ REAL-TIME SYSTEM LOGS ] ----------------------", "1;36"))
-
-    for line in visible_logs:
-        print(" " + fit(line, width - 2))
-
-    for _ in range(max(0, 12 - len(visible_logs))):
-        print(" ")
-
-    task_line = status.get("currentTask") or "IDLE"
-    result_line = status.get("lastTaskStatus") or "WAITING"
-    heartbeat_line = status.get("lastHeartbeatTime") or "-"
-    print()
-    print(color("---------------------- [ LIVE COMPUTE ACTIVITY ] ----------------------", "1;36"))
-    for line in build_activity_lines(sn, frame if online else 0):
-        print(color(line, "0;32"))
-    print(" ")
-    print()
-    print(color("---------------------- [ EDGE NODE STATUS PANEL ] ---------------------", "1;36"))
-    print(f"  CURRENT TASK:   {color(task_line, '1;33')}")
-    print(f"  LAST RESULT:    {color(result_line, '1;32' if result_line == 'COMPLETED' else '1;37')}")
-    print(f"  LAST HEARTBEAT: {heartbeat_line}")
-    print(f"  NODE VERSION:   {color(status.get('agentVersion', APP_VERSION), '1;35')}")
+    print(color(line(width, "", " local display only "), "1;30"))
     sys.stdout.flush()
 
 
@@ -196,7 +261,7 @@ def main():
             break
         except Exception as exc:
             clear()
-            print(f"LD-AI screen error: {exc}")
+            print(f"{SCREEN_NAME} screen error: {exc}")
             time.sleep(1)
 
 

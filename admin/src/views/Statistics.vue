@@ -159,8 +159,8 @@ const statCards = computed(() => [
   },
   {
     label: '累计收益',
-    value: `¥${stats.value.earnings?.total || '0.00'}`,
-    subtext: `昨日 ¥${stats.value.earnings?.yesterday || '0.00'}`
+    value: `${stats.value.earnings?.total || '0.00'} U`,
+    subtext: `昨日 ${stats.value.earnings?.yesterday || '0.00'} U`
   },
   {
     label: '总算力值',
@@ -215,7 +215,7 @@ const updateTrendChart = () => {
   if (!trendChart || !trendData.value.dates) return
 
   const typeMap = {
-    earnings: { name: '收益 (¥)', data: trendData.value.earnings },
+    earnings: { name: '收益 (U)', data: trendData.value.earnings },
     users: { name: '新增用户', data: trendData.value.users },
     devices: { name: '新增设备', data: trendData.value.devices }
   }

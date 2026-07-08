@@ -47,7 +47,7 @@
         </el-table-column>
         <el-table-column label="奖励金额" width="120">
           <template #default="{ row }">
-            <span class="amount-text">+¥{{ row.reward }}</span>
+            <span class="amount-text">+{{ row.reward}} U</span>
           </template>
         </el-table-column>
         <el-table-column label="奖励类型" width="120">

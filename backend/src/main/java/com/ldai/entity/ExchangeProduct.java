@@ -31,22 +31,22 @@ public class ExchangeProduct {
     /** 商品图片列表(JSON数组) */
     private String images;
 
-    /** 基础价格(元) */
+    /** 基础价格(U) */
     private BigDecimal basePrice;
 
-    /** 会员价(元) - level 1 */
+    /** 会员价(U) - level 1 */
     private BigDecimal priceLevel1;
 
-    /** 社区价(元) - level 2 */
+    /** 社区价(U) - level 2 */
     private BigDecimal priceLevel2;
 
-    /** 县级价(元) - level 3 */
+    /** 县级价(U) - level 3 */
     private BigDecimal priceLevel3;
 
-    /** 市级价(元) - level 4 */
+    /** 市级价(U) - level 4 */
     private BigDecimal priceLevel4;
 
-    /** 联创价(元) - level 5 */
+    /** 联创价(U) - level 5 */
     private BigDecimal priceLevel5;
 
     /** 库存数量 */
@@ -63,7 +63,7 @@ public class ExchangeProduct {
 
     // ========== 非数据库字段 ==========
 
-    /** 当前用户等级对应的价格(元) */
+    /** 当前用户等级对应的价格(U) */
     @TableField(exist = false)
     private BigDecimal userPrice;
 

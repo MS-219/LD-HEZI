@@ -179,11 +179,11 @@ export default function HomeScreen() {
       {/* 收益统计 */}
       <View style={styles.statRow}>
         <Card style={styles.statCard}>
-          <Text style={styles.statValue}>¥{earnings.yesterday}</Text>
+          <Text style={styles.statValue}>{earnings.yesterday} U</Text>
           <Text style={styles.statLabel}>昨日收益</Text>
         </Card>
         <Card style={styles.statCard}>
-          <Text style={styles.statValue}>¥{earnings.total}</Text>
+          <Text style={styles.statValue}>{earnings.total} U</Text>
           <Text style={styles.statLabel}>累计收益</Text>
         </Card>
       </View>

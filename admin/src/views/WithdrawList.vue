@@ -6,7 +6,7 @@
         <div class="amount-card total">
           <div class="amount-icon">💰</div>
           <div class="amount-info">
-            <div class="amount-value">¥{{ formatAmount(stats.totalAmount) }}</div>
+            <div class="amount-value">{{ formatAmount(stats.totalAmount)}} U</div>
             <div class="amount-label">累计提现金额</div>
           </div>
         </div>
@@ -15,7 +15,7 @@
         <div class="amount-card pending-pay">
           <div class="amount-icon">⏳</div>
           <div class="amount-info">
-            <div class="amount-value">¥{{ formatAmount(stats.pendingPayAmount) }}</div>
+            <div class="amount-value">{{ formatAmount(stats.pendingPayAmount)}} U</div>
             <div class="amount-label">待打款金额</div>
           </div>
         </div>
@@ -24,7 +24,7 @@
         <div class="amount-card paid-amount">
           <div class="amount-icon">✅</div>
           <div class="amount-info">
-            <div class="amount-value">¥{{ formatAmount(stats.paidAmount) }}</div>
+            <div class="amount-value">{{ formatAmount(stats.paidAmount)}} U</div>
             <div class="amount-label">已打款金额</div>
           </div>
         </div>
@@ -40,7 +40,7 @@
           <div class="stat-info">
             <div class="stat-value">{{ stats.pending }}</div>
             <div class="stat-label">待审核</div>
-            <div class="stat-amount">¥{{ formatAmount(stats.pendingAuditAmount) }}</div>
+            <div class="stat-amount">{{ formatAmount(stats.pendingAuditAmount)}} U</div>
           </div>
         </div>
       </el-col>
@@ -186,17 +186,17 @@
         </el-table-column>
         <el-table-column label="提现金额" width="120">
           <template #default="{ row }">
-            <span class="amount">¥{{ row.amount }}</span>
+            <span class="amount">{{ row.amount}} U</span>
           </template>
         </el-table-column>
         <el-table-column label="手续费" width="100">
           <template #default="{ row }">
-            <span class="fee">¥{{ row.fee || '0.00' }}</span>
+            <span class="fee">{{ row.fee || '0.00'}} U</span>
           </template>
         </el-table-column>
         <el-table-column label="实际到账" width="120">
           <template #default="{ row }">
-            <span class="actual">¥{{ row.actualAmount }}</span>
+            <span class="actual">{{ row.actualAmount}} U</span>
           </template>
         </el-table-column>
         <el-table-column label="提现方式" width="100">
@@ -610,7 +610,7 @@ const handleApprove = async (row) => {
 
 const handlePaid = async (row) => {
   try {
-    await ElMessageBox.confirm(`确认已完成线下打款？\n线下打款不扣提现手续费\n实际到账：¥${formatAmount(row.amount)}`, '确认打款', {
+    await ElMessageBox.confirm(`确认已完成线下打款？\n线下打款不扣提现手续费\n实际到账：${formatAmount(row.amount)} U`, '确认打款', {
       type: 'success'
     })
     
@@ -816,7 +816,7 @@ onMounted(() => {
   font-size: 16px;
 }
 
-/* 用户信息单元格 */
+/* 用户信息单U格 */
 .user-info-cell {
   display: flex;
   align-items: center;
