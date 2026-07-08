@@ -95,7 +95,7 @@
                 <view class="hashrate-banner">
                     <view class="banner-left">
                         <text class="banner-icon">⚡</text>
-                        <text class="banner-label">可回收聚芯算力值</text>
+                        <text class="banner-label">可回收算力值</text>
                     </view>
                     <text class="banner-value">{{walletInfo.displayHashrate || 0}}</text>
                     <text class="banner-arrow">〉</text>

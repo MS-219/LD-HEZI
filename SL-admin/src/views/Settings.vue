@@ -128,7 +128,7 @@
           <div class="form-item">
             <div class="form-label">
               <strong>初始算力值</strong>
-              <p>新设备绑定时的初始聚芯算力值。</p>
+              <p>新设备绑定时的初始算力值。</p>
             </div>
             <div class="form-control">
               <el-input-number

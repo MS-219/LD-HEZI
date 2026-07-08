@@ -293,7 +293,7 @@ public class DeviceEarningsServiceImpl extends ServiceImpl<DeviceEarningsMapper,
             }
         }
 
-        // 重置结算时间为当前时间，并叠加聚芯算力值
+        // 重置结算时间为当前时间，并叠加算力值
         device.setLastPayTime(now);
         int currentHashrate = device.getHashrate() != null ? device.getHashrate() : 0;
         device.setHashrate(currentHashrate + 100);

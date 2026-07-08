@@ -244,7 +244,7 @@
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="用户ID">{{ currentTask.userId || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="消耗聚芯算力值">
+        <el-descriptions-item label="消耗算力值">
           <span class="quota">⚡ {{ currentTask.costQuota || 0 }}</span>
         </el-descriptions-item>
         

@@ -115,7 +115,7 @@
         <view class="cost-summary">
             <text class="total-label">预估消耗:</text>
             <text class="total-value">{{totalCost}}</text>
-            <text class="total-unit">聚芯算力值</text>
+            <text class="total-unit">算力值</text>
         </view>
         <button class="generate-btn {{generating ? 'disabled' : ''}}" bindtap="startGenerate" disabled="{{generating}}">
             <text wx:if="{{!generating}}">✨ 开始生成</text>

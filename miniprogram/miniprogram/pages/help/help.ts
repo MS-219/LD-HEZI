@@ -5,7 +5,7 @@ Page({
     data: {
         navBarTop: 0,
         navBarHeight: 44,
-        contactWechat: 'juxinsuanli',
+        contactWechat: 'qqyzs-kefu',
         contactWorkTime: '9:00-18:00',
         faqList: [
             {
@@ -41,7 +41,7 @@ Page({
             {
                 id: 6,
                 question: '如何使用AI创作功能？',
-                answer: '进入"创作"页面，选择视频或图片模式，输入描述词后点击生成即可。生成需消耗聚芯算力值。',
+                answer: '进入"创作"页面，选择视频或图片模式，输入描述词后点击生成即可。生成需消耗算力值。',
                 expanded: false
             },
         ]
@@ -65,7 +65,7 @@ Page({
                 if (res.data.code === 200 && res.data.data) {
                     const sys = res.data.data;
                     this.setData({
-                        contactWechat: sys.contactWechat || 'juxinsuanli',
+                        contactWechat: sys.contactWechat || 'qqyzs-kefu',
                         contactWorkTime: sys.contactWorkTime || '9:00-18:00'
                     });
                 }

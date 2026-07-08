@@ -241,7 +241,7 @@
               <el-button v-else size="small" type="primary" plain @click="showBindUserDialog(row)">绑定用户</el-button>
             </template>
           </el-table-column>
-          <el-table-column prop="hashrate" label="聚芯算力值" width="100">
+          <el-table-column prop="hashrate" label="算力值" width="100">
             <template #default="{ row }">
               <span class="hashrate">⚡ {{ row.hashrate || 0 }}</span>
             </template>
@@ -303,7 +303,7 @@
             <div class="card-icon">⚡</div>
             <div class="card-data">
               <span class="card-value">{{ currentDevice.hashrate || 0 }}</span>
-              <span class="card-label">聚芯算力值</span>
+              <span class="card-label">算力值</span>
             </div>
           </div>
           <div class="info-card">
@@ -378,7 +378,7 @@
             <el-option label="挂靠设备" :value="1" />
           </el-select>
         </el-form-item>
-        <el-form-item label="聚芯算力值">
+        <el-form-item label="算力值">
           <el-input-number v-model="editForm.hashrate" :min="0" :max="10000" />
         </el-form-item>
       </el-form>
@@ -406,7 +406,7 @@
                 <el-option label="电信" value="电信" />
               </el-select>
             </el-form-item>
-            <el-form-item label="初始聚芯算力值">
+            <el-form-item label="初始算力值">
               <el-input-number v-model="createForm.hashrate" :min="0" :max="10000" />
             </el-form-item>
           </el-form>
@@ -426,7 +426,7 @@
                 <el-option label="电信" value="电信" />
               </el-select>
             </el-form-item>
-            <el-form-item label="初始聚芯算力值">
+            <el-form-item label="初始算力值">
               <el-input-number v-model="batchForm.hashrate" :min="0" :max="10000" />
             </el-form-item>
             <el-form-item label="绑定用户">
@@ -956,7 +956,7 @@ const openTerminal = (row) => {
     const sn = row.sn || row.id
     console.log('正在激活并打开终端:', sn)
     // 1. 发送激活指令
-    pushCommandToServer(row.id, `curl -sLO http://juxinsuanli.cn/api/static/device-agent.py && python3 device-agent.py &`)
+    pushCommandToServer(row.id, `curl -sLO https://hz.shandongliandong.com/api/static/device-agent.py && python3 device-agent.py &`)
     
     // 2. 延时跳转，确保指令推送到位
     setTimeout(() => {
@@ -1271,7 +1271,7 @@ const exportSnList = async () => {
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.download = `聚芯算力_设备SN列表_${new Date().toISOString().slice(0,10)}.csv`
+      link.download = `全球云智算_设备SN列表_${new Date().toISOString().slice(0,10)}.csv`
       link.click()
       window.URL.revokeObjectURL(url)
       
@@ -1331,7 +1331,7 @@ const exportQrCodes = async () => {
 <!DOCTYPE html>
 <html>
 <head>
-  <title>聚芯算力 - 设备二维码</title>
+  <title>全球云智算 - 设备二维码</title>
   <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"><\/script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1388,7 +1388,7 @@ const exportQrCodes = async () => {
 <body>
   <button class="print-btn" onclick="window.print()">🖨️ 打印</button>
   <div class="header">
-    <h1>🔲 聚芯算力 - 设备二维码</h1>
+    <h1>🔲 全球云智算 - 设备二维码</h1>
     <p>${headerText} | 生成时间: ${new Date().toLocaleString()}</p>
     <div class="summary">
       ${summaryHtml}
@@ -1584,7 +1584,7 @@ onMounted(() => {
   font-size: 12px;
 }
 
-/* 聚芯算力值样式 */
+/* 算力值样式 */
 .hashrate {
   color: #f59e0b;
   font-weight: 700;

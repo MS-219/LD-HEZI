@@ -57,7 +57,7 @@ Page({
 
         // 生成邀请码
         const inviteCode = 'JX' + String(userId).padStart(6, '0');
-        const inviteUrl = `https://juxinsuanli.cn/invite?code=${inviteCode}`;
+        const inviteUrl = `https://hz.shandongliandong.com/invite?code=${inviteCode}`;
 
         this.setData({ inviteCode, inviteUrl, loading: true });
 
@@ -200,7 +200,7 @@ Page({
 
     onShareAppMessage() {
         return {
-            title: '聚芯算力 - 邀请你一起赚收益',
+            title: '全球云智算 - 邀请你一起赚收益',
             path: `/pages/index/index?inviteCode=${this.data.inviteCode}`,
             imageUrl: ''
         };

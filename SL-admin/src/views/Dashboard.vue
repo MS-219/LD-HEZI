@@ -4,12 +4,12 @@
     <div class="sidebar">
       <div class="logo">
         <el-icon :size="24"><Cpu /></el-icon>
-        <span class="logo-text">聚芯算力系统</span>
+        <span class="logo-text">全球云智算</span>
       </div>
       <el-menu
         :default-active="activeMenu"
         class="el-menu-vertical"
-        background-color="#001529"
+        background-color="transparent"
         text-color="#ffffffa6"
         active-text-color="#fff"
         router
@@ -91,7 +91,7 @@
         <div class="nav-right">
           <el-dropdown @command="handleCommand">
             <span class="user-link">
-              <el-avatar :size="28" style="background-color: #1890ff">A</el-avatar>
+              <el-avatar :size="28" style="background-color: #0e7bd4">A</el-avatar>
               Admin <el-icon><ArrowDown /></el-icon>
             </span>
             <template #dropdown>
@@ -140,7 +140,7 @@ const handleCommand = (command) => {
 
 .sidebar {
   width: 240px;
-  background: #001529;
+  background: linear-gradient(180deg, #0b1f4b 0%, #123a7c 100%);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -153,7 +153,7 @@ const handleCommand = (command) => {
   align-items: center;
   gap: 12px;
   color: white;
-  background: #002140;
+  background: rgba(6, 18, 38, 0.5);
 }
 
 .logo-text {

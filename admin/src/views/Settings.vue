@@ -48,8 +48,8 @@
             </el-form-item>
             <el-form-item label="算力兑换比例">
               <el-input-number v-model="earningsSettings.hashratePerYuan" :min="1" :precision="0" :step="10" />
-              <span class="unit">聚芯算力值 = 1元</span>
-              <div class="hint">配置多少聚芯算力值兑换1元人民币</div>
+              <span class="unit">算力值 = 1元</span>
+              <div class="hint">配置多少算力值兑换1元人民币</div>
             </el-form-item>
 
             <!-- 动态邀请等级设置 -->
@@ -131,13 +131,13 @@
           </template>
           <el-form :model="systemSettings" label-width="120px">
             <el-form-item label="系统名称">
-              <el-input v-model="systemSettings.siteName" placeholder="聚芯算力" />
+              <el-input v-model="systemSettings.siteName" placeholder="全球云智算" />
             </el-form-item>
             <el-form-item label="联系邮箱">
               <el-input v-model="systemSettings.contactEmail" placeholder="admin@example.com" />
             </el-form-item>
             <el-form-item label="客服微信">
-              <el-input v-model="systemSettings.contactWechat" placeholder="juxinsuanli" />
+              <el-input v-model="systemSettings.contactWechat" placeholder="客服微信号" />
             </el-form-item>
             <el-form-item label="工作时间">
               <el-input v-model="systemSettings.contactWorkTime" placeholder="9:00-18:00" />
@@ -162,11 +162,11 @@
           <el-form :model="aiPricingSettings" label-width="140px">
             <el-form-item label="图片生成">
               <el-input-number v-model="aiPricingSettings.imageGenCost" :min="1" :precision="0" :step="1" />
-              <span class="unit">聚芯算力值/次</span>
+              <span class="unit">算力值/次</span>
             </el-form-item>
             <el-form-item label="图生视频">
               <el-input-number v-model="aiPricingSettings.imageToVideoCost" :min="1" :precision="0" :step="10" />
-              <span class="unit">聚芯算力值/次</span>
+              <span class="unit">算力值/次</span>
             </el-form-item>
             <el-form-item label="视频生成">
               <el-input-number v-model="aiPricingSettings.videoGenCost" :min="0" :precision="0" :step="10" />
@@ -175,23 +175,23 @@
             </el-form-item>
             <el-form-item label="4秒额外消耗">
               <el-input-number v-model="aiPricingSettings.videoExtra4s" :min="0" :precision="0" :step="5" />
-              <span class="unit">聚芯算力值</span>
+              <span class="unit">算力值</span>
             </el-form-item>
             <el-form-item label="10秒额外消耗">
               <el-input-number v-model="aiPricingSettings.videoExtra10s" :min="0" :precision="0" :step="5" />
-              <span class="unit">聚芯算力值</span>
+              <span class="unit">算力值</span>
             </el-form-item>
             <el-form-item label="15秒额外消耗">
               <el-input-number v-model="aiPricingSettings.videoExtra15s" :min="0" :precision="0" :step="10" />
-              <span class="unit">聚芯算力值</span>
+              <span class="unit">算力值</span>
             </el-form-item>
             <el-form-item label="25秒额外消耗">
               <el-input-number v-model="aiPricingSettings.videoExtra25s" :min="0" :precision="0" :step="20" />
-              <span class="unit">聚芯算力值</span>
+              <span class="unit">算力值</span>
             </el-form-item>
             <el-form-item label="AI对话">
               <el-input-number v-model="aiPricingSettings.chatCost" :min="0" :precision="0" :step="1" />
-              <span class="unit">聚芯算力值/次</span>
+              <span class="unit">算力值/次</span>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="saveAiPricingSettings">保存设置</el-button>
@@ -277,7 +277,7 @@ const earningsSettings = reactive({
   hourlyRate: 2.4,
   minWithdraw: 10,
   withdrawFee: 1,
-  hashratePerYuan: 100  // 多少聚芯算力值=1元
+  hashratePerYuan: 100  // 多少算力值=1元
 })
 
 const inviteLevels = reactive([
@@ -306,7 +306,7 @@ const deviceSettings = reactive({
 })
 
 const systemSettings = reactive({
-  siteName: '聚芯算力',
+  siteName: '全球云智算',
   contactEmail: '',
   contactWechat: '',
   contactWorkTime: '',

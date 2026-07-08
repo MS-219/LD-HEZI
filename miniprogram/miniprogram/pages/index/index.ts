@@ -163,7 +163,7 @@ Page({
       {
         id: 1,
         imageUrl: '',
-        title: '聚芯算力',
+        title: '全球云智算',
         subtitle: '管道收入 | 轻松躺赚 | 流量变现'
       }
     ];

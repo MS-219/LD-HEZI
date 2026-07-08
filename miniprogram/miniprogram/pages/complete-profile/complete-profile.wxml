@@ -8,7 +8,7 @@
         <!-- 头部提示 -->
         <view class="header-tip">
             <text class="tip-emoji">🎉</text>
-            <text class="tip-title">欢迎加入聚芯算力！</text>
+            <text class="tip-title">欢迎加入全球云智算！</text>
             <text class="tip-desc">请完善您的头像和昵称</text>
         </view>
         <!-- 头像选择 -->

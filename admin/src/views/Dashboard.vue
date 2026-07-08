@@ -4,11 +4,15 @@
       <el-aside width="240px" class="aside">
         <div class="logo">
           <div class="logo-icon-wrap">
-            <span class="logo-icon">⚡</span>
+            <svg viewBox="0 0 48 48" class="logo-mark" aria-hidden="true">
+              <path d="M36 20a10 10 0 0 0-19.4-3.3A8 8 0 0 0 12 32h23a7 7 0 0 0 1-12z"
+                fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" />
+              <rect x="19" y="17" width="10" height="10" rx="2" fill="currentColor" opacity="0.9" />
+            </svg>
           </div>
           <div class="logo-text-wrap">
-            <span class="logo-text">聚芯算力</span>
-            <span class="logo-subtitle">管理后台</span>
+            <span class="logo-text">全球云智算</span>
+            <span class="logo-subtitle">CLOUD CONSOLE</span>
           </div>
         </div>
         <el-menu
@@ -36,14 +40,6 @@
             <span class="status-dot online"></span>
             <span class="status-text">系统运行正常</span>
           </div>
-          <a
-            href="https://beian.miit.gov.cn/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="record-no"
-          >
-            浙ICP备2025220408号
-          </a>
         </div>
       </el-aside>
       
@@ -227,7 +223,7 @@ const toggleFullscreen = () => {
 }
 
 .aside {
-  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+  background: linear-gradient(180deg, #0b1f4b 0%, #123a7c 100%);
   display: flex;
   flex-direction: column;
   border-right: none;
@@ -247,17 +243,18 @@ const toggleFullscreen = () => {
 .logo-icon-wrap {
   width: 44px;
   height: 44px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-radius: 12px;
+  background: rgba(34, 211, 238, 0.12);
+  border: 1px solid rgba(34, 211, 238, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  color: #4dd6f0;
 }
 
-.logo-icon {
-  font-size: 24px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+.logo-mark {
+  width: 28px;
+  height: 28px;
 }
 
 .logo-text-wrap {
@@ -306,9 +303,9 @@ const toggleFullscreen = () => {
 }
 
 :deep(.el-menu-item.is-active) {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+  background: linear-gradient(90deg, #0e7bd4 0%, #22d3ee 100%) !important;
   color: #fff !important;
-  box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 8px 16px rgba(14, 123, 212, 0.35);
   font-weight: 700;
 }
 
@@ -447,7 +444,7 @@ const toggleFullscreen = () => {
 
 .action-btn:hover {
   background: #f8fafc;
-  color: #6366f1;
+  color: #0e7bd4;
   border-color: #c7d2fe;
   transform: translateY(-2px);
 }
@@ -476,7 +473,7 @@ const toggleFullscreen = () => {
 }
 
 .avatar {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #0e7bd4 0%, #22d3ee 100%);
   font-weight: 800;
   border: 2px solid #fff;
   box-shadow: 0 4px 8px rgba(99, 102, 241, 0.2);

@@ -146,7 +146,7 @@ public class InviteServiceImpl implements IInviteService {
             BigDecimal currentBalance = inviter.getBalance() != null ? inviter.getBalance() : BigDecimal.ZERO;
             inviter.setBalance(currentBalance.add(reward));
 
-            // 同步更新聚芯算力值 (配额)
+            // 同步更新算力值 (配额)
             int hashrateRate = Integer.parseInt(configService.getConfig("earnings.hashratePerYuan", "100"));
             int quotaAdd = reward.multiply(new java.math.BigDecimal(hashrateRate)).intValue();
             inviter.setQuota((inviter.getQuota() != null ? inviter.getQuota() : 0) + quotaAdd);

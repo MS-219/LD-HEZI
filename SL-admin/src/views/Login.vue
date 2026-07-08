@@ -1,78 +1,61 @@
 <template>
   <div class="login-page">
-    <!-- 动态背景 -->
-    <div class="bg-animation">
-      <div class="particles">
-        <div class="particle" v-for="i in 50" :key="i" :style="getParticleStyle(i)"></div>
-      </div>
-      <div class="glow-orbs">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-      </div>
-    </div>
+    <div class="scanlines"></div>
 
-    <!-- 登录卡片 - 居中 -->
-    <div class="login-wrapper">
-      <div class="login-card" :class="{ 'animate-in': showCard }">
-        <!-- Logo -->
-        <div class="logo-section">
-          <div class="logo-circle">
-            <span class="logo-icon">⚡</span>
-          </div>
-          <h1 class="brand-title">算力监控</h1>
-          <p class="brand-subtitle">节点监测预警平台</p>
-        </div>
+    <div class="login-shell" :class="{ ready: showCard }">
+      <!-- 顶部状态条 -->
+      <div class="shell-head">
+        <span class="head-dot"></span>
+        <span class="head-title">GLOBAL CLOUD · SCHEDULER</span>
+        <span class="head-status">● ONLINE</span>
+      </div>
 
-        <!-- 登录表单 -->
+      <div class="shell-body">
+        <h1 class="console-title">全球云智算</h1>
+        <p class="console-sub">调度与节点监控中心</p>
+
         <el-form :model="form" :rules="rules" ref="formRef" @submit.prevent class="login-form">
           <el-form-item prop="username">
-            <el-input 
-              v-model="form.username" 
-              placeholder="请输入用户名" 
+            <el-input
+              v-model="form.username"
+              placeholder="操作员账号"
               prefix-icon="User"
               size="large"
-              class="custom-input"
+              class="term-input"
             />
           </el-form-item>
           <el-form-item prop="password">
-            <el-input 
-              v-model="form.password" 
-              type="password" 
-              placeholder="请输入密码"
+            <el-input
+              v-model="form.password"
+              type="password"
+              placeholder="访问口令"
               prefix-icon="Lock"
               size="large"
               show-password
-              class="custom-input"
+              class="term-input"
               @keyup.enter.prevent="handleLogin"
             />
           </el-form-item>
-          
+
           <div class="remember-row">
             <el-checkbox v-model="rememberMe">记住我</el-checkbox>
           </div>
 
-          <el-button 
-            type="primary" 
-            size="large" 
+          <el-button
+            type="primary"
+            size="large"
             :loading="loading"
             native-type="button"
-            @click="handleLogin" 
+            @click="handleLogin"
             class="login-btn"
           >
-            <span v-if="!loading">登 录</span>
-            <span v-else>登录中...</span>
+            {{ loading ? '验证中...' : '接入调度中心' }}
           </el-button>
         </el-form>
+      </div>
 
-        <!-- 底部 -->
-        <div class="login-footer">
-          <div class="features">
-            <span class="feature">🌐 分布式算力</span>
-            <span class="feature">🔒 联邦调度</span>
-            <span class="feature">📈 极速监控</span>
-          </div>
-        </div>
+      <div class="shell-foot">
+        <span>NODES</span><span>SCHEDULING</span><span>MONITORING</span>
       </div>
     </div>
   </div>
@@ -100,26 +83,13 @@ const rules = {
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 }
 
-// 粒子样式生成
-const getParticleStyle = (i) => {
-  const size = Math.random() * 4 + 2
-  return {
-    left: `${Math.random() * 100}%`,
-    top: `${Math.random() * 100}%`,
-    width: `${size}px`,
-    height: `${size}px`,
-    animationDelay: `${Math.random() * 5}s`,
-    animationDuration: `${Math.random() * 10 + 10}s`
-  }
-}
-
 const handleLogin = async () => {
   if (loading.value) return
   if (!formRef.value) return
-  
+
   await formRef.value.validate(async (valid) => {
     if (!valid) return
-    
+
     loading.value = true
     try {
       localStorage.removeItem('sl_token')
@@ -129,7 +99,7 @@ const handleLogin = async () => {
         password: form.password
       })
       const payload = res?.data || res
-      
+
       if (Number(payload.code) === 200 && payload.data?.token) {
         localStorage.setItem('sl_token', payload.data.token) // 使用专属 token 名称
         if (rememberMe.value) {
@@ -152,7 +122,7 @@ const handleLogin = async () => {
 onMounted(() => {
   setTimeout(() => {
     showCard.value = true
-  }, 100)
+  }, 80)
 })
 </script>
 
@@ -162,286 +132,145 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #022c22 0%, #064e3b 50%, #022c22 100%);
-  overflow: hidden;
+  background:
+    radial-gradient(800px 400px at 80% -10%, rgba(14, 123, 212, 0.15), transparent 60%),
+    #061226;
   position: relative;
+  overflow: hidden;
 }
 
-/* 动态背景 */
-.bg-animation {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+/* 扫描线质感 */
+.scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.015) 0px,
+    rgba(255, 255, 255, 0.015) 1px,
+    transparent 1px,
+    transparent 4px
+  );
   pointer-events: none;
 }
 
-/* 粒子效果 */
-.particles {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
-
-.particle {
-  position: absolute;
-  background: rgba(52, 211, 153, 0.6);
-  border-radius: 50%;
-  animation: float-particle linear infinite;
-}
-
-@keyframes float-particle {
-  0% {
-    transform: translateY(100vh) scale(0);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-100vh) scale(1);
-    opacity: 0;
-  }
-}
-
-/* 光晕效果 */
-.glow-orbs {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
-
-.orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  animation: float-orb 15s ease-in-out infinite;
-}
-
-.orb-1 {
-  width: 500px;
-  height: 500px;
-  background: rgba(16, 185, 129, 0.3);
-  top: -200px;
-  left: -200px;
-  animation-delay: 0s;
-}
-
-.orb-2 {
+.login-shell {
   width: 400px;
-  height: 400px;
-  background: rgba(5, 150, 105, 0.25);
-  bottom: -150px;
-  right: -150px;
-  animation-delay: -5s;
-}
-
-.orb-3 {
-  width: 300px;
-  height: 300px;
-  background: rgba(52, 211, 153, 0.2);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation-delay: -10s;
-}
-
-@keyframes float-orb {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  25% {
-    transform: translate(50px, -50px) scale(1.1);
-  }
-  50% {
-    transform: translate(-30px, 30px) scale(0.9);
-  }
-  75% {
-    transform: translate(20px, 20px) scale(1.05);
-  }
-}
-
-/* 登录卡片容器 */
-.login-wrapper {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
-.login-card {
-  width: 420px;
-  max-width: 90vw;
-  padding: 48px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(77, 214, 240, 0.25);
+  border-radius: 10px;
+  background: rgba(9, 24, 48, 0.92);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 0, 0, 0.4);
   opacity: 0;
-  transform: translateY(30px) scale(0.95);
-  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(16px);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  z-index: 2;
 }
 
-.login-card.animate-in {
+.login-shell.ready {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateY(0);
 }
 
-/* Logo 区域 */
-.logo-section {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.logo-circle {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+/* 顶部状态条 */
+.shell-head {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-  box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
-  animation: pulse-glow 3s infinite;
+  gap: 10px;
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(77, 214, 240, 0.15);
+  font-family: 'SF Mono', 'Consolas', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: rgba(174, 220, 255, 0.6);
 }
 
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
-  }
-  50% {
-    box-shadow: 0 10px 60px rgba(16, 185, 129, 0.6), 0 0 30px rgba(52, 211, 153, 0.3);
-  }
+.head-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #22d3ee;
+  box-shadow: 0 0 8px rgba(34, 211, 238, 0.9);
 }
 
-.logo-icon {
-  font-size: 36px;
-  animation: bounce-icon 2s ease-in-out infinite;
+.head-status {
+  margin-left: auto;
+  color: #34d399;
 }
 
-@keyframes bounce-icon {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
+.shell-body {
+  padding: 34px 34px 26px;
 }
 
-.brand-title {
-  font-size: 32px;
+.console-title {
+  font-size: 28px;
   font-weight: 800;
-  color: #fff;
-  margin: 0 0 8px 0;
-  letter-spacing: 4px;
-  background: linear-gradient(135deg, #fff 0%, #a7f3d0 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  letter-spacing: 5px;
+  color: #ffffff;
+  margin: 0 0 6px;
 }
 
-.brand-subtitle {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0;
+.console-sub {
+  font-size: 13px;
+  color: rgba(174, 220, 255, 0.55);
+  letter-spacing: 2px;
+  margin: 0 0 30px;
 }
 
-/* 表单样式 */
-.login-form {
-  margin-bottom: 24px;
-}
-
-:deep(.custom-input .el-input__wrapper) {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 6px 16px;
+.term-input :deep(.el-input__wrapper) {
+  background: rgba(6, 18, 38, 0.9);
+  border: 1px solid rgba(77, 214, 240, 0.2);
+  border-radius: 6px;
   box-shadow: none;
-  transition: all 0.3s;
 }
 
-:deep(.custom-input .el-input__wrapper:hover) {
-  border-color: rgba(16, 185, 129, 0.5);
-  background: rgba(255, 255, 255, 0.08);
+.term-input :deep(.el-input__wrapper.is-focus) {
+  border-color: #22d3ee;
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.15);
 }
 
-:deep(.custom-input .el-input__wrapper.is-focus) {
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-  background: rgba(255, 255, 255, 0.1);
+.term-input :deep(.el-input__inner) {
+  color: #d9efff;
 }
 
-:deep(.custom-input .el-input__inner) {
-  color: #fff;
-  font-size: 15px;
+.term-input :deep(.el-input__inner::placeholder) {
+  color: rgba(174, 220, 255, 0.35);
 }
 
-:deep(.custom-input .el-input__inner::placeholder) {
-  color: rgba(255, 255, 255, 0.4);
-}
-
-:deep(.custom-input .el-input__prefix .el-icon) {
-  color: rgba(255, 255, 255, 0.5);
+.term-input :deep(.el-input__prefix .el-icon) {
+  color: rgba(77, 214, 240, 0.6);
 }
 
 .remember-row {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
-:deep(.el-checkbox__label) {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-:deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
-  background-color: #10b981;
-  border-color: #10b981;
+.remember-row :deep(.el-checkbox__label) {
+  color: rgba(174, 220, 255, 0.55);
 }
 
 .login-btn {
   width: 100%;
-  height: 52px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  height: 46px;
   border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
   letter-spacing: 4px;
-  transition: all 0.3s;
-  position: relative;
-  overflow: hidden;
+  background: linear-gradient(90deg, #0e7bd4 0%, #22d3ee 100%);
 }
 
 .login-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
+  opacity: 0.9;
 }
 
-/* 底部 */
-.login-footer {
-  text-align: center;
-}
-
-.features {
+.shell-foot {
   display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.feature {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-  padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-top: 1px solid rgba(77, 214, 240, 0.15);
+  font-family: 'SF Mono', 'Consolas', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: rgba(174, 220, 255, 0.35);
 }
 </style>

@@ -148,7 +148,7 @@ public class SettingsController {
 
         // 系统设置
         Map<String, Object> system = new HashMap<>();
-        system.put("siteName", configService.getConfig(KEY_SITE_NAME, "聚芯算力"));
+        system.put("siteName", configService.getConfig(KEY_SITE_NAME, "全球云智算"));
         system.put("contactEmail", configService.getConfig(KEY_CONTACT_EMAIL, ""));
         system.put("contactWechat", configService.getConfig(KEY_CONTACT_WECHAT, "juxinsuanli"));
         system.put("contactWorkTime", configService.getConfig(KEY_CONTACT_WORK_TIME, "9:00-18:00"));
@@ -353,7 +353,7 @@ public class SettingsController {
     }
 
     /**
-     * 获取单个AI功能消耗的聚芯算力值（小程序调用）
+     * 获取单个AI功能消耗的算力值（小程序调用）
      */
     @GetMapping("/ai-cost/{type}")
     public Result<Object> getAiCost(@PathVariable String type) {
@@ -434,7 +434,7 @@ public class SettingsController {
     @GetMapping("/system-config")
     public Result<Object> getSystemConfig() {
         Map<String, Object> system = new HashMap<>();
-        system.put("siteName", configService.getConfig(KEY_SITE_NAME, "聚芯算力"));
+        system.put("siteName", configService.getConfig(KEY_SITE_NAME, "全球云智算"));
         system.put("contactWechat", configService.getConfig(KEY_CONTACT_WECHAT, "juxinsuanli"));
         system.put("contactWorkTime", configService.getConfig(KEY_CONTACT_WORK_TIME, "9:00-18:00"));
         system.put("contactEmail", configService.getConfig(KEY_CONTACT_EMAIL, ""));

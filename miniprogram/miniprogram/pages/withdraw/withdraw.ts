@@ -12,8 +12,8 @@ Page({
             total: '0.00',
             pending: '0.00',
             withdrawn: '0.00',
-            hashrateBalance: 0,  // 可提现聚芯算力值
-            totalHashrate: 0     // 累计聚芯算力值
+            hashrateBalance: 0,  // 可提现算力值
+            totalHashrate: 0     // 累计算力值
         },
         form: {
             type: 3, // 1-微信(暂关) 2-支付宝 3-银行卡

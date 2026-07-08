@@ -245,7 +245,7 @@ public class AppUserController {
         if (user == null) {
             return Result.error("用户不存在");
         }
-        // 强制根据余额同步聚芯算力值并保存到数据库
+        // 强制根据余额同步算力值并保存到数据库
         if (user.getBalance() != null) {
             try {
                 int hashrateRate = Integer.parseInt(configService.getConfig("earnings.hashratePerYuan", "100"));
@@ -538,7 +538,7 @@ public class AppUserController {
 
         // 填充额外信息
         for (AppUser user : result.getRecords()) {
-            // 强制根据余额同步聚芯算力值显示
+            // 强制根据余额同步算力值显示
             if (user.getBalance() != null) {
                 user.setQuota(user.getBalance().multiply(new java.math.BigDecimal(hashrateRate)).intValue());
             }
@@ -748,7 +748,7 @@ public class AppUserController {
         result.put("avatarUrl", user.getAvatarUrl());
         result.put("phone", user.getPhone());
         result.put("balance", user.getBalance());
-        // 强制根据余额同步聚芯算力值显示, 覆盖数据库中的配额字段
+        // 强制根据余额同步算力值显示, 覆盖数据库中的配额字段
         result.put("quota",
                 user.getBalance() != null
                         ? user.getBalance().multiply(new java.math.BigDecimal(hashrateRate)).intValue()

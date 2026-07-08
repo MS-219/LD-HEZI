@@ -12,17 +12,17 @@ CREATE TABLE IF NOT EXISTS `system_config` (
 -- 插入默认配置
 INSERT INTO `system_config` (`config_key`, `config_value`, `description`) VALUES
 ('earnings.hourlyRate', '2.4', '每小时收益（元）'),
-('earnings.hashratePerYuan', '100', '算力兑换比例（多少聚芯算力值=1元）'),
+('earnings.hashratePerYuan', '100', '算力兑换比例（多少算力值=1元）'),
 ('earnings.minWithdraw', '10', '最低提现金额（元）'),
 ('earnings.withdrawFee', '1', '提现手续费（%）'),
-('ai.imageGenCost', '10', '图片生成消耗聚芯算力值'),
-('ai.imageToVideoCost', '100', '图生视频消耗聚芯算力值'),
-('ai.videoGenCost', '200', '视频生成消耗聚芯算力值'),
-('ai.chatCost', '1', 'AI对话消耗聚芯算力值'),
+('ai.imageGenCost', '10', '图片生成消耗算力值'),
+('ai.imageToVideoCost', '100', '图生视频消耗算力值'),
+('ai.videoGenCost', '200', '视频生成消耗算力值'),
+('ai.chatCost', '1', 'AI对话消耗算力值'),
 ('device.heartbeatTimeout', '120', '心跳超时时间（秒）'),
 ('device.offlineThreshold', '120', '离线判定时间（秒）'),
 ('device.autoAssignBusiness', 'true', '自动分配业务号'),
-('system.siteName', '聚芯算力', '系统名称'),
+('system.siteName', '全球云智算', '系统名称'),
 ('system.contactEmail', '', '联系邮箱'),
 ('system.maintenanceMode', 'false', '维护模式')
 ON DUPLICATE KEY UPDATE `config_key` = `config_key`;

@@ -1,0 +1,10 @@
+/* 全球云智算 全局主题：覆盖 Element Plus 主色（深海蓝 + 青） */
+:root {
+  --el-color-primary: #0e7bd4;
+  --el-color-primary-light-3: #4f9fe1;
+  --el-color-primary-light-5: #86bdea;
+  --el-color-primary-light-7: #b7d7f2;
+  --el-color-primary-light-8: #cfe4f6;
+  --el-color-primary-light-9: #e7f2fb;
+  --el-color-primary-dark-2: #0b62aa;
+}

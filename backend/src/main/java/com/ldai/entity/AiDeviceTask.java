@@ -36,7 +36,7 @@ public class AiDeviceTask {
     private Integer retryCount = 0;
 
     /**
-     * 奖励聚芯算力值
+     * 奖励算力值
      */
 
     /**

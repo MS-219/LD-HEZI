@@ -35,7 +35,7 @@ page {
     font-weight: 500;
 }
 
-/* 已消耗聚芯算力值卡片 */
+/* 已消耗算力值卡片 */
 .status-card {
     background: #ffffff;
     border-radius: 40rpx;

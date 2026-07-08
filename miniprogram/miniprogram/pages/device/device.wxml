@@ -79,7 +79,7 @@
                     <!-- Footer Stats -->
                     <view class="card-footer-stats">
                         <view class="stat-col">
-                            <text class="stat-label">可回收聚芯算力值</text>
+                            <text class="stat-label">可回收算力值</text>
                             <text class="stat-val">{{item.hashrate}}</text>
                         </view>
                         <view class="stat-divider"></view>

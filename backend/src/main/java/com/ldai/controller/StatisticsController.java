@@ -132,7 +132,7 @@ public class StatisticsController {
                 result.put("currentBalance", currentBalance);
                 result.put("deviceCount", deviceCount);
                 result.put("onlineCount", onlineCount);
-                // 新增 quota 字段，直接返回数据库中的真实聚芯算力值，供前端创作页使用
+                // 新增 quota 字段，直接返回数据库中的真实算力值，供前端创作页使用
                 result.put("quota", user != null && user.getQuota() != null ? user.getQuota() : 0);
 
                 return Result.success(result);

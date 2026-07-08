@@ -277,7 +277,7 @@ Page({
                         balance: data.currentBalance || '0.00',
                         totalEarnings: data.totalEarnings || data.total || '0.00', // 累计收益
                         deviceCount: data.deviceCount || 0,
-                        displayHashrate: Math.round((parseFloat(data.currentBalance) || 0) * (this.data.hashrateRate || 100)) // 动态计算聚芯算力值
+                        displayHashrate: Math.round((parseFloat(data.currentBalance) || 0) * (this.data.hashrateRate || 100)) // 动态计算算力值
                     },
                     deviceStats: {
                         total: data.deviceCount || 0,
@@ -411,7 +411,7 @@ Page({
         }
 
         // 2. 针对生产环境的简单处理
-        if (fullUrl.startsWith('http://juxinsuanli.cn')) {
+        if (fullUrl.startsWith('http://hz.shandongliandong.com')) {
             fullUrl = fullUrl.replace('http://', 'https://');
         }
 

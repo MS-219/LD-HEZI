@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 聚芯算力 Linux 部署脚本
+# 全球云智算 Linux 部署脚本
 # 域名: juxinsuanli.cn
 # 服务器: 123.57.226.180
 # 使用方法: ./deploy.sh [命令]

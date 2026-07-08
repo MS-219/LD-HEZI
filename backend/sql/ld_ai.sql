@@ -71,7 +71,7 @@ CREATE TABLE `device`  (
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '设备备注名',
   `location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '未知位置' COMMENT '地理位置',
   `carrier` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '运营商',
-  `hashrate` int(11) NULL DEFAULT 0 COMMENT '聚芯算力值',
+  `hashrate` int(11) NULL DEFAULT 0 COMMENT '算力值',
   `last_heartbeat_time` datetime(0) NULL DEFAULT NULL COMMENT '最后心跳时间',
   `last_pay_time` datetime(0) NULL DEFAULT NULL COMMENT '上次结算时间',
   `bind_time` datetime(0) NULL DEFAULT NULL COMMENT '绑定时间',
@@ -122,7 +122,7 @@ CREATE TABLE `notice`  (
 -- Records of notice (示例数据)
 -- ----------------------------
 INSERT INTO `notice` VALUES (1, '小程序迁移通知', '如有企业用户或特殊权限用户，请提前与您的专属客户经理沟通，我们将提供一对一协助。', NULL, 1, 1, 10, '2025-12-01 10:00:00', '2025-12-01 10:00:00', '2025-12-01 10:00:00');
-INSERT INTO `notice` VALUES (2, '联动聚芯算力今日上线！', '全新版本，算力更强，收益更高。欢迎体验！', NULL, 2, 1, 5, '2025-12-10 09:00:00', '2025-12-10 09:00:00', '2025-12-10 09:00:00');
+INSERT INTO `notice` VALUES (2, '全球云智算今日上线！', '全新版本，算力更强，收益更高。欢迎体验！', NULL, 2, 1, 5, '2025-12-10 09:00:00', '2025-12-10 09:00:00', '2025-12-10 09:00:00');
 
 -- ----------------------------
 -- 7. Table structure for withdraw (提现记录)

@@ -40,10 +40,10 @@ Page({
     data: {
         navBarTop: 0,
         navBarHeight: 44,
-        quota: 0,  // 用户聚芯算力值
+        quota: 0,  // 用户算力值
         balance: 0, // 用户余额
         hashrateRate: 100, // 算力兑换比例
-        consumedHashrate: 0, // 已消耗聚芯算力值
+        consumedHashrate: 0, // 已消耗算力值
         imagesCount: 0,
         i2vCount: 0,
         vGenCount: 0,
@@ -98,7 +98,7 @@ Page({
         // 获取最新的收费标准
         this.fetchAiCosts();
 
-        // 如果已登录，获取聚芯算力值和统计
+        // 如果已登录，获取算力值和统计
         if (userId) {
             this.fetchQuota();
             this.fetchStats();
@@ -141,7 +141,7 @@ Page({
         });
     },
 
-    // 获取用户聚芯算力值 (基于余额动态计算)
+    // 获取用户算力值 (基于余额动态计算)
     fetchQuota() {
         const userId = wx.getStorageSync('userId');
         if (!userId) return;

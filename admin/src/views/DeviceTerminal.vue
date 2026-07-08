@@ -82,7 +82,7 @@ const initTerminal = () => {
   fitAddon.fit()
   bindTerminalInput()
 
-  term.writeln('\x1b[1;32m[LD-AI 终端]\x1b[0m 欢迎使用远程维护系统...')
+  term.writeln('\x1b[1;32m[全球云智算终端]\x1b[0m 欢迎使用远程维护系统...')
   term.writeln('\x1b[1;33m[系统]\x1b[0m 终端标识: ' + sn.value)
   term.writeln('\x1b[1;33m[系统]\x1b[0m 正在建立通信隧道...\r\n')
 

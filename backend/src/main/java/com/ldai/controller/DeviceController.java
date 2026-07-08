@@ -307,7 +307,7 @@ public class DeviceController {
             map.put("createTime", device.getCreateTime());
             map.put("bindTime", device.getBindTime());
 
-            // 聚芯算力值统计：计算今日贡献的算力 (运行小时数 * 100)
+            // 算力值统计：计算今日贡献的算力 (运行小时数 * 100)
             int todayHours = deviceEarningsMapper.countByDeviceAndDate(device.getId(), today);
             map.put("hashrate", todayHours * 100);
 
@@ -872,7 +872,7 @@ public class DeviceController {
                 "sn", device.getSn(),
                 "status", device.getStatus(),
                 "bound", device.getUserId() != null,
-                "name", device.getName() != null ? device.getName() : "聚芯算力节点"));
+                "name", device.getName() != null ? device.getName() : "云智算节点"));
     }
 
     /**
@@ -916,7 +916,7 @@ public class DeviceController {
                 "bindCode", device.getBindCode() != null ? device.getBindCode() : "",
                 "status", device.getStatus(),
                 "bound", device.getUserId() != null,
-                "name", device.getName() != null ? device.getName() : "聚芯算力节点"));
+                "name", device.getName() != null ? device.getName() : "云智算节点"));
     }
 
     /**

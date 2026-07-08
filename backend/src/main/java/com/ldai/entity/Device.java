@@ -42,7 +42,7 @@ public class Device {
     // 运营商 (移动/联通/电信)
     private String carrier;
 
-    // 贡献聚芯算力值
+    // 贡献算力值
     private Integer hashrate;
 
     // 设备类型 0:真实设备 1:挂靠设备

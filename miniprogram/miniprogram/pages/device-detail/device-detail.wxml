@@ -16,7 +16,7 @@
             <view class="device-meta">
                 <view class="meta-row">
                     <view class="device-title-wrap">
-                        <text class="device-name">{{device.name || '聚芯算力节点'}}</text>
+                        <text class="device-name">{{device.name || '全球云智算节点'}}</text>
                         <view class="device-sn-row">
                             <text class="sn-label">SN</text>
                             <text class="device-sn">{{device.bindCode || device.sn}}</text>
@@ -31,7 +31,7 @@
         </view>
         <view class="stats-panel">
             <view class="stat-item primary">
-                <text class="label">可回收聚芯算力值</text>
+                <text class="label">可回收算力值</text>
                 <text class="value highlight">{{device.hashrate || 0}}</text>
             </view>
             <view class="stat-divider"></view>

@@ -162,7 +162,7 @@ Page({
             const idx = url.indexOf('/uploads/');
             fullUrl = API_BASE + url.substring(idx);
         }
-        if (fullUrl.startsWith('http://juxinsuanli.cn')) {
+        if (fullUrl.startsWith('http://hz.shandongliandong.com')) {
             fullUrl = fullUrl.replace('http://', 'https://');
         }
         if (API_BASE.startsWith('https') && fullUrl.startsWith('http://')) {

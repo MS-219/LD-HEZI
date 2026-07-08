@@ -148,7 +148,7 @@ const statCards = computed(() => [
     subClass: ''
   },
   { 
-    label: '总聚芯算力值', 
+    label: '总算力值', 
     value: stats.value.hashrate?.total || 0, 
     icon: '⚡', 
     type: 'orange',

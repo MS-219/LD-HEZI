@@ -325,7 +325,7 @@ Page({
                 if (err.errMsg && err.errMsg.includes('domain')) {
                     wx.showModal({
                         title: '域名未配置',
-                        content: `文件服务器域名未在小程序后台配置。\n\n请在微信公众平台-开发管理-开发设置中，将 juxinsuanli.cn 添加到 downloadFile 合法域名。`,
+                        content: `文件服务器域名未在小程序后台配置。\n\n请在微信公众平台-开发管理-开发设置中，将 hz.shandongliandong.com 添加到 downloadFile 合法域名。`,
                         showCancel: false
                     });
                 } else if (err.errMsg && err.errMsg.includes('url')) {

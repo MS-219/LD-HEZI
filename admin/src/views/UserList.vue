@@ -34,7 +34,7 @@
           <div class="stat-icon">⚡</div>
           <div class="stat-info">
             <div class="stat-value">{{ stats.totalQuota || 0 }}</div>
-            <div class="stat-label">总聚芯算力值</div>
+            <div class="stat-label">总算力值</div>
           </div>
         </div>
       </el-col>
@@ -110,7 +110,7 @@
             <span class="balance">¥{{ row.balance || '0.00' }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="聚芯算力值" width="90">
+        <el-table-column label="算力值" width="90">
           <template #default="{ row }">
             <span class="quota-value">⚡{{ row.quota ?? 0 }}</span>
           </template>
@@ -216,7 +216,7 @@
             </div>
             <div class="stat-item">
               <div class="stat-num quota-value">⚡ {{ currentUser.quota ?? 0 }}</div>
-              <div class="stat-text">聚芯算力值</div>
+              <div class="stat-text">算力值</div>
             </div>
             <div class="stat-item">
               <div class="stat-num">¥{{ currentUser.totalEarnings || '0.00' }}</div>
@@ -300,7 +300,7 @@
               </el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="备注" :span="2">{{ currentUser.remark || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="聚芯算力值">⚡ {{ currentUser.quota ?? 0 }}</el-descriptions-item>
+            <el-descriptions-item label="算力值">⚡ {{ currentUser.quota ?? 0 }}</el-descriptions-item>
             <el-descriptions-item label="OpenID" :span="2">
               <code>{{ currentUser.openid }}</code>
             </el-descriptions-item>
@@ -435,10 +435,10 @@
       </template>
     </el-dialog>
 
-    <!-- 充值聚芯算力值弹窗 -->
-    <el-dialog v-model="rechargeVisible" title="充值聚芯算力值" width="400px">
+    <!-- 充值算力值弹窗 -->
+    <el-dialog v-model="rechargeVisible" title="充值算力值" width="400px">
       <el-form :model="rechargeForm" label-width="80px">
-        <el-form-item label="当前聚芯算力值">
+        <el-form-item label="当前算力值">
           <span class="quota-value">⚡ {{ rechargeForm.currentQuota }}</span>
         </el-form-item>
         <el-form-item label="充值数量">
@@ -741,7 +741,7 @@ const confirmRecharge = async () => {
       amount: rechargeForm.amount
     })
     if (res.data.code === 200) {
-      ElMessage.success(`成功充值 ${rechargeForm.amount} 聚芯算力值`)
+      ElMessage.success(`成功充值 ${rechargeForm.amount} 算力值`)
       rechargeVisible.value = false
       fetchUsers()
       fetchStats()

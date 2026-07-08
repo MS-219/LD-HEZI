@@ -48,7 +48,7 @@ npm install
 
 ## 二开前优先处理
 
-1. 替换品牌文案：当前仍有“聚芯算力”“LD-AI”等母版名称。
+1. 替换品牌文案：当前仍有“全球云智算”“LD-AI”等母版名称。
 2. 替换域名：当前仍引用 `juxinsuanli.cn`、`api.juxinsuanli.cn`、`ld.juxinsuanli.cn`。
 3. 迁移密钥：`backend/src/main/resources/application.yml` 中包含微信和 AI 服务配置，二开时应改为环境变量。
 4. 初始化数据库：基础 SQL 在 `backend/sql/`，主库名默认为 `juxinsuanli`。
