@@ -47,40 +47,8 @@ build_admin() {
     build_frontend_dir "SL-admin" "算力监控后台"
 }
 
-stop_legacy_backend() {
-    if command -v systemctl >/dev/null 2>&1 && systemctl list-unit-files 2>/dev/null | grep -q "^ld-ai.service"; then
-        if systemctl is-active --quiet ld-ai; then
-            warn "停止旧 systemd 后端服务 ld-ai"
-            systemctl stop ld-ai || true
-        fi
-        if [ "${DISABLE_LEGACY_SERVICE:-true}" = "true" ]; then
-            if systemctl is-enabled --quiet ld-ai 2>/dev/null; then
-                warn "禁用旧 systemd 后端服务开机自启，避免和 Docker 容器抢占 8080"
-                systemctl disable ld-ai || true
-            fi
-        fi
-    fi
-
-    if docker ps -a --format '{{.Names}}' | grep -qx "$BACKEND_CONTAINER"; then
-        return
-    fi
-
-    local pids
-    pids="$(pgrep -f 'app.jar|backend.*\.jar' || true)"
-    if [ -n "$pids" ]; then
-        warn "停止旧 Java 后端进程: $pids"
-        kill $pids 2>/dev/null || true
-        sleep 2
-        pids="$(pgrep -f 'app.jar|backend.*\.jar' || true)"
-        if [ -n "$pids" ]; then
-            kill -9 $pids 2>/dev/null || true
-        fi
-    fi
-}
-
 start_backend() {
     ensure_dirs
-    stop_legacy_backend
 
     if docker ps -a --format '{{.Names}}' | grep -qx "$BACKEND_CONTAINER"; then
         warn "替换旧后端容器 $BACKEND_CONTAINER"
@@ -199,10 +167,9 @@ case "${1:-help}" in
   ./deploy-docker.sh logs           查看后端日志
 
 说明:
-  - MySQL 继续使用现有 127.0.0.1:3307，不会动数据库容器。
-  - 宿主机 Nginx 继续使用现有配置，前端仍输出到 admin/dist 和 SL-admin/dist。
-  - 第一次 deploy 会在构建成功后停止旧 ld-ai/app.jar，再启动 Docker 后端。
-  - 默认会禁用旧 ld-ai.service 开机自启；如需保留，执行前设置 DISABLE_LEGACY_SERVICE=false。
+  - MySQL 使用 qqyzs-mysql 容器（127.0.0.1:3307，库 ldhezi）。
+  - 端口默认 8080，共享服务器上用 SERVER_PORT=8090 ./deploy-docker.sh deploy 指定。
+  - 本脚本只操作 qqyzs-backend 容器，不影响宿主机上其他项目的容器。
 USAGE
         ;;
 esac
