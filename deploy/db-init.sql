@@ -2,7 +2,7 @@
 -- 全球云智算（LD-HEZI）数据库初始化脚本
 -- 库名: ldhezi  字符集: utf8mb4
 -- 依据 backend/src/main/java/com/ldai/entity/ 下 26 个实体类生成
---（MyBatis-Plus 驼峰字段 → 下划线列名）
+-- (MyBatis-Plus 驼峰字段 -> 下划线列名)
 --
 -- 用法:
 --   docker exec -i qqyzs-mysql mysql -uldhezi -pldhezi ldhezi < deploy/db-init.sql
