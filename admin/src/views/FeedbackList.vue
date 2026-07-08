@@ -341,7 +341,7 @@ onMounted(() => {
 }
 code {
   font-size: 12px;
-  color: #6366f1;
+  color: #0e7bd4;
   background: rgba(99, 102, 241, 0.1);
   padding: 2px 6px;
   border-radius: 4px;

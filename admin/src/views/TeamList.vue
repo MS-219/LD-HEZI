@@ -431,7 +431,7 @@ onMounted(() => {
   font-weight: 600;
   color: #374151;
   padding-left: 10px;
-  border-left: 4px solid #4f46e5;
+  border-left: 4px solid #0b62aa;
 }
 
 .leader-col {
@@ -526,7 +526,7 @@ onMounted(() => {
 }
 
 .stat-value.highlight {
-  color: #4f46e5;
+  color: #0b62aa;
 }
 
 .empty-state {

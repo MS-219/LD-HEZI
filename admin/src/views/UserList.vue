@@ -978,7 +978,7 @@ onMounted(() => {
 
 .user-id {
   font-size: 11px;
-  color: #7c3aed;
+  color: #0b62aa;
   font-weight: 500;
 }
 
@@ -1121,7 +1121,7 @@ onMounted(() => {
 .sn-code {
   font-family: 'SF Mono', 'Monaco', monospace;
   font-size: 12px;
-  color: #7c3aed;
+  color: #0b62aa;
   background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
   padding: 3px 8px;
   border-radius: 4px;
@@ -1136,7 +1136,7 @@ onMounted(() => {
 code {
   font-family: 'SF Mono', 'Monaco', monospace;
   font-size: 12px;
-  color: #7c3aed;
+  color: #0b62aa;
   background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
   padding: 3px 8px;
   border-radius: 4px;
@@ -1239,7 +1239,7 @@ code {
   position: absolute;
   top: -12px;
   left: 16px;
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, #0e7bd4 0%, #0b62aa 100%);
   color: #fff;
   padding: 2px 12px;
   border-radius: 20px;
@@ -1274,7 +1274,7 @@ code {
 .sync-tip {
   margin-top: 8px;
   text-align: center;
-  color: #6366f1;
+  color: #0e7bd4;
   background: #f5f3ff;
   padding: 4px;
   border-radius: 4px;

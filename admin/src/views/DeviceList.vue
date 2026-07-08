@@ -126,7 +126,7 @@
       <el-table :data="offlineLogs" v-loading="offlineLogLoading" stripe>
         <el-table-column label="绑定码" width="200">
           <template #default="{ row }">
-            <span style="font-weight: bold; color: #7c3aed;">{{ row.bindCode || row.sn }}</span>
+            <span style="font-weight: bold; color: #0b62aa;">{{ row.bindCode || row.sn }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="offlineTime" label="离线判定时间" width="180" />
@@ -444,7 +444,7 @@
     <el-dialog v-model="bindUserVisible" title="绑定用户" width="550px" @opened="loadInitialUsers">
       <el-form :model="bindUserForm" label-width="100px">
         <el-form-item label="当前设备">
-          <span style="font-weight: bold; color: #7c3aed;">{{ bindUserForm.deviceSn }}</span>
+          <span style="font-weight: bold; color: #0b62aa;">{{ bindUserForm.deviceSn }}</span>
         </el-form-item>
         <el-form-item label="选择用户" required>
           <el-select 
@@ -957,7 +957,7 @@ const initChart = async () => {
           type: 'line',
           smooth: true,
           areaStyle: { opacity: 0.3 },
-          itemStyle: { color: '#7c3aed' }
+          itemStyle: { color: '#0b62aa' }
         }]
       }
       myChart.setOption(option)
@@ -1280,14 +1280,14 @@ const exportQrCodes = async () => {
     .qr-item.bound { border-color: #10b981; background: #f0fdf4; }
     .qr-item.unbound { border-color: #f59e0b; background: #fffbeb; }
     .qr-item img { margin: 10px auto; display: block; }
-    .qr-code { font-size: 18px; font-weight: bold; color: #7c3aed; margin-top: 10px; }
+    .qr-code { font-size: 18px; font-weight: bold; color: #0b62aa; margin-top: 10px; }
     .qr-sn { font-size: 10px; color: #999; word-break: break-all; margin-top: 5px; }
     .qr-status { font-size: 12px; margin-top: 5px; }
     .qr-status.bound { color: #10b981; }
     .qr-status.unbound { color: #f59e0b; }
     .print-btn { 
       position: fixed; top: 10px; right: 10px; 
-      padding: 10px 20px; background: #7c3aed; color: white; 
+      padding: 10px 20px; background: #0b62aa; color: white; 
       border: none; border-radius: 5px; cursor: pointer; 
       z-index: 100;
     }
@@ -1544,7 +1544,7 @@ onMounted(() => {
 
 .user-id {
   font-size: 11px;
-  color: #7c3aed;
+  color: #0b62aa;
   font-weight: 500;
 }
 
@@ -1775,7 +1775,7 @@ onMounted(() => {
 }
 
 :deep(.el-button--info) {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, #0e7bd4 0%, #0b62aa 100%);
   border: none;
   color: #fff;
 }
@@ -1809,7 +1809,7 @@ onMounted(() => {
 .header-sn {
   font-family: 'SF Mono', 'Monaco', monospace;
   font-size: 13px;
-  color: #7c3aed;
+  color: #0b62aa;
   background: #f5f3ff;
   padding: 2px 8px;
   border-radius: 4px;
@@ -1890,7 +1890,7 @@ onMounted(() => {
 
 .sn-value {
   font-family: 'SF Mono', 'Monaco', monospace;
-  color: #7c3aed;
+  color: #0b62aa;
   font-weight: 600;
 }
 

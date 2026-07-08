@@ -28,7 +28,7 @@ body {
 }
 
 .el-button--primary {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+  background: linear-gradient(135deg, #0e7bd4 0%, #1e5fae 100%) !important;
   border: none !important;
 }
 

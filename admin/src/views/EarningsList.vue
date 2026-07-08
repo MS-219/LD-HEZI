@@ -540,7 +540,7 @@ onMounted(() => {
 }
 
 .stat-card.income-total {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, #0e7bd4 0%, #0b62aa 100%);
   box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);
 }
 
@@ -607,7 +607,7 @@ onMounted(() => {
 }
 
 .sum-amount {
-  color: #4f46e5;
+  color: #0b62aa;
   font-weight: 700;
   font-size: 15px;
 }
@@ -636,7 +636,7 @@ onMounted(() => {
 
 .user-id {
   font-size: 11px;
-  color: #7c3aed;
+  color: #0b62aa;
   font-weight: 500;
 }
 
@@ -701,7 +701,7 @@ onMounted(() => {
 code {
   font-family: 'SF Mono', 'Monaco', monospace;
   font-size: 12px;
-  color: #7c3aed;
+  color: #0b62aa;
   background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
   padding: 2px 6px;
   border-radius: 4px;
@@ -873,7 +873,7 @@ code {
 }
 
 .result-stat-item.highlight {
-  border-color: #8b5cf6;
+  border-color: #1e5fae;
   background: rgba(237, 233, 254, 0.5);
 }
 
@@ -893,7 +893,7 @@ code {
 }
 
 .result-stat-item.highlight .result-stat-value {
-  color: #7c3aed;
+  color: #0b62aa;
 }
 
 .result-stat-label {

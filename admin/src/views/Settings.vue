@@ -5,7 +5,7 @@
       <el-col :span="24" style="margin-bottom: 24px;">
         <el-card class="setting-card profile-card" id="profile">
           <template #header>
-            <span class="card-title">👤 个人信息</span>
+            <span class="card-title">个人信息</span>
           </template>
           <div class="profile-info">
             <el-avatar :size="80" class="profile-avatar">{{ (adminInfo.username || 'A').charAt(0).toUpperCase() }}</el-avatar>
@@ -31,7 +31,7 @@
       <el-col :span="12">
         <el-card class="setting-card">
           <template #header>
-            <span class="card-title">💰 收益设置</span>
+            <span class="card-title">收益设置</span>
           </template>
           <el-form :model="earningsSettings" label-width="140px">
             <el-form-item label="每小时收益 (￥)">
@@ -78,7 +78,7 @@
       <el-col :span="12">
         <el-card class="setting-card">
           <template #header>
-            <span class="card-title">📱 设备设置</span>
+            <span class="card-title">设备设置</span>
           </template>
           <el-form :model="deviceSettings" label-width="120px">
             <el-form-item label="心跳超时时间">
@@ -101,7 +101,7 @@
         <!-- 提现日期限制设置 -->
         <el-card class="setting-card" style="margin-top: 24px;">
           <template #header>
-            <span class="card-title">📅 提现日期限制</span>
+            <span class="card-title">提现日期限制</span>
           </template>
           <el-form label-width="120px">
             <el-form-item label="允许提现日">
@@ -127,7 +127,7 @@
       <el-col :span="12" style="margin-top: 24px;">
         <el-card class="setting-card">
           <template #header>
-            <span class="card-title">⚙️ 系统设置</span>
+            <span class="card-title">系统设置</span>
           </template>
           <el-form :model="systemSettings" label-width="120px">
             <el-form-item label="系统名称">
@@ -158,7 +158,7 @@
         <el-card class="setting-card">
           <template #header>
             <div class="card-header-flex">
-              <span class="card-title">🖼️ 首页轮播图</span>
+              <span class="card-title">首页轮播图</span>
               <el-button type="success" size="small" @click="addBanner">+ 添加轮播</el-button>
             </div>
           </template>
@@ -197,7 +197,7 @@
       <el-col :span="12" style="margin-top: 24px;">
         <el-card class="setting-card" id="security">
           <template #header>
-            <span class="card-title">🔒 安全设置</span>
+            <span class="card-title">安全设置</span>
           </template>
           <el-form :model="securitySettings" label-width="120px">
             <el-form-item label="当前密码">
@@ -516,7 +516,7 @@ onMounted(async () => {
 }
 
 .profile-avatar {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, #0e7bd4 0%, #0b62aa 100%);
   font-size: 36px;
   font-weight: 800;
   box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
@@ -648,7 +648,7 @@ onMounted(async () => {
 }
 
 .banner-img-preview:hover {
-  border-color: #6366f1;
+  border-color: #0e7bd4;
   background: #f5f3ff;
 }
 

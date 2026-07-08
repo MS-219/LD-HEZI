@@ -563,7 +563,7 @@ onMounted(refreshAll)
 
 .stat-card.primary { border-left: 4px solid #1890ff; }
 .stat-card.warning { border-left: 4px solid #faad14; }
-.stat-card.indigo { border-left: 4px solid #6366f1; }
+.stat-card.indigo { border-left: 4px solid #0e7bd4; }
 .stat-card.success { border-left: 4px solid #52c41a; }
 .stat-card.danger { border-left: 4px solid #f56c6c; }
 

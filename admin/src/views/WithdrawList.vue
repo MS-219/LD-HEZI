@@ -663,7 +663,7 @@ onMounted(() => {
 }
 
 .amount-card.total {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #0e7bd4 0%, #1e5fae 100%);
 }
 
 .amount-card.pending-pay {
