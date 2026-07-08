@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 7,
   },
-  typeItemOn: { borderColor: colors.primary, backgroundColor: '#eef2ff' },
+  typeItemOn: { borderColor: colors.primary, backgroundColor: '#e7f2fb' },
   typeText: { color: colors.textSecondary, fontSize: 13 },
   typeTextOn: { color: colors.primary, fontWeight: '700' },
   input: {

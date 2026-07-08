@@ -119,8 +119,10 @@ function AppShell() {
                 const active = tab === item.key;
                 return (
                   <Pressable key={item.key} style={styles.tabButton} onPress={() => setTab(item.key)}>
-                    <Text style={styles.tabIcon}>{item.icon}</Text>
-                    <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{item.label}</Text>
+                    <View style={[styles.tabPill, active && styles.tabPillActive]}>
+                      <Text style={styles.tabIcon}>{item.icon}</Text>
+                      <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{item.label}</Text>
+                    </View>
                   </Pressable>
                 );
               })}
@@ -157,11 +159,20 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.border,
-    paddingTop: 6,
-    paddingBottom: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
-  tabButton: { flex: 1, alignItems: 'center', gap: 2 },
-  tabIcon: { fontSize: 18 },
-  tabLabel: { fontSize: 11, color: colors.muted },
-  tabLabelActive: { color: colors.primary, fontWeight: '700' },
+  tabButton: { flex: 1, alignItems: 'center' },
+  tabPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 999,
+  },
+  tabPillActive: { backgroundColor: colors.navy },
+  tabIcon: { fontSize: 16 },
+  tabLabel: { fontSize: 12, color: colors.muted, fontWeight: '600' },
+  tabLabelActive: { color: '#ffffff', fontWeight: '700' },
 });
