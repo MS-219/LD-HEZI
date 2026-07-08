@@ -16,22 +16,25 @@
           </div>
         </div>
         <el-menu
-          :default-active="activeMenu" 
-          router 
+          :default-active="activeMenu"
+          router
           class="menu"
           background-color="transparent"
-          text-color="#a0aec0"
-          active-text-color="#fff"
+          text-color="#51637f"
+          active-text-color="#0e7bd4"
         >
-          <el-menu-item
-            v-for="item in visibleMenus"
-            :key="item.index"
-            :index="item.index"
-          >
-            <el-icon><component :is="item.icon" /></el-icon>
-            <span :style="item.badge ? 'flex: 1;' : undefined">{{ menuLabel(item) }}</span>
-            <el-badge v-if="item.badge && pendingApplyCount > 0" :value="pendingApplyCount" :max="99" class="menu-badge" />
-          </el-menu-item>
+          <template v-for="group in visibleGroups" :key="group.name">
+            <div class="menu-group-label">{{ group.name }}</div>
+            <el-menu-item
+              v-for="item in group.items"
+              :key="item.index"
+              :index="item.index"
+            >
+              <el-icon><component :is="item.icon" /></el-icon>
+              <span :style="item.badge ? 'flex: 1;' : undefined">{{ menuLabel(item) }}</span>
+              <el-badge v-if="item.badge && pendingApplyCount > 0" :value="pendingApplyCount" :max="99" class="menu-badge" />
+            </el-menu-item>
+          </template>
         </el-menu>
         
         <!-- 侧边栏底部 -->
@@ -131,25 +134,49 @@ const displayUsername = computed(() => {
 const displayRole = computed(() => (isFactoryUser.value ? '工厂' : '超级管理员'))
 const userAvatarText = computed(() => (isFactoryUser.value ? '厂' : 'A'))
 
-const menuItems = [
-  { index: '/statistics', label: '数据统计', icon: DataAnalysis, adminOnly: true },
-  { index: '/device', label: '设备管理', factoryLabel: '设备二维码', icon: Monitor, adminOnly: true, factory: true },
-  { index: '/user', label: '用户管理', icon: User, adminOnly: true },
-  { index: '/notice', label: '公告管理', icon: Bell, adminOnly: true },
-  { index: '/withdraw', label: '提现管理', icon: Wallet, adminOnly: true },
-  { index: '/payment-apply', label: '账户变更审核', icon: Postcard, badge: true, adminOnly: true },
-  { index: '/earnings', label: '收益管理', icon: Money, adminOnly: true },
-  { index: '/feedback', label: '意见反馈', icon: Message, adminOnly: true },
-  { index: '/reward', label: '分润流水', icon: List, adminOnly: true },
-  { index: '/settings', label: '系统设置', icon: Setting, adminOnly: true },
-  { index: '/team', label: '团队管理', icon: UserFilled, adminOnly: true },
+const menuGroups = [
+  {
+    name: '总览',
+    items: [
+      { index: '/statistics', label: '数据统计', icon: DataAnalysis, adminOnly: true },
+    ],
+  },
+  {
+    name: '业务管理',
+    items: [
+      { index: '/device', label: '设备管理', factoryLabel: '设备二维码', icon: Monitor, adminOnly: true, factory: true },
+      { index: '/user', label: '用户管理', icon: User, adminOnly: true },
+      { index: '/notice', label: '公告管理', icon: Bell, adminOnly: true },
+      { index: '/feedback', label: '意见反馈', icon: Message, adminOnly: true },
+    ],
+  },
+  {
+    name: '财务管理',
+    items: [
+      { index: '/withdraw', label: '提现管理', icon: Wallet, adminOnly: true },
+      { index: '/payment-apply', label: '账户变更审核', icon: Postcard, badge: true, adminOnly: true },
+      { index: '/earnings', label: '收益管理', icon: Money, adminOnly: true },
+      { index: '/reward', label: '分润流水', icon: List, adminOnly: true },
+    ],
+  },
+  {
+    name: '系统',
+    items: [
+      { index: '/settings', label: '系统设置', icon: Setting, adminOnly: true },
+      { index: '/team', label: '团队管理', icon: UserFilled, adminOnly: true },
+    ],
+  },
 ]
 
-const visibleMenus = computed(() => {
-  if (isFactoryUser.value) {
-    return menuItems.filter(item => item.factory)
-  }
-  return menuItems.filter(item => item.adminOnly)
+const visibleGroups = computed(() => {
+  return menuGroups
+    .map((group) => ({
+      name: group.name,
+      items: group.items.filter((item) =>
+        isFactoryUser.value ? item.factory : item.adminOnly
+      ),
+    }))
+    .filter((group) => group.items.length > 0)
 })
 
 const menuLabel = (item) => {
@@ -217,33 +244,32 @@ const toggleFullscreen = () => {
 }
 
 .aside {
-  background: linear-gradient(180deg, #0b1f4b 0%, #123a7c 100%);
+  background: #ffffff;
   display: flex;
   flex-direction: column;
-  border-right: none;
-  box-shadow: 4px 0 24px rgba(15, 23, 42, 0.15);
+  border-right: 1px solid #e3e9f2;
+  box-shadow: none;
   z-index: 100;
 }
 
 .logo {
-  height: 80px;
+  height: 72px;
   display: flex;
   align-items: center;
-  padding: 0 24px;
-  gap: 14px;
-  background: rgba(0, 0, 0, 0.1);
+  padding: 0 20px;
+  gap: 12px;
+  border-bottom: 1px solid #e3e9f2;
 }
 
 .logo-icon-wrap {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(34, 211, 238, 0.12);
-  border: 1px solid rgba(34, 211, 238, 0.4);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0b1f4b 0%, #0e7bd4 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #4dd6f0;
+  color: #7fe3f7;
 }
 
 .logo-mark {
@@ -257,16 +283,16 @@ const toggleFullscreen = () => {
 }
 
 .logo-text {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
-  color: #fff;
+  color: #0f2a5c;
   letter-spacing: 1.5px;
   line-height: 1.2;
 }
 
 .logo-subtitle {
-  font-size: 11px;
-  color: #94a3b8;
+  font-size: 10px;
+  color: #8296b3;
   letter-spacing: 2px;
   text-transform: uppercase;
 }
@@ -274,33 +300,53 @@ const toggleFullscreen = () => {
 .menu {
   flex: 1;
   border-right: none;
-  padding: 20px 14px;
+  padding: 8px 14px 20px;
   overflow-y: auto;
 }
 
 /* 滚动条美化 */
 .menu::-webkit-scrollbar { width: 4px; }
-.menu::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.05); border-radius: 4px; }
+.menu::-webkit-scrollbar-thumb { background: #e3e9f2; border-radius: 4px; }
+
+/* 分组小标题 */
+.menu-group-label {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #9aa9c2;
+  padding: 18px 12px 6px;
+  user-select: none;
+}
 
 :deep(.el-menu-item) {
-  height: 50px;
-  margin: 6px 0;
-  border-radius: 12px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: #94a3b8 !important;
+  height: 42px;
+  margin: 2px 0;
+  border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+  color: #51637f !important;
+  position: relative;
 }
 
 :deep(.el-menu-item:hover) {
-  background: rgba(255, 255, 255, 0.05) !important;
-  color: #fff !important;
-  padding-left: 25px !important;
+  background: #f2f6fb !important;
+  color: #0f2a5c !important;
 }
 
 :deep(.el-menu-item.is-active) {
-  background: linear-gradient(90deg, #0e7bd4 0%, #22d3ee 100%) !important;
-  color: #fff !important;
-  box-shadow: 0 8px 16px rgba(14, 123, 212, 0.35);
+  background: #e7f2fb !important;
+  color: #0e7bd4 !important;
   font-weight: 700;
+  box-shadow: none;
+}
+
+:deep(.el-menu-item.is-active::before) {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: #0e7bd4;
 }
 
 :deep(.el-menu-item) {
@@ -323,8 +369,8 @@ const toggleFullscreen = () => {
 }
 
 .aside-footer {
-  padding: 20px 24px;
-  background: rgba(0, 0, 0, 0.1);
+  padding: 14px 20px;
+  border-top: 1px solid #e3e9f2;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -334,9 +380,9 @@ const toggleFullscreen = () => {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
+  padding: 8px 12px;
+  background: #f2f6fb;
+  border-radius: 8px;
 }
 
 .status-dot {
@@ -369,8 +415,8 @@ const toggleFullscreen = () => {
 }
 
 .status-text {
-  font-size: 13px;
-  color: #cbd5e1;
+  font-size: 12px;
+  color: #51637f;
   font-weight: 500;
 }
 

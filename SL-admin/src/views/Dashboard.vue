@@ -10,8 +10,8 @@
         :default-active="activeMenu"
         class="el-menu-vertical"
         background-color="transparent"
-        text-color="#ffffffa6"
-        active-text-color="#fff"
+        text-color="#51637f"
+        active-text-color="#0e7bd4"
         router
       >
         <el-menu-item index="/overview">
@@ -140,7 +140,8 @@ const handleCommand = (command) => {
 
 .sidebar {
   width: 240px;
-  background: linear-gradient(180deg, #0b1f4b 0%, #123a7c 100%);
+  background: #ffffff;
+  border-right: 1px solid #e3e9f2;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -152,8 +153,8 @@ const handleCommand = (command) => {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: white;
-  background: rgba(6, 18, 38, 0.5);
+  color: #0f2a5c;
+  border-bottom: 1px solid #e3e9f2;
 }
 
 .logo-text {
@@ -164,6 +165,31 @@ const handleCommand = (command) => {
 .el-menu-vertical {
   border-right: none;
   flex: 1;
+  padding: 8px;
+}
+
+.el-menu-vertical :deep(.el-menu-item),
+.el-menu-vertical :deep(.el-sub-menu__title) {
+  height: 42px;
+  line-height: 42px;
+  border-radius: 8px;
+  margin: 2px 0;
+}
+
+.el-menu-vertical :deep(.el-menu-item:hover),
+.el-menu-vertical :deep(.el-sub-menu__title:hover) {
+  background: #f2f6fb !important;
+  color: #0f2a5c !important;
+}
+
+.el-menu-vertical :deep(.el-menu-item.is-active) {
+  background: #e7f2fb !important;
+  color: #0e7bd4 !important;
+  font-weight: 700;
+}
+
+.el-menu-vertical :deep(.el-sub-menu .el-menu) {
+  background: transparent !important;
 }
 
 .main-content {
