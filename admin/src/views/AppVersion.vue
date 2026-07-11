@@ -73,7 +73,12 @@ const publish = async () => {
     if (res.data.code !== 200) return ElMessage.error(res.data.msg || '发布失败')
     ElMessage.success('版本发布成功')
     form.versionName = ''; form.versionCode += 1; form.releaseNotes = ''; apkFile.value = null; uploadRef.value?.clearFiles(); loadList()
-  } catch (e) { ElMessage.error('上传失败，请检查网络或文件大小') } finally { publishing.value = false }
+  } catch (e) {
+    const status = e.response?.status
+    if (status === 413) ElMessage.error('APK 超过服务器上传限制，请联系管理员调整 Nginx 配置')
+    else if (e.code === 'ECONNABORTED') ElMessage.error('上传超时，请检查网络后重试')
+    else ElMessage.error(e.response?.data?.msg || '上传失败，请检查网络连接后重试')
+  } finally { publishing.value = false }
 }
 onMounted(loadList)
 </script>
