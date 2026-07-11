@@ -14,8 +14,15 @@ import RewardList from '../views/RewardList.vue'
 import Settings from '../views/Settings.vue'
 import TeamList from '../views/TeamList.vue'
 import DeviceTerminal from '../views/DeviceTerminal.vue'
+import AppDownload from '../views/AppDownload.vue'
 
 const routes = [
+    {
+        path: '/download',
+        name: 'AppDownload',
+        component: AppDownload,
+        meta: { requiresAuth: false, title: '下载全球云智算 App' }
+    },
     {
         path: '/login',
         name: 'Login',
@@ -133,12 +140,16 @@ router.beforeEach((to, from, next) => {
         } else {
             next('/')
         }
-    } else if (userRole === 'factory' && to.path !== '/device' && to.path !== '/login') {
+    } else if (to.meta.requiresAuth !== false && userRole === 'factory' && to.path !== '/device' && to.path !== '/login') {
         // 工厂用户只能访问设备二维码导出页
         next('/device')
     } else {
         next()
     }
+})
+
+router.afterEach((to) => {
+    document.title = to.meta.title ? `${to.meta.title} - 全球云智算` : '全球云智算'
 })
 
 export default router
