@@ -26,16 +26,26 @@ cd android && ./gradlew assembleRelease
    https://gitee.com/openharmony-sig/ohos_react_native ）。
 2. 在 RN 侧构建鸿蒙 bundle（入口为本目录的 `index.harmony.ts`）：
    ```bash
-   npx react-native bundle \
-     --platform harmony \
-     --entry-file index.harmony.ts \
-     --bundle-output ./harmony-bundle/bundle.harmony.js \
-     --assets-dest ./harmony-bundle/assets
+   npm run bundle:harmony
    ```
+   当前仓库未内置 DevEco/RNOH 原生壳，因此默认脚本使用 React Native CLI 已支持的
+   `android` platform 做 JS 打包；运行时平台仍由鸿蒙 RNOH 宿主提供，业务入口仍是
+   `index.harmony.ts`。
+
+   如果你的 DevEco 工程已经完整接入 RNOH 平台包，并且本地 CLI 已识别
+   `--platform harmony`，可使用：
+   ```bash
+   npm run bundle:harmony:rnoh
+   ```
+   产物目录：
+   - `harmony-bundle/bundle.harmony.js`
+   - `harmony-bundle/assets/`
 3. ArkTS 侧加载 bundle，`appKey` 填 `QuanQiuYunZhiSuan`（与 `index.harmony.ts` 中
    `AppRegistry.registerComponent` 的名字一致）。
 4. AsyncStorage 使用 RNOH 社区版
    `@react-native-oh-tpl/async-storage`（API 与安卓版完全一致，无需改业务代码）。
+5. 在 DevEco Studio 中打包 `.hap` / `.app`。本仓库负责产出 RN 业务 bundle，
+   鸿蒙原生壳工程由 DevEco/RNOH 负责签名与发布。
 
 ## 平台差异与降级策略
 
@@ -47,10 +57,12 @@ cd android && ./gradlew assembleRelease
 | 分享邀请 | RN `Share` API | RNOH 已支持；异常时降级为复制链接（`InviteScreen`） |
 | 返回键 | `BackHandler` | RNOH 已支持（对应鸿蒙侧滑返回） |
 | 状态栏 | RN `StatusBar` | RNOH 已支持 |
+| 设备标识 | `android-...` | `harmony-...`（`src/platform.ts`） |
 
 若要在鸿蒙上补齐剪贴板/选图能力，可在 `src/native/` 两个封装文件里接入鸿蒙原生
 TurboModule（`@ohos.pasteboard`、`@ohos.file.picker`），业务代码无需改动。
 
 ## 判断当前平台
 
-RNOH 下 `Platform.OS === 'harmony'`，需要平台特判时统一使用该值。
+RNOH 下 `Platform.OS === 'harmony'`。业务代码不要直接散落判断，统一使用
+`src/platform.ts` 中的 `isHarmony`、`appPlatform`、`getDeviceIdPrefix()`。

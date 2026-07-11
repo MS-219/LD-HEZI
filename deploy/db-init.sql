@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `app_user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_openid` (`openid`),
   KEY `idx_inviter` (`inviter_id`),
-  KEY `idx_phone` (`phone`)
+  UNIQUE KEY `uk_phone` (`phone`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户';
 
 -- 设备

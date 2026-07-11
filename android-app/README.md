@@ -17,6 +17,23 @@ npm run android
 EXPO_PUBLIC_API_BASE=http://你的后端地址:8080
 ```
 
+## 正式包
+
+安卓正式包已输出在 `release/`：
+
+- `release/LD-HeZi-1.0.0-release.apk`
+- `release/LD-HeZi-1.0.0-release.aab`
+
+鸿蒙 NEXT 使用 RNOH 宿主工程加载 JS bundle：
+
+```bash
+npm run bundle:harmony
+```
+
+产物会输出到 `harmony-bundle/`，再放入 DevEco Studio 的 ArkTS/RNOH 工程打包
+`.hap` / `.app`。完整 RNOH 平台环境可改用 `npm run bundle:harmony:rnoh`。
+详细步骤见 [HARMONYOS.md](./HARMONYOS.md)。
+
 ## 功能覆盖（与小程序对齐，AI 创作相关功能按需求移除）
 
 底部 Tab（3 个，小程序原“创作”Tab 为 AI 功能已移除）：
@@ -56,9 +73,15 @@ EXPO_PUBLIC_API_BASE=http://你的后端地址:8080
 
 ## 登录方式
 
-App 端没有 `wx.login`，使用设备生成的稳定 `deviceId` 走 `/api/user/appLogin`
-自动登录/注册（后端以 `app_ + deviceId` 作为 openid，同一设备重复登录得到同一账号），
-支持邀请码注册与全局 401 登录态失效处理。
+App 使用手机号 + 阿里云短信验证码登录：
+
+- `POST /api/user/sms/send` 发送验证码
+- `POST /api/user/sms/login` 校验验证码并登录/注册
+- 登录请求携带稳定 `deviceId`，旧版匿名设备账号首次短信登录时会自动绑定手机号，
+  保留原有设备、收益、邀请关系和订单数据
+- 支持邀请码注册与全局 401 登录态失效处理
+
+阿里云 AccessKey 仅配置在后端环境变量中，App 不保存任何短信服务密钥。
 
 ## 目录结构
 
@@ -71,6 +94,7 @@ src/
   session.tsx         登录会话管理
   api.ts              统一请求 / 上传 / token 过期处理
   config.ts           API 地址等全局配置
+  platform.ts         Android / Harmony 平台识别与设备 ID 前缀
   storage.ts          AsyncStorage 封装
   theme.ts            主题色
   components/         公共组件（NavBar、Card、InputDialog 等）

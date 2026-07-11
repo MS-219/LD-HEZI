@@ -20,6 +20,10 @@ services:
       SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD: "${SPRING_DATASOURCE_HIKARI_LEAK_DETECTION_THRESHOLD:-20000}"
       IP2REGION_XDB_PATH: "/app/ip2region.xdb"
       CORS_ALLOWED_ORIGINS: "${CORS_ALLOWED_ORIGINS:-https://hz.shandongliandong.com,https://juxinsuanli.cn,https://www.juxinsuanli.cn,https://ld.juxinsuanli.cn,https://api.juxinsuanli.cn}"
+      ALIBABA_CLOUD_ACCESS_KEY_ID: "${ALIBABA_CLOUD_ACCESS_KEY_ID:-}"
+      ALIBABA_CLOUD_ACCESS_KEY_SECRET: "${ALIBABA_CLOUD_ACCESS_KEY_SECRET:-}"
+      ALIYUN_SMS_SIGN_NAME: "${ALIYUN_SMS_SIGN_NAME:-成都联动云芯数字科技}"
+      ALIYUN_SMS_TEMPLATE_CODE: "${ALIYUN_SMS_TEMPLATE_CODE:-SMS_336585113}"
     volumes:
       - ./backend/uploads:/app/uploads
       - ./device_agent:/device_agent:ro

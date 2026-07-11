@@ -19,6 +19,16 @@ public interface IAppUserService extends IService<AppUser> {
     AppUser getByOpenid(String openid);
 
     /**
+     * 手机号验证码登录/注册；存在旧版设备账号时优先绑定该账号以保留历史数据。
+     */
+    String phoneLogin(String phone, String deviceId);
+
+    /**
+     * 根据手机号获取用户。
+     */
+    AppUser getByPhone(String phone);
+
+    /**
      * 自动更新所有用户的分润等级
      */
     void updateAllUserLevels();

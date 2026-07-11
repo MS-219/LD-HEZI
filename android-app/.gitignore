@@ -39,3 +39,7 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+/harmony-bundle
+
+# local release artifacts and signing material
+/release/

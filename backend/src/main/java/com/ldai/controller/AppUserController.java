@@ -434,10 +434,30 @@ public class AppUserController {
      * 通过微信 getPhoneNumber 获取的 code 换取手机号
      */
     @PostMapping("/bindPhone")
-    public Result<Object> bindPhone(@RequestBody Map<String, Object> params) {
-        Long userId = Long.valueOf(params.get("userId").toString());
-        String code = (String) params.get("code");
+    public Result<Object> bindPhone(
+            @RequestBody Map<String, Object> params,
+            @RequestHeader(value = "Authorization", required = false) String token) {
+        if (token == null || token.isBlank()) {
+            return Result.error("未登录，请先登录");
+        }
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        if (!com.ldai.util.JwtUtil.validateToken(token)) {
+            return Result.error("登录已过期，请重新登录");
+        }
 
+        Object userIdValue = params.get("userId");
+        if (userIdValue == null) {
+            return Result.error("用户ID不能为空");
+        }
+        Long userId = Long.valueOf(userIdValue.toString());
+        Long tokenUserId = com.ldai.util.JwtUtil.getUserId(token);
+        if (tokenUserId == null || !tokenUserId.equals(userId)) {
+            return Result.error("无权为其他用户绑定手机号");
+        }
+
+        String code = (String) params.get("code");
         if (code == null || code.isEmpty()) {
             return Result.error("code 不能为空");
         }
@@ -447,20 +467,20 @@ public class AppUserController {
             return Result.error("用户不存在");
         }
 
-        // 调用微信接口获取手机号
+        // 调用微信接口获取手机号。
         String phone = wechatService.getPhoneNumber(code);
         if (phone == null || phone.isEmpty()) {
             return Result.error("获取手机号失败");
         }
 
+        AppUser phoneOwner = appUserService.getByPhone(phone);
+        if (phoneOwner != null && !phoneOwner.getId().equals(userId)) {
+            return Result.error("该手机号已绑定其他账号");
+        }
+
         user.setPhone(phone);
         boolean success = appUserService.updateById(user);
-
-        if (success) {
-            return Result.success(Map.of("phone", phone));
-        } else {
-            return Result.error("绑定失败");
-        }
+        return success ? Result.success(Map.of("phone", phone)) : Result.error("绑定失败");
     }
 
     /**

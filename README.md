@@ -46,6 +46,20 @@ npm install
 
 然后用微信开发者工具打开 `miniprogram/`。
 
+## App 短信验证码登录
+
+Android / Harmony App 使用阿里云短信服务完成手机号验证码登录。后端启动前配置：
+
+```bash
+export ALIBABA_CLOUD_ACCESS_KEY_ID=你的AccessKeyId
+export ALIBABA_CLOUD_ACCESS_KEY_SECRET=你的AccessKeySecret
+export ALIYUN_SMS_SIGN_NAME='成都联动云芯数字科技'
+export ALIYUN_SMS_TEMPLATE_CODE='SMS_336585113'
+```
+
+短信模板必须包含 `${code}` 变量。AccessKey 只能配置在后端服务器，禁止写入 App。
+已有数据库升级前先执行 `backend/sql/add_app_user_phone_unique.sql` 中的重复手机号检查及唯一索引变更。
+
 ## 二开前优先处理
 
 1. 替换品牌文案：当前仍有“全球云智算”“LD-AI”等母版名称。

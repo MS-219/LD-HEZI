@@ -70,3 +70,16 @@ ai:
     api-key: ${LINGYA_API_KEY:}
     base-url: ${GEMINI_BASE_URL:https://api.lingyaai.cn/v1beta}
     model: ${GEMINI_MODEL:gemini-3-pro-preview-thinking}
+
+# 阿里云短信验证码登录
+aliyun:
+  sms:
+    access-key-id: ${ALIBABA_CLOUD_ACCESS_KEY_ID:}
+    access-key-secret: ${ALIBABA_CLOUD_ACCESS_KEY_SECRET:}
+    sign-name: ${ALIYUN_SMS_SIGN_NAME:成都联动云芯数字科技}
+    template-code: ${ALIYUN_SMS_TEMPLATE_CODE:SMS_336585113}
+    code-length: ${ALIYUN_SMS_CODE_LENGTH:6}
+    expire-minutes: ${ALIYUN_SMS_EXPIRE_MINUTES:5}
+    resend-seconds: ${ALIYUN_SMS_RESEND_SECONDS:60}
+    max-sends-per-hour: ${ALIYUN_SMS_MAX_SENDS_PER_HOUR:5}
+    max-verify-attempts: ${ALIYUN_SMS_MAX_VERIFY_ATTEMPTS:5}

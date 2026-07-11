@@ -55,6 +55,53 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUser> impl
         return this.getOne(wrapper);
     }
 
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public String phoneLogin(String phone, String deviceId) {
+        AppUser user = getByPhone(phone);
+
+        // 兼容旧版 App：同一设备首次使用手机号登录时，将匿名设备账号升级为手机账号，
+        // 从而保留原有设备、收益、邀请关系和订单数据。
+        if (user == null && deviceId != null && !deviceId.isBlank()) {
+            AppUser deviceUser = getByOpenid("app_" + deviceId.trim());
+            if (deviceUser != null && (deviceUser.getPhone() == null || deviceUser.getPhone().isBlank())) {
+                deviceUser.setPhone(phone);
+                if (deviceUser.getNickname() == null || "微信用户".equals(deviceUser.getNickname())) {
+                    deviceUser.setNickname("手机用户");
+                }
+                this.updateById(deviceUser);
+                user = deviceUser;
+            }
+        }
+
+        if (user == null) {
+            user = new AppUser();
+            user.setId(generateUniqueId());
+            user.setOpenid("sms_" + java.util.UUID.randomUUID().toString().replace("-", ""));
+            user.setPhone(phone);
+            user.setNickname("手机用户");
+            user.setBalance(BigDecimal.ZERO);
+            user.setQuota(0);
+            user.setLevel(0);
+            user.setCreateTime(LocalDateTime.now());
+            this.save(user);
+        }
+
+        return JwtUtil.generateToken(user.getId(), user.getOpenid(), "app");
+    }
+
+    @Override
+    public AppUser getByPhone(String phone) {
+        if (phone == null || phone.isBlank()) {
+            return null;
+        }
+        return this.lambdaQuery()
+                .eq(AppUser::getPhone, phone.trim())
+                .orderByAsc(AppUser::getCreateTime)
+                .last("LIMIT 1")
+                .one();
+    }
+
     /**
      * 生成唯一的 6 位随机数字 ID
      */

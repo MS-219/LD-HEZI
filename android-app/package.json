@@ -12,6 +12,8 @@
     "react-native": "0.86.0"
   },
   "devDependencies": {
+    "@react-native-community/cli": "^20.2.0",
+    "@react-native/metro-config": "^0.86.0",
     "@types/react": "~19.2.2",
     "typescript": "~6.0.3"
   },
@@ -19,7 +21,9 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "bundle:harmony": "rm -rf harmony-bundle && npx react-native bundle --platform android --dev false --entry-file index.harmony.ts --bundle-output harmony-bundle/bundle.harmony.js --assets-dest harmony-bundle/assets",
+    "bundle:harmony:rnoh": "rm -rf harmony-bundle && npx react-native bundle --platform harmony --dev false --entry-file index.harmony.ts --bundle-output harmony-bundle/bundle.harmony.js --assets-dest harmony-bundle/assets"
   },
   "private": true
 }

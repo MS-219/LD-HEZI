@@ -50,6 +50,18 @@ build_admin() {
 start_backend() {
     ensure_dirs
 
+    # 优先读取服务器项目目录下的 .env；已 export 的同名变量会覆盖 .env。
+    local env_args=()
+    if [[ -f "$SCRIPT_DIR/.env" ]]; then
+        env_args+=(--env-file "$SCRIPT_DIR/.env")
+    fi
+    local env_name
+    for env_name in ALIBABA_CLOUD_ACCESS_KEY_ID ALIBABA_CLOUD_ACCESS_KEY_SECRET ALIYUN_SMS_SIGN_NAME ALIYUN_SMS_TEMPLATE_CODE; do
+        if [[ -n "${!env_name:-}" ]]; then
+            env_args+=(-e "$env_name=${!env_name}")
+        fi
+    done
+
     if docker ps -a --format '{{.Names}}' | grep -qx "$BACKEND_CONTAINER"; then
         warn "替换旧后端容器 $BACKEND_CONTAINER"
         docker rm -f "$BACKEND_CONTAINER" >/dev/null
@@ -60,6 +72,7 @@ start_backend() {
         --name "$BACKEND_CONTAINER" \
         --restart unless-stopped \
         --network host \
+        "${env_args[@]}" \
         -e TZ=Asia/Shanghai \
         -e SERVER_PORT="${SERVER_PORT:-8080}" \
         -e JAVA_OPTS="${JAVA_OPTS:-}" \

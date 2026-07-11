@@ -1,8 +1,8 @@
 /**
  * 登录会话管理。
  *
- * App 端没有 wx.login，使用设备侧生成的稳定 deviceId 走 /api/user/appLogin
- * 登录/注册（后端用 "app_" + deviceId 作为 openid，同一设备重复登录得到同一账号）。
+ * App 使用手机号 + 阿里云短信验证码登录。登录请求仍携带设备侧生成的稳定 deviceId，
+ * 后端可在首次升级时把旧版匿名设备账号绑定到手机号，保留历史设备和收益数据。
  */
 import React, {
   createContext,
@@ -13,6 +13,7 @@ import React, {
   useState,
 } from 'react';
 import { formatUrl, onTokenExpired, request } from './api';
+import { getDeviceIdPrefix } from './platform';
 import { getItem, getJSON, removeItem, setItem, setJSON } from './storage';
 
 export interface UserInfo {
@@ -31,12 +32,14 @@ export interface Session {
   isLoggedIn: boolean;
   userId: number;
   userInfo: UserInfo;
-  /** 登录（可携带邀请码） */
-  login: (inviteCode?: string) => Promise<void>;
+  /** 发送短信验证码，返回倒计时秒数。 */
+  sendSmsCode: (phone: string) => Promise<number>;
+  /** 手机号验证码登录（可携带邀请码）。 */
+  login: (phone: string, code: string, inviteCode?: string) => Promise<void>;
   logout: () => Promise<void>;
-  /** 从服务端刷新用户信息 */
+  /** 从服务端刷新用户信息。 */
   refreshUser: () => Promise<void>;
-  /** 本地更新用户信息（改昵称/头像后同步 UI） */
+  /** 本地更新用户信息（改昵称/头像后同步 UI）。 */
   patchUser: (patch: Partial<UserInfo>) => void;
 }
 
@@ -51,9 +54,13 @@ export function useSession(): Session {
 async function ensureDeviceId(): Promise<string> {
   const existing = await getItem('deviceId');
   if (existing) return existing;
-  const id = `android-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  const id = `${getDeviceIdPrefix()}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
   await setItem('deviceId', id);
   return id;
+}
+
+function normalizePhone(phone: string): string {
+  return phone.replace(/\s+/g, '').trim();
 }
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
@@ -81,17 +88,31 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const sendSmsCode = useCallback(async (phone: string) => {
+    const normalized = normalizePhone(phone);
+    const res = await request<{ cooldown?: number }>({
+      url: '/api/user/sms/send',
+      method: 'POST',
+      data: { phone: normalized },
+    });
+    if (res.code !== 200) {
+      throw new Error(res.msg || '验证码发送失败');
+    }
+    return res.data?.cooldown || 60;
+  }, []);
+
   const login = useCallback(
-    async (inviteCode?: string) => {
+    async (phone: string, code: string, inviteCode?: string) => {
+      const normalized = normalizePhone(phone);
       const deviceId = await ensureDeviceId();
       const pendingInviteCode = inviteCode || (await getItem('pendingInviteCode')) || '';
       const res = await request<any>({
-        url: '/api/user/appLogin',
+        url: '/api/user/sms/login',
         method: 'POST',
         data: {
+          phone: normalized,
+          code: code.trim(),
           deviceId,
-          nickname: '',
-          avatarUrl: '',
           inviteCode: pendingInviteCode,
         },
       });
@@ -99,22 +120,25 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         throw new Error(res.msg || '登录失败');
       }
       const data = res.data;
+      const info: UserInfo = {
+        id: data.userId,
+        nickname: data.nickname || '',
+        avatarUrl: formatUrl(data.avatarUrl || ''),
+        phone: data.phone || normalized,
+        quota: 0,
+        level: data.level || 0,
+      };
       await Promise.all([
         setItem('token', data.token),
         setItem('userId', String(data.userId)),
+        setItem('lastLoginPhone', normalized),
+        setJSON('userInfo', info),
         removeItem('pendingInviteCode'),
       ]);
       setUserId(data.userId);
       setIsLoggedIn(true);
-      setUserInfo({
-        id: data.userId,
-        nickname: data.nickname || '',
-        avatarUrl: formatUrl(data.avatarUrl || ''),
-        phone: '',
-        quota: 0,
-        level: data.level || 0,
-      });
-      // 拉取完整信息（含手机号/额度）
+      setUserInfo(info);
+      // 拉取完整信息（含额度等）。
       refreshUser().catch(() => undefined);
     },
     [refreshUser]
@@ -135,7 +159,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  // 启动：先用本地缓存快速恢复，再静默校验/自动登录
+  // 启动时只恢复已有登录态；没有 token 时展示短信登录页，不再匿名自动注册。
   useEffect(() => {
     (async () => {
       try {
@@ -149,18 +173,14 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
           setIsLoggedIn(true);
           if (cached) setUserInfo(cached);
           refreshUser().catch(() => undefined);
-        } else {
-          await login();
         }
-      } catch {
-        // 首次自动登录失败（如无网络），保持未登录，由“我的”页提供重试入口
       } finally {
         setBooting(false);
       }
     })();
-  }, [login, refreshUser]);
+  }, [refreshUser]);
 
-  // 全局 token 过期 → 同步登出状态
+  // 全局 token 过期 → 同步登出状态。
   useEffect(() => {
     return onTokenExpired(() => {
       setIsLoggedIn(false);
@@ -170,8 +190,18 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo<Session>(
-    () => ({ booting, isLoggedIn, userId, userInfo, login, logout, refreshUser, patchUser }),
-    [booting, isLoggedIn, userId, userInfo, login, logout, refreshUser, patchUser]
+    () => ({
+      booting,
+      isLoggedIn,
+      userId,
+      userInfo,
+      sendSmsCode,
+      login,
+      logout,
+      refreshUser,
+      patchUser,
+    }),
+    [booting, isLoggedIn, userId, userInfo, sendSmsCode, login, logout, refreshUser, patchUser]
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

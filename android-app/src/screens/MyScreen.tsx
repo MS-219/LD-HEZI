@@ -47,13 +47,12 @@ const menuGroups: MenuItem[][] = [
 
 export default function MyScreen() {
   const nav = useNavigation();
-  const { isLoggedIn, userId, userInfo, login, logout, refreshUser, patchUser } = useSession();
+  const { isLoggedIn, userId, userInfo, logout, refreshUser, patchUser } = useSession();
   const [hashrateRate, setHashrateRate] = useState(100);
   const [wallet, setWallet] = useState({ balance: '0.00', totalEarnings: '0.00', displayHashrate: 0 });
   const [deviceStats, setDeviceStats] = useState({ total: 0, online: 0, offline: 0 });
   const [refreshing, setRefreshing] = useState(false);
   const [editNickname, setEditNickname] = useState(false);
-  const [loggingIn, setLoggingIn] = useState(false);
 
   const fetchSettings = useCallback(async () => {
     try {
@@ -98,17 +97,6 @@ export default function MyScreen() {
   useEffect(() => {
     if (isLoggedIn) loadAll();
   }, [isLoggedIn, loadAll]);
-
-  const onLogin = async () => {
-    setLoggingIn(true);
-    try {
-      await login();
-    } catch (err) {
-      Alert.alert('登录失败', err instanceof Error ? err.message : '请检查网络');
-    } finally {
-      setLoggingIn(false);
-    }
-  };
 
   const onLogout = () => {
     Alert.alert('确认退出', '确定要退出登录吗？', [
@@ -196,18 +184,7 @@ export default function MyScreen() {
   };
 
   if (!isLoggedIn) {
-    return (
-      <View style={styles.loginPage}>
-        <Text style={styles.loginTitle}>全球云智算</Text>
-        <Text style={styles.loginTip}>登录后查看设备与收益</Text>
-        <Button
-          title={loggingIn ? '登录中...' : '一键登录'}
-          onPress={onLogin}
-          disabled={loggingIn}
-          style={styles.loginButton}
-        />
-      </View>
-    );
+    return null;
   }
 
   const needCompleteInfo = !userInfo.avatarUrl || !userInfo.nickname || userInfo.nickname === '微信用户';
@@ -338,10 +315,6 @@ export default function MyScreen() {
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: colors.bg },
   content: { padding: 16, paddingBottom: 32 },
-  loginPage: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg, padding: 32 },
-  loginTitle: { fontSize: 28, fontWeight: '800', color: colors.text },
-  loginTip: { color: colors.textSecondary, marginTop: 10, marginBottom: 24 },
-  loginButton: { alignSelf: 'stretch' },
   userCard: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   avatar: { width: 60, height: 60, borderRadius: 30, backgroundColor: colors.border },
   avatarFallback: { alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary },

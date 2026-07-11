@@ -42,6 +42,7 @@ import MyScreen from './screens/MyScreen';
 import NoticeDetailScreen from './screens/NoticeDetailScreen';
 import PartnerDeviceDetailScreen from './screens/PartnerDeviceDetailScreen';
 import PartnerDevicesScreen from './screens/PartnerDevicesScreen';
+import PhoneLoginScreen from './screens/PhoneLoginScreen';
 import WithdrawRecordScreen from './screens/WithdrawRecordScreen';
 import WithdrawScreen from './screens/WithdrawScreen';
 
@@ -92,13 +93,22 @@ function TabRoot({ tab }: { tab: string }) {
 }
 
 function AppShell() {
-  const { booting } = useSession();
+  const { booting, isLoggedIn } = useSession();
   const [tab, setTab] = useState('home');
 
   if (booting) {
     return (
       <SafeAreaView style={styles.app}>
         <LoadingView text="正在进入全球云智算" />
+      </SafeAreaView>
+    );
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <SafeAreaView style={styles.app}>
+        <StatusBar barStyle="dark-content" backgroundColor={colors.bg} />
+        <PhoneLoginScreen />
       </SafeAreaView>
     );
   }
