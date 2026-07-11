@@ -7,6 +7,7 @@ export const API_BASE = process.env.EXPO_PUBLIC_API_BASE || 'https://hz.shandong
 export const UPLOAD_URL = `${API_BASE}/api/upload/image`;
 
 export const VERSION = '1.0.0';
+export const VERSION_CODE = 1;
 
 export const APP_NAME = '全球云智算';
 

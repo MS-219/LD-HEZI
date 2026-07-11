@@ -3,6 +3,7 @@ import Login from '../views/Login.vue'
 import Dashboard from '../views/Dashboard.vue'
 import DeviceList from '../views/DeviceList.vue'
 import UserList from '../views/UserList.vue'
+import AppVersion from '../views/AppVersion.vue'
 import Statistics from '../views/Statistics.vue'
 import NoticeList from '../views/NoticeList.vue'
 import WithdrawList from '../views/WithdrawList.vue'
@@ -89,6 +90,12 @@ const routes = [
                 name: 'RewardList',
                 component: RewardList,
                 meta: { title: '分润流水' }
+            },
+            {
+                path: 'app-version',
+                name: 'AppVersion',
+                component: AppVersion,
+                meta: { title: 'App版本管理' }
             },
             {
                 path: 'settings',

@@ -102,7 +102,7 @@ import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import { 
   DataAnalysis, Monitor, User, ArrowDown, Bell, Wallet,
-  Money, Setting, Lock, SwitchButton, FullScreen, Message, List, UserFilled, Postcard
+  Money, Setting, Lock, SwitchButton, FullScreen, Message, List, UserFilled, Postcard, UploadFilled
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 
@@ -163,6 +163,7 @@ const menuGroups = [
     name: '系统',
     items: [
       { index: '/settings', label: '系统设置', icon: Setting, adminOnly: true },
+      { index: '/app-version', label: 'App版本管理', icon: UploadFilled, adminOnly: true },
       { index: '/team', label: '团队管理', icon: UserFilled, adminOnly: true },
     ],
   },

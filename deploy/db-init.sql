@@ -59,6 +59,14 @@ CREATE TABLE IF NOT EXISTS `app_user` (
   `withdraw_disabled` TINYINT(1) DEFAULT 0,
   `user_type` VARCHAR(16) DEFAULT 'personal',
   `remark` VARCHAR(512) DEFAULT NULL,
+  `password_hash` VARCHAR(100) DEFAULT NULL,
+  `must_change_password` TINYINT(1) NOT NULL DEFAULT 1,
+  `account_enabled` TINYINT(1) NOT NULL DEFAULT 1,
+  `session_key` VARCHAR(64) DEFAULT NULL,
+  `login_fail_count` INT NOT NULL DEFAULT 0,
+  `locked_until` DATETIME DEFAULT NULL,
+  `password_updated_at` DATETIME DEFAULT NULL,
+  `last_login_at` DATETIME DEFAULT NULL,
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `merchant_id` BIGINT DEFAULT NULL,
   `external_user_id` VARCHAR(128) DEFAULT NULL,
@@ -67,6 +75,26 @@ CREATE TABLE IF NOT EXISTS `app_user` (
   KEY `idx_inviter` (`inviter_id`),
   UNIQUE KEY `uk_phone` (`phone`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户';
+
+-- App 发布版本
+CREATE TABLE IF NOT EXISTS `app_release` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `platform` VARCHAR(20) NOT NULL DEFAULT 'android',
+  `version_name` VARCHAR(32) NOT NULL,
+  `version_code` INT NOT NULL,
+  `release_notes` TEXT,
+  `file_name` VARCHAR(255) NOT NULL,
+  `file_path` VARCHAR(255) NOT NULL,
+  `file_size` BIGINT NOT NULL,
+  `sha256` CHAR(64) NOT NULL,
+  `published` TINYINT(1) NOT NULL DEFAULT 1,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `published_at` DATETIME DEFAULT NULL,
+  `created_by` BIGINT DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_platform_version_code` (`platform`, `version_code`),
+  KEY `idx_platform_published_version` (`platform`, `published`, `version_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='App发布版本';
 
 -- 设备
 CREATE TABLE IF NOT EXISTS `device` (
@@ -157,6 +185,14 @@ CREATE TABLE IF NOT EXISTS `withdraw` (
   `qr_code` VARCHAR(512) DEFAULT NULL,
   `status` INT DEFAULT 0 COMMENT '0-待审核 1-已通过 2-已拒绝 3-已打款 4-失败',
   `remark` VARCHAR(512) DEFAULT NULL,
+  `password_hash` VARCHAR(100) DEFAULT NULL,
+  `must_change_password` TINYINT(1) NOT NULL DEFAULT 1,
+  `account_enabled` TINYINT(1) NOT NULL DEFAULT 1,
+  `session_key` VARCHAR(64) DEFAULT NULL,
+  `login_fail_count` INT NOT NULL DEFAULT 0,
+  `locked_until` DATETIME DEFAULT NULL,
+  `password_updated_at` DATETIME DEFAULT NULL,
+  `last_login_at` DATETIME DEFAULT NULL,
   `payment_fail_count` INT DEFAULT 0,
   `id_card` VARCHAR(32) DEFAULT NULL,
   `mobile` VARCHAR(32) DEFAULT NULL,
@@ -264,6 +300,14 @@ CREATE TABLE IF NOT EXISTS `exchange_order` (
   `ship_time` DATETIME DEFAULT NULL,
   `receive_time` DATETIME DEFAULT NULL,
   `remark` VARCHAR(512) DEFAULT NULL,
+  `password_hash` VARCHAR(100) DEFAULT NULL,
+  `must_change_password` TINYINT(1) NOT NULL DEFAULT 1,
+  `account_enabled` TINYINT(1) NOT NULL DEFAULT 1,
+  `session_key` VARCHAR(64) DEFAULT NULL,
+  `login_fail_count` INT NOT NULL DEFAULT 0,
+  `locked_until` DATETIME DEFAULT NULL,
+  `password_updated_at` DATETIME DEFAULT NULL,
+  `last_login_at` DATETIME DEFAULT NULL,
   `admin_remark` VARCHAR(512) DEFAULT NULL,
   `inviter_id` BIGINT DEFAULT NULL,
   `inviter_level` INT DEFAULT NULL,

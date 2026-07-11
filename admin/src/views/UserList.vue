@@ -72,6 +72,7 @@
           <el-button @click="resetSearch">重置</el-button>
           <el-button type="success" @click="refreshData">🔄 刷新</el-button>
           <el-button type="warning" @click="refreshLevels">📊 同步等级</el-button>
+          <el-button type="primary" plain @click="openAccountDialog">➕ 新增账号</el-button>
         </el-col>
         <el-col :span="5" style="text-align: right;">
           <span class="total-count">共 {{ total }} 位用户</span>
@@ -130,6 +131,14 @@
             </el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="账号状态" width="110">
+          <template #default="{ row }">
+            <el-tag v-if="!row.passwordUpdatedAt" type="info">未开通</el-tag>
+            <el-tag v-else-if="row.accountEnabled === false" type="danger">已停用</el-tag>
+            <el-tag v-else-if="row.mustChangePassword" type="warning">待改密</el-tag>
+            <el-tag v-else type="success">正常</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="等级" width="100">
           <template #default="{ row }">
             <el-tag :type="getLevelTag(row.level)" size="small" effect="dark">
@@ -165,12 +174,16 @@
             <span class="create-time">{{ formatTime(row.createTime) }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="300" fixed="right">
+        <el-table-column label="操作" width="460" fixed="right">
           <template #default="{ row }">
             <div style="display: flex; gap: 4px; flex-wrap: nowrap;">
               <el-button size="small" type="primary" @click="viewUser(row)">详情</el-button>
               <el-button size="small" @click="editUser(row)">编辑</el-button>
               <el-button size="small" type="warning" @click="rechargeQuota(row)">充值</el-button>
+              <el-button v-if="row.passwordUpdatedAt" size="small" type="info" @click="resetAccountPassword(row)">重置密码</el-button>
+              <el-button v-if="row.passwordUpdatedAt" size="small" :type="row.accountEnabled === false ? 'success' : 'danger'" @click="toggleAccount(row)">
+                {{ row.accountEnabled === false ? '启用账号' : '停用账号' }}
+              </el-button>
               <el-button 
                 size="small" 
                 :type="row.withdrawDisabled ? 'success' : 'danger'" 
@@ -455,6 +468,22 @@
       </template>
     </el-dialog>
   </div>
+  <el-dialog v-model="accountDialogVisible" title="新增 App 账号" width="440px">
+    <el-form label-width="80px">
+      <el-form-item label="手机号" required><el-input v-model="accountForm.phone" maxlength="11" placeholder="请输入11位手机号" /></el-form-item>
+      <el-form-item label="昵称" required><el-input v-model="accountForm.nickname" maxlength="50" placeholder="请输入昵称" /></el-form-item>
+    </el-form>
+    <template #footer><el-button @click="accountDialogVisible=false">取消</el-button><el-button type="primary" :loading="accountSaving" @click="createAccount">创建账号</el-button></template>
+  </el-dialog>
+
+  <el-dialog v-model="passwordResultVisible" title="临时密码（仅显示一次）" width="480px" :close-on-click-modal="false">
+    <el-alert type="warning" :closable="false" title="请立即复制并安全交给用户。关闭后无法再次查看明文。" />
+    <el-descriptions :column="1" border style="margin-top:16px">
+      <el-descriptions-item label="手机号">{{ temporaryResult.phone }}</el-descriptions-item>
+      <el-descriptions-item label="临时密码"><code style="font-size:20px;font-weight:700">{{ temporaryResult.temporaryPassword }}</code></el-descriptions-item>
+    </el-descriptions>
+    <template #footer><el-button type="primary" @click="copyTemporaryPassword">复制密码</el-button><el-button @click="passwordResultVisible=false">我已保存</el-button></template>
+  </el-dialog>
 </template>
 
 <script setup>
@@ -463,6 +492,57 @@ import axios from 'axios'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 const userList = ref([])
+const accountDialogVisible = ref(false)
+const passwordResultVisible = ref(false)
+const accountSaving = ref(false)
+const accountForm = reactive({ phone: '', nickname: '' })
+const temporaryResult = reactive({ phone: '', temporaryPassword: '' })
+
+const showTemporaryPassword = (data) => {
+  temporaryResult.phone = data.phone || ''
+  temporaryResult.temporaryPassword = data.temporaryPassword || ''
+  passwordResultVisible.value = true
+}
+const openAccountDialog = () => {
+  accountForm.phone = ''
+  accountForm.nickname = ''
+  accountDialogVisible.value = true
+}
+const createAccount = async () => {
+  if (!/^1[3-9]\d{9}$/.test(accountForm.phone)) return ElMessage.warning('请输入正确的11位手机号')
+  if (!accountForm.nickname.trim()) return ElMessage.warning('请输入昵称')
+  accountSaving.value = true
+  try {
+    const res = await axios.post('/api/admin/app-account/open', { phone: accountForm.phone, nickname: accountForm.nickname.trim() })
+    if (res.data.code !== 200) return ElMessage.error(res.data.msg || '创建失败')
+    accountDialogVisible.value = false
+    showTemporaryPassword(res.data.data)
+    fetchUsers(); fetchStats()
+  } catch (e) { ElMessage.error('网络错误') } finally { accountSaving.value = false }
+}
+const resetAccountPassword = async (row) => {
+  try {
+    await ElMessageBox.confirm(`确定重置 ${row.nickname || row.phone} 的密码吗？旧登录会立即失效。`, '重置密码', { type: 'warning' })
+    const res = await axios.post('/api/admin/app-account/reset-password', { userId: row.id })
+    if (res.data.code !== 200) return ElMessage.error(res.data.msg || '重置失败')
+    showTemporaryPassword(res.data.data); fetchUsers()
+  } catch (e) { if (e !== 'cancel') ElMessage.error('操作失败') }
+}
+const toggleAccount = async (row) => {
+  const enabled = row.accountEnabled === false
+  const warning = enabled ? '启用后设备将从此刻恢复产生收益，不补发停用期间收益。' : '停用后用户立即退出，名下设备不再产生收益，历史数据保留。'
+  try {
+    await ElMessageBox.confirm(warning, enabled ? '启用账号' : '停用账号', { type: 'warning' })
+    const res = await axios.post('/api/admin/app-account/status', { userId: row.id, enabled })
+    if (res.data.code !== 200) return ElMessage.error(res.data.msg || '操作失败')
+    ElMessage.success(enabled ? '账号已启用' : '账号已停用'); fetchUsers()
+  } catch (e) { if (e !== 'cancel') ElMessage.error('操作失败') }
+}
+const copyTemporaryPassword = async () => {
+  try { await navigator.clipboard.writeText(temporaryResult.temporaryPassword); ElMessage.success('密码已复制') }
+  catch (e) { ElMessage.warning('复制失败，请手动复制') }
+}
+
 const loading = ref(false)
 const detailLoading = ref(false)
 const saving = ref(false)

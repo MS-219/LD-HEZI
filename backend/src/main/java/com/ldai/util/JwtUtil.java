@@ -47,12 +47,24 @@ public class JwtUtil {
      * @param role     后台角色：admin / factory
      */
     public static String generateToken(Long userId, String username, String userType, String role) {
+        return generateToken(userId, username, userType, role, null);
+    }
+
+    /** 生成带唯一会话键的 App Token。 */
+    public static String generateAppToken(Long userId, String username, String sessionKey) {
+        return generateToken(userId, username, "app", null, sessionKey);
+    }
+
+    private static String generateToken(Long userId, String username, String userType, String role, String sessionKey) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("username", username);
         claims.put("userType", userType);
         if (role != null && !role.isBlank()) {
             claims.put("role", role);
+        }
+        if (sessionKey != null && !sessionKey.isBlank()) {
+            claims.put("sessionKey", sessionKey);
         }
 
         // 管理员 7 天，小程序用户 30 天
@@ -129,6 +141,13 @@ public class JwtUtil {
     public static String getRole(String token) {
         Claims claims = parseToken(token);
         return claims != null ? (String) claims.get("role") : null;
+    }
+
+    /** 从 Token 获取 App 唯一会话键。 */
+    public static String getSessionKey(String token) {
+        Claims claims = parseToken(token);
+        Object value = claims == null ? null : claims.get("sessionKey");
+        return value == null ? null : String.valueOf(value);
     }
 
     /**

@@ -20,6 +20,8 @@ import {
 import { LoadingView } from './components/common';
 import { Navigator } from './navigation';
 import { SessionProvider, useSession } from './session';
+import UpdateGate from './components/UpdateGate';
+import ChangePasswordScreen from './screens/ChangePasswordScreen';
 import { colors } from './theme';
 
 import AddressManageScreen from './screens/AddressManageScreen';
@@ -93,7 +95,7 @@ function TabRoot({ tab }: { tab: string }) {
 }
 
 function AppShell() {
-  const { booting, isLoggedIn } = useSession();
+  const { booting, isLoggedIn, mustChangePassword } = useSession();
   const [tab, setTab] = useState('home');
 
   if (booting) {
@@ -109,6 +111,15 @@ function AppShell() {
       <SafeAreaView style={styles.app}>
         <StatusBar barStyle="dark-content" backgroundColor={colors.bg} />
         <PhoneLoginScreen />
+      </SafeAreaView>
+    );
+  }
+
+  if (mustChangePassword) {
+    return (
+      <SafeAreaView style={styles.app}>
+        <StatusBar barStyle="dark-content" backgroundColor={colors.bg} />
+        <ChangePasswordScreen />
       </SafeAreaView>
     );
   }
@@ -146,9 +157,11 @@ function AppShell() {
 
 export default function AppRoot() {
   return (
-    <SessionProvider>
-      <AppShell />
-    </SessionProvider>
+    <UpdateGate>
+      <SessionProvider>
+        <AppShell />
+      </SessionProvider>
+    </UpdateGate>
   );
 }
 

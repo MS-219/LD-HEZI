@@ -82,6 +82,32 @@ public class AppUser {
     /** 后台备注 */
     private String remark;
 
+    /** BCrypt 密码散列（严禁序列化返回客户端） */
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private String passwordHash;
+
+    /** 是否必须修改临时密码 */
+    private Boolean mustChangePassword;
+
+    /** 账号是否启用 */
+    private Boolean accountEnabled;
+
+    /** 当前唯一会话键，新登录/改密/停用时轮换 */
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private String sessionKey;
+
+    /** 连续登录失败次数 */
+    private Integer loginFailCount;
+
+    /** 密码登录锁定截止时间 */
+    private LocalDateTime lockedUntil;
+
+    /** 密码最近修改时间 */
+    private LocalDateTime passwordUpdatedAt;
+
+    /** 最近登录时间 */
+    private LocalDateTime lastLoginAt;
+
     /** 创建时间 */
     private LocalDateTime createTime;
 

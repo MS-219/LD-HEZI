@@ -3,10 +3,15 @@
   "version": "1.0.0",
   "main": "index.ts",
   "dependencies": {
+    "@noble/hashes": "^2.2.0",
     "@react-native-async-storage/async-storage": "^3.1.1",
+    "base64-js": "^1.5.1",
     "expo": "~57.0.2",
+    "expo-application": "~57.0.0",
     "expo-clipboard": "~57.0.0",
+    "expo-file-system": "~57.0.0",
     "expo-image-picker": "~57.0.2",
+    "expo-intent-launcher": "~57.0.0",
     "expo-status-bar": "~57.0.0",
     "react": "19.2.3",
     "react-native": "0.86.0"

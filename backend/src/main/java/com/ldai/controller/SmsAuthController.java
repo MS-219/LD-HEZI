@@ -1,9 +1,6 @@
 package com.ldai.controller;
 
 import com.ldai.common.Result;
-import com.ldai.entity.AppUser;
-import com.ldai.service.IAppUserService;
-import com.ldai.service.IInviteService;
 import com.ldai.service.SmsVerificationService;
 import com.ldai.service.SmsVerificationService.SmsVerificationException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,23 +21,22 @@ public class SmsAuthController {
     private static final Logger log = LoggerFactory.getLogger(SmsAuthController.class);
 
     private final SmsVerificationService smsVerificationService;
-    private final IAppUserService appUserService;
-    private final IInviteService inviteService;
+    private final com.ldai.service.AppAccountService accountService;
 
     public SmsAuthController(SmsVerificationService smsVerificationService,
-                             IAppUserService appUserService,
-                             IInviteService inviteService) {
+                             com.ldai.service.AppAccountService accountService) {
         this.smsVerificationService = smsVerificationService;
-        this.appUserService = appUserService;
-        this.inviteService = inviteService;
+        this.accountService = accountService;
     }
 
     @PostMapping("/send")
     public Result<Object> send(@RequestBody Map<String, String> params, HttpServletRequest request) {
         try {
-            int cooldown = smsVerificationService.sendCode(params.get("phone"), getClientIp(request));
+            String phone = smsVerificationService.normalizePhone(params.get("phone"));
+            accountService.assertSmsLoginAvailable(phone);
+            int cooldown = smsVerificationService.sendCode(phone, getClientIp(request));
             return Result.success(Map.of("cooldown", cooldown));
-        } catch (SmsVerificationException e) {
+        } catch (SmsVerificationException | com.ldai.service.AppAccountService.AccountException e) {
             return Result.error(e.getMessage());
         }
     }
@@ -55,40 +51,10 @@ public class SmsAuthController {
             return Result.error(e.getMessage());
         }
 
-        String deviceId = trimToNull(params.get("deviceId"));
-        String inviteCode = trimToNull(params.get("inviteCode"));
-
-        AppUser phoneUser = appUserService.getByPhone(phone);
-        AppUser deviceUser = deviceId == null ? null : appUserService.getByOpenid("app_" + deviceId);
-        boolean canUpgradeDeviceUser = deviceUser != null
-                && (deviceUser.getPhone() == null || deviceUser.getPhone().isBlank());
-        boolean isNewUser = phoneUser == null && !canUpgradeDeviceUser;
-
         try {
-            String token = appUserService.phoneLogin(phone, deviceId);
-            AppUser user = appUserService.getByPhone(phone);
-            if (user == null) {
-                log.error("手机号登录完成后未找到用户: phone={}", maskPhone(phone));
-                return Result.error("登录失败，请稍后重试");
-            }
-
-            if (isNewUser && inviteCode != null) {
-                try {
-                    inviteService.handleNewUserInvite(user.getId(), inviteCode);
-                } catch (Exception e) {
-                    log.warn("短信注册绑定邀请关系失败: userId={}, inviteCode={}, error={}",
-                            user.getId(), inviteCode, e.getMessage());
-                }
-            }
-
-            return Result.success(Map.of(
-                    "token", token,
-                    "userId", user.getId(),
-                    "isNewUser", isNewUser,
-                    "nickname", user.getNickname() == null ? "" : user.getNickname(),
-                    "avatarUrl", user.getAvatarUrl() == null ? "" : user.getAvatarUrl(),
-                    "phone", phone,
-                    "level", user.getLevel() == null ? 0 : user.getLevel()));
+            return Result.success(accountService.smsLogin(phone));
+        } catch (com.ldai.service.AppAccountService.AccountException e) {
+            return Result.error(e.getMessage());
         } catch (Exception e) {
             log.error("手机号登录失败: phone={}", maskPhone(phone), e);
             return Result.error("登录失败，请稍后重试");
@@ -102,13 +68,6 @@ public class SmsAuthController {
         }
         String realIp = request.getHeader("X-Real-IP");
         return realIp == null || realIp.isBlank() ? request.getRemoteAddr() : realIp.trim();
-    }
-
-    private String trimToNull(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        return value.trim();
     }
 
     private String maskPhone(String phone) {

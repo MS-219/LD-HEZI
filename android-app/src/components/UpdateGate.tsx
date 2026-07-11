@@ -1,0 +1,17 @@
+import React,{useCallback,useEffect,useState} from 'react';
+import {Alert,Linking,Platform,SafeAreaView,StyleSheet,Text,View} from 'react-native';
+import {Button,LoadingView} from './common';
+import {checkLatestVersion,downloadAndVerifyApk,launchApkInstaller,releaseDownloadUrl,type AppReleaseInfo} from '../update';
+import {colors,radius} from '../theme';
+import {isHarmony} from '../platform';
+
+export default function UpdateGate({children}:{children:React.ReactNode}){
+  const [checking,setChecking]=useState(true);const [release,setRelease]=useState<AppReleaseInfo|null>(null);const [progress,setProgress]=useState(0);const [working,setWorking]=useState(false);const [apkUri,setApkUri]=useState('');
+  const check=useCallback(async()=>{try{setRelease(await checkLatestVersion());}catch{ /* 网络失败按产品决策临时放行 */ }finally{setChecking(false)}},[]);
+  useEffect(()=>{check();const timer=setInterval(check,10*60*1000);return()=>clearInterval(timer);},[check]);
+  const update=async()=>{if(!release)return;if(isHarmony){Linking.openURL(releaseDownloadUrl(release.downloadUrl)).catch(()=>Alert.alert('提示','无法打开下载地址'));return;}setWorking(true);try{const uri=apkUri||await downloadAndVerifyApk(release,setProgress);setApkUri(uri);await launchApkInstaller(uri);}catch(e){Alert.alert('更新提示',e instanceof Error?e.message:'更新失败，请重试');}finally{setWorking(false)}};
+  if(checking)return <SafeAreaView style={styles.page}><LoadingView text="正在检查版本"/></SafeAreaView>;
+  if(!release)return <>{children}</>;
+  return <SafeAreaView style={styles.page}><View style={styles.card}><View style={styles.icon}><Text style={styles.iconText}>↑</Text></View><Text style={styles.title}>发现新版本 {release.versionName}</Text><Text style={styles.required}>本次为强制更新，完成安装后才能继续使用</Text><View style={styles.notes}><Text style={styles.notesTitle}>更新内容</Text><Text style={styles.notesText}>{release.releaseNotes||'性能优化与体验改进'}</Text></View>{working&&<><View style={styles.track}><View style={[styles.bar,{width:`${Math.round(progress*100)}%`}]}/></View><Text style={styles.progress}>{progress<1?`下载校验中 ${Math.round(progress*100)}%`:'准备安装...'}</Text></>}<Button title={isHarmony?'下载最新版 APK':apkUri?'重新打开安装器':working?'正在更新...':'立即更新'} onPress={update} disabled={working}/><Text style={styles.footer}>{Platform.OS==='android'?'Android 系统会要求你确认安装，这是正常的安全流程':'请下载并安装兼容版本'}</Text></View></SafeAreaView>;
+}
+const styles=StyleSheet.create({page:{flex:1,justifyContent:'center',padding:24,backgroundColor:colors.bg},card:{backgroundColor:colors.card,borderRadius:radius.xl,padding:24,borderWidth:1,borderColor:colors.border},icon:{width:62,height:62,borderRadius:20,alignSelf:'center',alignItems:'center',justifyContent:'center',backgroundColor:colors.navy},iconText:{fontSize:36,color:colors.cyan,fontWeight:'900'},title:{textAlign:'center',fontSize:23,fontWeight:'900',color:colors.navy,marginTop:18},required:{textAlign:'center',fontSize:14,color:'#d97706',marginTop:10,lineHeight:22},notes:{backgroundColor:'#f7fafc',borderRadius:radius.md,padding:16,marginVertical:22},notesTitle:{fontWeight:'800',color:colors.text,marginBottom:8},notesText:{color:colors.textSecondary,lineHeight:22},track:{height:8,borderRadius:8,backgroundColor:'#e5e7eb',overflow:'hidden',marginBottom:8},bar:{height:8,backgroundColor:colors.primary},progress:{textAlign:'center',fontSize:12,color:colors.muted,marginBottom:16},footer:{textAlign:'center',fontSize:12,color:colors.muted,marginTop:14,lineHeight:18}});

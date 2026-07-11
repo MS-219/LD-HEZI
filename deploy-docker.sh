@@ -20,6 +20,22 @@ ensure_dirs() {
     mkdir -p "$SCRIPT_DIR/backend/uploads" "$SCRIPT_DIR/logs"
 }
 
+run_migrations() {
+    local mysql_container="${MYSQL_CONTAINER:-qqyzs-mysql}"
+    local migration="$SCRIPT_DIR/backend/sql/add_app_account_and_version.sql"
+    if ! docker ps --format '{{.Names}}' | grep -qx "$mysql_container"; then
+        err "MySQL 容器未运行: $mysql_container"
+        return 1
+    fi
+    info "执行数据库迁移: $(basename "$migration")"
+    docker exec -i "$mysql_container" sh -c '
+        exec mysql \
+          -u"${MYSQL_USER:-root}" \
+          -p"${MYSQL_PASSWORD:-${MYSQL_ROOT_PASSWORD}}" \
+          "${MYSQL_DATABASE:-ldhezi}"
+    ' < "$migration"
+}
+
 build_backend() {
     info "构建后端 Docker 镜像: $BACKEND_IMAGE"
     DOCKER_BUILDKIT=1 docker build \
@@ -107,6 +123,7 @@ wait_backend() {
 
 deploy() {
     ensure_dirs
+    run_migrations
     build_backend
     build_admin
     start_backend
@@ -147,6 +164,9 @@ case "${1:-help}" in
         ensure_dirs
         build_admin
         ;;
+    migrate)
+        run_migrations
+        ;;
     start)
         start_backend
         wait_backend
@@ -173,6 +193,7 @@ case "${1:-help}" in
   ./deploy-docker.sh build          只构建，不启动
   ./deploy-docker.sh build-backend  只构建后端镜像
   ./deploy-docker.sh build-admin    只构建两个后台前端
+  ./deploy-docker.sh migrate        执行账号与 App 版本数据库迁移
   ./deploy-docker.sh start          启动后端容器
   ./deploy-docker.sh restart        重建后端容器
   ./deploy-docker.sh stop           停止后端容器

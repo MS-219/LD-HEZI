@@ -144,6 +144,13 @@ public class DeviceEarningsServiceImpl extends ServiceImpl<DeviceEarningsMapper,
 
         // 获取用户，根据等级计算实际收益
         com.ldai.entity.AppUser user = appUserService.getById(device.getUserId());
+        // 停用期间不产生收益，并推进结算时间，恢复后不补发停用期间收益。
+        if (user != null && Boolean.FALSE.equals(user.getAccountEnabled())) {
+            device.setLastPayTime(now);
+            deviceService.updateById(device);
+            log.info("跳过已停用账号收益: userId={}, deviceId={}", user.getId(), device.getId());
+            return;
+        }
         if (user != null) {
             int level = user.getLevel() != null ? user.getLevel() : 0;
 

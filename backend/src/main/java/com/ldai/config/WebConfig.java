@@ -2,12 +2,24 @@ package com.ldai.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.File;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    private final AppAuthInterceptor appAuthInterceptor;
+
+    public WebConfig(AppAuthInterceptor appAuthInterceptor) {
+        this.appAuthInterceptor = appAuthInterceptor;
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(appAuthInterceptor).addPathPatterns("/api/**");
+    }
 
     @Override
     public void addResourceHandlers(@org.springframework.lang.NonNull ResourceHandlerRegistry registry) {
@@ -21,6 +33,10 @@ public class WebConfig implements WebMvcConfigurer {
         // 将 /uploads/** 映射到本地物理路径
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:" + uploadPath);
+
+        String appReleasePath = System.getProperty("user.dir") + "/uploads/app-releases/";
+        registry.addResourceHandler("/api/app-releases/**")
+                .addResourceLocations("file:" + appReleasePath);
 
         String upgradePackagePath = System.getProperty("user.dir") + "/uploads/agent-upgrades/";
         registry.addResourceHandler("/api/upgrade-packages/**")
