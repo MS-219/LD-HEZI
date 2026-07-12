@@ -24,17 +24,12 @@ import UpdateGate from './components/UpdateGate';
 import ChangePasswordScreen from './screens/ChangePasswordScreen';
 import { colors } from './theme';
 
-import AddressManageScreen from './screens/AddressManageScreen';
 import AllPartnerDevicesScreen from './screens/AllPartnerDevicesScreen';
 import CompleteProfileScreen from './screens/CompleteProfileScreen';
 import DeviceDetailScreen from './screens/DeviceDetailScreen';
 import DeviceScreen from './screens/DeviceScreen';
 import EarningsDetailScreen from './screens/EarningsDetailScreen';
 import EditPaymentScreen from './screens/EditPaymentScreen';
-import ExchangeDetailScreen from './screens/ExchangeDetailScreen';
-import ExchangeOrderDetailScreen from './screens/ExchangeOrderDetailScreen';
-import ExchangeOrdersScreen from './screens/ExchangeOrdersScreen';
-import ExchangeScreen from './screens/ExchangeScreen';
 import FeedbackScreen from './screens/FeedbackScreen';
 import HelpScreen from './screens/HelpScreen';
 import HomeScreen from './screens/HomeScreen';
@@ -64,11 +59,6 @@ const screens = {
   'partner-device-detail': PartnerDeviceDetailScreen,
   help: HelpScreen,
   feedback: FeedbackScreen,
-  exchange: ExchangeScreen,
-  'exchange-detail': ExchangeDetailScreen,
-  'exchange-orders': ExchangeOrdersScreen,
-  'exchange-order-detail': ExchangeOrderDetailScreen,
-  'address-manage': AddressManageScreen,
 };
 
 const tabs = [

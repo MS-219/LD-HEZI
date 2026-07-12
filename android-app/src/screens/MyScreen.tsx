@@ -35,9 +35,6 @@ const menuGroups: MenuItem[][] = [
     { id: 'devices', icon: '📱', text: '我的设备' },
     { id: 'payment', icon: '💳', text: '收款信息设置' },
     { id: 'invite', icon: '🎁', text: '邀请好友' },
-    { id: 'exchange', icon: '📦', text: '兑换设备' },
-    { id: 'exchange-orders', icon: '📋', text: '兑换订单' },
-    { id: 'address', icon: '📍', text: '收货地址' },
   ],
   [
     { id: 'help', icon: '❓', text: '帮助中心' },
@@ -154,15 +151,6 @@ export default function MyScreen() {
         break;
       case 'invite':
         nav.navigate('invite');
-        break;
-      case 'exchange':
-        nav.navigate('exchange');
-        break;
-      case 'exchange-orders':
-        nav.navigate('exchange-orders');
-        break;
-      case 'address':
-        nav.navigate('address-manage');
         break;
       case 'help':
         nav.navigate('help');
