@@ -25,8 +25,20 @@ export async function downloadAndVerifyApk(release:AppReleaseInfo,onProgress:(va
 }
 
 export async function launchApkInstaller(fileUri:string):Promise<void>{
-  const FileSystem=await import('expo-file-system/legacy'); const IntentLauncher=await import('expo-intent-launcher');
+  const FileSystem=await import('expo-file-system/legacy');
+  const IntentLauncher=await import('expo-intent-launcher');
   const contentUri=await FileSystem.getContentUriAsync(fileUri);
-  try{await IntentLauncher.startActivityAsync('android.intent.action.VIEW',{data:contentUri,type:'application/vnd.android.package-archive',flags:1});}
-  catch{await IntentLauncher.startActivityAsync('android.settings.MANAGE_UNKNOWN_APP_SOURCES',{data:'package:com.quanqiuyun.zhisuan'});throw new Error('请允许“安装未知应用”，返回后再次点击安装');}
+  const options={data:contentUri,type:'application/vnd.android.package-archive',flags:0x10000001};
+  try{
+    // INSTALL_PACKAGE 会直接交给系统软件包安装器，避免弹出“使用什么打开”的普通应用选择器。
+    await IntentLauncher.startActivityAsync('android.intent.action.INSTALL_PACKAGE',options);
+  }catch(installError){
+    try{
+      // 少数厂商系统不响应 INSTALL_PACKAGE，回退到标准 APK VIEW Intent。
+      await IntentLauncher.startActivityAsync('android.intent.action.VIEW',options);
+    }catch{
+      await IntentLauncher.startActivityAsync('android.settings.MANAGE_UNKNOWN_APP_SOURCES',{data:'package:com.quanqiuyun.zhisuan'});
+      throw new Error('请允许“安装未知应用”，返回本页面后再次点击“重新打开安装器”');
+    }
+  }
 }
