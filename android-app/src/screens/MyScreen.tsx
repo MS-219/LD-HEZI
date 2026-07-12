@@ -15,7 +15,7 @@ import {
   View,
 } from 'react-native';
 import { formatUrl, request, uploadImage } from '../api';
-import { Button, Card, InputDialog } from '../components/common';
+import { Button, Card, GlyphBadge, InputDialog, SectionHeader } from '../components/common';
 import { imagePickerAvailable, pickImages } from '../native/imagePicker';
 import { useNavigation } from '../navigation';
 import { useSession } from '../session';
@@ -26,19 +26,20 @@ interface MenuItem {
   id: string;
   icon: string;
   text: string;
+  tone?: 'blue' | 'green' | 'orange' | 'red';
 }
 
 // 与小程序 my 页 menuList 一致，去掉 AI 相关的“我的创作”
 const menuGroups: MenuItem[][] = [
   [
-    { id: 'earnings', icon: '📊', text: '收益明细' },
-    { id: 'devices', icon: '📱', text: '我的设备' },
-    { id: 'payment', icon: '💳', text: '收款信息设置' },
-    { id: 'invite', icon: '🎁', text: '邀请好友' },
+    { id: 'earnings', icon: '收', text: '收益明细', tone: 'blue' },
+    { id: 'devices', icon: '设', text: '我的设备', tone: 'green' },
+    { id: 'payment', icon: '款', text: '收款信息设置', tone: 'orange' },
+    { id: 'invite', icon: '邀', text: '邀请好友', tone: 'red' },
   ],
   [
-    { id: 'help', icon: '❓', text: '帮助中心' },
-    { id: 'feedback', icon: '💬', text: '意见反馈' },
+    { id: 'help', icon: '助', text: '帮助中心', tone: 'blue' },
+    { id: 'feedback', icon: '议', text: '意见反馈', tone: 'green' },
   ],
 ];
 
@@ -183,6 +184,7 @@ export default function MyScreen() {
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadAll} />}
     >
+      <View style={styles.pageHead}><Text style={styles.pageTitle}>个人中心</Text><Text style={styles.pageSubtitle}>账户、收益与服务管理</Text></View>
       {/* 用户信息 */}
       <Card style={styles.userCard}>
         <Pressable onPress={onChooseAvatar}>
@@ -214,19 +216,20 @@ export default function MyScreen() {
       )}
 
       {/* 钱包卡片 */}
+      <SectionHeader title="我的资产" subtitle="收益与算力数据" />
       <Card style={styles.walletCard}>
         <View style={styles.walletRow}>
           <View style={styles.walletItem}>
-            <Text style={[styles.walletValue, styles.onDark]}>{wallet.balance} U</Text>
-            <Text style={[styles.walletLabel, styles.onDarkMuted]}>可提现余额</Text>
+            <Text style={styles.walletValue}>{wallet.balance} U</Text>
+            <Text style={styles.walletLabel}>可提现余额</Text>
           </View>
           <View style={styles.walletItem}>
-            <Text style={[styles.walletValue, styles.onDark]}>{wallet.totalEarnings} U</Text>
-            <Text style={[styles.walletLabel, styles.onDarkMuted]}>累计收益</Text>
+            <Text style={styles.walletValue}>{wallet.totalEarnings} U</Text>
+            <Text style={styles.walletLabel}>累计收益</Text>
           </View>
           <View style={styles.walletItem}>
-            <Text style={[styles.walletValue, styles.onDark]}>{wallet.displayHashrate}</Text>
-            <Text style={[styles.walletLabel, styles.onDarkMuted]}>算力值</Text>
+            <Text style={styles.walletValue}>{wallet.displayHashrate}</Text>
+            <Text style={styles.walletLabel}>算力值</Text>
           </View>
         </View>
         <View style={styles.walletActions}>
@@ -247,6 +250,7 @@ export default function MyScreen() {
       </Card>
 
       {/* 设备统计 */}
+      <SectionHeader title="设备概览" />
       <Card>
         <View style={styles.walletRow}>
           <Pressable style={styles.walletItem} onPress={() => nav.switchTab('device')}>
@@ -265,6 +269,7 @@ export default function MyScreen() {
       </Card>
 
       {/* 功能菜单 */}
+      <SectionHeader title="常用服务" />
       {menuGroups.map((group, gi) => (
         <Card key={gi} style={styles.menuCard}>
           {group.map((item, index) => (
@@ -273,7 +278,7 @@ export default function MyScreen() {
               onPress={() => onMenuTap(item.id)}
               style={[styles.menuRow, index < group.length - 1 && styles.menuRowBorder]}
             >
-              <Text style={styles.menuIcon}>{item.icon}</Text>
+              <GlyphBadge text={item.icon} tone={item.tone} />
               <Text style={styles.menuText}>{item.text}</Text>
               <Text style={styles.menuArrow}>›</Text>
             </Pressable>
@@ -301,37 +306,12 @@ export default function MyScreen() {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: colors.bg },
-  content: { padding: 16, paddingBottom: 32 },
-  userCard: { flexDirection: 'row', alignItems: 'center', gap: 14 },
-  avatar: { width: 60, height: 60, borderRadius: 30, backgroundColor: colors.border },
-  avatarFallback: { alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary },
-  avatarText: { color: '#ffffff', fontSize: 24, fontWeight: '700' },
-  userMeta: { flex: 1 },
-  nickname: { fontSize: 18, fontWeight: '800', color: colors.text },
-  editHint: { fontSize: 13, color: colors.muted },
-  userId: { color: colors.textSecondary, marginTop: 4, fontSize: 13 },
-  levelBadge: {
-    backgroundColor: '#e7f2fb',
-    borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-  },
-  levelText: { color: colors.primary, fontWeight: '800', fontSize: 13 },
-  completeTip: { color: colors.orange, fontSize: 13, marginBottom: 10, marginLeft: 4 },
-  walletCard: { backgroundColor: '#0f2a5c', borderColor: '#0f2a5c' },
-  onDark: { color: '#ffffff' },
-  onDarkMuted: { color: '#9fd2f5' },
-  walletRow: { flexDirection: 'row' },
-  walletItem: { flex: 1, alignItems: 'center' },
-  walletValue: { fontSize: 18, fontWeight: '800', color: colors.text },
-  walletLabel: { marginTop: 4, fontSize: 12, color: colors.textSecondary },
-  walletActions: { flexDirection: 'row', gap: 8, marginTop: 16 },
-  walletButton: { flex: 1, paddingVertical: 9 },
-  menuCard: { paddingVertical: 4 },
-  menuRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 13 },
-  menuRowBorder: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.border },
-  menuIcon: { fontSize: 18, width: 32 },
-  menuText: { flex: 1, fontSize: 15, color: colors.text },
-  menuArrow: { fontSize: 20, color: colors.muted },
+  page: { flex: 1, backgroundColor: 'transparent' }, content: { padding: 16, paddingBottom: 34 },
+  pageHead: { marginTop: 8, marginBottom: 17 }, pageTitle: { color: colors.navy, fontSize: 25, fontWeight: '900', letterSpacing: 0.6 }, pageSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 5 },
+  userCard: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 17 }, avatar: { width: 62, height: 62, borderRadius: 21, backgroundColor: colors.border }, avatarFallback: { alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primarySoft, borderWidth: 1, borderColor: '#C8E2F5' }, avatarText: { color: colors.primary, fontSize: 24, fontWeight: '900' },
+  userMeta: { flex: 1 }, nickname: { fontSize: 18, fontWeight: '900', color: colors.text }, editHint: { fontSize: 13, color: colors.primary }, userId: { color: colors.textSecondary, marginTop: 5, fontSize: 12 },
+  levelBadge: { backgroundColor: colors.primarySoft, borderRadius: radius.pill, paddingHorizontal: 11, paddingVertical: 6, borderWidth: 1, borderColor: '#D1E7F8' }, levelText: { color: colors.primary, fontWeight: '900', fontSize: 12 }, completeTip: { color: colors.orange, fontSize: 12, marginBottom: 10, marginLeft: 4, fontWeight: '700' },
+  walletCard: { backgroundColor: 'rgba(255,255,255,0.96)', borderColor: '#CFE3F3', paddingVertical: 19 }, walletRow: { flexDirection: 'row' }, walletItem: { flex: 1, alignItems: 'center' }, walletValue: { fontSize: 18, fontWeight: '900', color: colors.text }, walletLabel: { marginTop: 5, fontSize: 11, color: colors.textSecondary },
+  walletActions: { flexDirection: 'row', gap: 8, marginTop: 18, paddingTop: 15, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border }, walletButton: { flex: 1, minHeight: 42, paddingVertical: 8 },
+  menuCard: { paddingVertical: 5 }, menuRow: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 59, paddingVertical: 10 }, menuRowBorder: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.borderSoft }, menuText: { flex: 1, fontSize: 14, fontWeight: '700', color: colors.text }, menuArrow: { fontSize: 22, color: colors.muted },
 });

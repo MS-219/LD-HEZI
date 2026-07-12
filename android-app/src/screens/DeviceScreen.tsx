@@ -184,6 +184,10 @@ export default function DeviceScreen() {
 
   return (
     <View style={styles.page}>
+      <View style={styles.pageHead}>
+        <View><Text style={styles.pageTitle}>设备中心</Text><Text style={styles.pageSubtitle}>查看运行状态与每日收益</Text></View>
+        <View style={styles.deviceCount}><Text style={styles.deviceCountValue}>{allDevices.length}</Text><Text style={styles.deviceCountLabel}> 台设备</Text></View>
+      </View>
       <View style={styles.header}>
         <TextInput
           value={keyword}
@@ -214,7 +218,7 @@ export default function DeviceScreen() {
         ListEmptyComponent={<Empty text={allDevices.length ? '没有匹配设备' : '暂无设备，点击右上角添加'} />}
         contentContainerStyle={{ paddingBottom: 24 }}
         renderItem={({ item }) => (
-          <Card onPress={() => nav.navigate('device-detail', { id: item.id })}>
+          <Card onPress={() => nav.navigate('device-detail', { id: item.id })} style={styles.deviceCard}>
             <View style={styles.cardHead}>
               <Text style={styles.deviceName}>{item.name || item.sn}</Text>
               <Badge text={item.statusText} color={item.online ? colors.online : colors.muted} />
@@ -222,10 +226,10 @@ export default function DeviceScreen() {
             <Pressable onPress={() => copyText(item.sn)}>
               <Text style={styles.deviceMeta}>设备号：{item.sn}（点击复制）</Text>
             </Pressable>
-            <Text style={styles.deviceMeta}>绑定日期：{item.bindDate}</Text>
-            <Text style={styles.deviceMeta}>
-              今日收益：<Text style={styles.earning}>{item.earnings} U</Text>
-            </Text>
+            <View style={styles.deviceInfoRow}>
+              <View><Text style={styles.deviceInfoLabel}>绑定日期</Text><Text style={styles.deviceInfoValue}>{item.bindDate}</Text></View>
+              <View style={styles.earningBox}><Text style={styles.deviceInfoLabel}>今日收益</Text><Text style={styles.earning}>{item.earnings} U</Text></View>
+            </View>
             <View style={styles.actions}>
               <Button
                 title="详情"
@@ -265,29 +269,18 @@ export default function DeviceScreen() {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: colors.bg, padding: 16 },
+  page: { flex: 1, backgroundColor: 'transparent', padding: 16 },
+  pageHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8, marginBottom: 17 },
+  pageTitle: { color: colors.navy, fontSize: 25, fontWeight: '900', letterSpacing: 0.6 },
+  pageSubtitle: { color: colors.textSecondary, fontSize: 12, marginTop: 5 },
+  deviceCount: { flexDirection: 'row', alignItems: 'baseline', paddingHorizontal: 12, paddingVertical: 8, borderRadius: radius.md, backgroundColor: 'rgba(255,255,255,0.82)', borderWidth: 1, borderColor: colors.border },
+  deviceCountValue: { color: colors.primary, fontSize: 18, fontWeight: '900' }, deviceCountLabel: { color: colors.textSecondary, fontSize: 10, fontWeight: '700' },
   header: { flexDirection: 'row', gap: 10, marginBottom: 12 },
-  search: {
-    flex: 1,
-    backgroundColor: colors.card,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    color: colors.text,
-  },
-  addButton: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.md,
-    paddingHorizontal: 14,
-    justifyContent: 'center',
-  },
-  addButtonText: { color: '#ffffff', fontWeight: '700' },
-  cardHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  deviceName: { fontSize: 16, fontWeight: '700', color: colors.text, flex: 1, marginRight: 8 },
-  deviceMeta: { color: colors.textSecondary, marginTop: 6, fontSize: 13 },
-  earning: { color: colors.orange, fontWeight: '700' },
-  actions: { flexDirection: 'row', gap: 8, marginTop: 12 },
-  actionButton: { flex: 1, paddingVertical: 8 },
+  search: { flex: 1, minHeight: 48, backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 14, paddingVertical: 10, color: colors.text, fontSize: 13 },
+  addButton: { minHeight: 48, backgroundColor: colors.primary, borderRadius: radius.md, paddingHorizontal: 15, justifyContent: 'center' }, addButtonText: { color: '#ffffff', fontWeight: '800', fontSize: 13 },
+  deviceCard: { padding: 17 }, cardHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }, deviceName: { fontSize: 17, fontWeight: '900', color: colors.text, flex: 1, marginRight: 8 },
+  deviceMeta: { color: colors.textSecondary, marginTop: 7, fontSize: 12 },
+  deviceInfoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 14, paddingTop: 13, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
+  deviceInfoLabel: { color: colors.muted, fontSize: 10, fontWeight: '700' }, deviceInfoValue: { color: colors.textSecondary, fontSize: 13, fontWeight: '700', marginTop: 4 }, earningBox: { alignItems: 'flex-end' }, earning: { color: colors.orange, fontWeight: '900', fontSize: 17, marginTop: 2 },
+  actions: { flexDirection: 'row', gap: 8, marginTop: 14 }, actionButton: { flex: 1, minHeight: 42, paddingVertical: 8 },
 });

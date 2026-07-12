@@ -1,34 +1,50 @@
 /**
- * 全球云智算 全局主题
- * 设计语言与管理后台一致：深海军蓝 + 青色高亮，扁平、留白、直角化。
+ * 全球云智算移动端视觉令牌。
+ * 方向：白色主体、浅蓝顶部氛围、由上至下渐变到纯白，强调可信与清晰。
  */
 export const colors = {
-  /** 主色：深蓝（按钮/高亮/选中态） */
-  primary: '#0e7bd4',
-  /** 深主色（按压态/深色面） */
-  primaryDark: '#0b62aa',
-  /** 海军蓝（标题栏/钱包卡/大色块） */
-  navy: '#0f2a5c',
-  navyDeep: '#0b1f4b',
-  /** 青色点缀（指示条/强调数字） */
-  cyan: '#22d3ee',
-  blue: '#0e7bd4',
-  green: '#14b8a6',
-  orange: '#f59e0b',
-  red: '#ef4444',
-  text: '#12294f',
-  textSecondary: '#51637f',
-  muted: '#9aa9c2',
-  border: '#e3e9f2',
-  bg: '#f2f6fb',
-  card: '#ffffff',
-  online: '#14b8a6',
-  offline: '#c3ceda',
+  primary: '#1677D2',
+  primaryDark: '#0E5DA8',
+  primarySoft: '#EAF4FD',
+  navy: '#123B66',
+  navyDeep: '#0B294A',
+  cyan: '#39A8E8',
+  blue: '#1677D2',
+  green: '#18A779',
+  greenSoft: '#EAF8F3',
+  orange: '#E99024',
+  orangeSoft: '#FFF5E7',
+  red: '#DF4D56',
+  redSoft: '#FDEDEF',
+  text: '#17324D',
+  textSecondary: '#60758B',
+  muted: '#94A6B8',
+  border: '#DCE8F2',
+  borderSoft: '#EAF1F7',
+  bg: 'transparent',
+  surface: '#F7FBFE',
+  card: '#FFFFFF',
+  online: '#18A779',
+  offline: '#9AAABD',
+  white: '#FFFFFF',
 };
 
+export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 };
+
 export const radius = {
-  sm: 6,
-  md: 8,
-  lg: 12,
-  xl: 14,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 22,
+  pill: 999,
+};
+
+export const shadow = {
+  card: {
+    shadowColor: '#315B7E',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    elevation: 3,
+  },
 };

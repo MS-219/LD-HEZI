@@ -9,6 +9,7 @@
  */
 import React, { useState } from 'react';
 import {
+  ImageBackground,
   Platform,
   Pressable,
   SafeAreaView,
@@ -62,10 +63,21 @@ const screens = {
 };
 
 const tabs = [
-  { key: 'home', label: '首页', icon: '🏠' },
-  { key: 'device', label: '设备', icon: '📱' },
-  { key: 'my', label: '我的', icon: '👤' },
+  { key: 'home', label: '首页' },
+  { key: 'device', label: '设备' },
+  { key: 'my', label: '我的' },
 ];
+
+function TabIcon({ name, active }: { name: string; active: boolean }) {
+  const color = active ? colors.primary : colors.muted;
+  if (name === 'home') {
+    return <View style={[styles.homeIcon, { borderColor: color }]}><View style={[styles.homeDoor, { backgroundColor: color }]} /></View>;
+  }
+  if (name === 'device') {
+    return <View style={[styles.deviceIcon, { borderColor: color }]}><View style={[styles.deviceDot, { backgroundColor: color }]} /></View>;
+  }
+  return <View style={styles.userIcon}><View style={[styles.userHead, { borderColor: color }]} /><View style={[styles.userBody, { borderColor: color }]} /></View>;
+}
 
 function TabRoot({ tab }: { tab: string }) {
   // 三个 tab 页都保持挂载，切换不丢状态（与小程序 tabBar 行为一致）
@@ -99,7 +111,7 @@ function AppShell() {
   if (!isLoggedIn) {
     return (
       <SafeAreaView style={styles.app}>
-        <StatusBar barStyle="dark-content" backgroundColor={colors.bg} />
+        <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
         <PhoneLoginScreen />
       </SafeAreaView>
     );
@@ -108,7 +120,7 @@ function AppShell() {
   if (mustChangePassword) {
     return (
       <SafeAreaView style={styles.app}>
-        <StatusBar barStyle="dark-content" backgroundColor={colors.bg} />
+        <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
         <ChangePasswordScreen />
       </SafeAreaView>
     );
@@ -116,7 +128,7 @@ function AppShell() {
 
   return (
     <SafeAreaView style={styles.app}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.card} />
+      <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
       <Navigator
         screens={screens}
         onSwitchTab={setTab}
@@ -130,8 +142,10 @@ function AppShell() {
                 const active = tab === item.key;
                 return (
                   <Pressable key={item.key} style={styles.tabButton} onPress={() => setTab(item.key)}>
-                    <View style={[styles.tabPill, active && styles.tabPillActive]}>
-                      <Text style={styles.tabIcon}>{item.icon}</Text>
+                    <View style={styles.tabPill}>
+                      <View style={[styles.tabIconWrap, active && styles.tabIconWrapActive]}>
+                        <TabIcon name={item.key} active={active} />
+                      </View>
                       <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{item.label}</Text>
                     </View>
                   </Pressable>
@@ -147,19 +161,21 @@ function AppShell() {
 
 export default function AppRoot() {
   return (
-    <UpdateGate>
-      <SessionProvider>
-        <AppShell />
-      </SessionProvider>
-    </UpdateGate>
+    <ImageBackground source={require('../assets/app-gradient.png')} resizeMode="stretch" style={styles.gradient}>
+      <UpdateGate>
+        <SessionProvider>
+          <AppShell />
+        </SessionProvider>
+      </UpdateGate>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  gradient: { flex: 1 },
   app: {
     flex: 1,
-    backgroundColor: colors.bg,
-    // 安卓 / 鸿蒙上 SafeAreaView 不处理状态栏高度，手动留白
+    backgroundColor: 'transparent',
     paddingTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight || 0,
   },
   root: { flex: 1 },
@@ -169,23 +185,29 @@ const styles = StyleSheet.create({
   hidden: { display: 'none' },
   tabBar: {
     flexDirection: 'row',
-    backgroundColor: colors.card,
+    backgroundColor: 'rgba(255,255,255,0.96)',
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.border,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  tabButton: { flex: 1, alignItems: 'center' },
-  tabPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
+    paddingTop: 7,
+    paddingBottom: Platform.OS === 'ios' ? 6 : 9,
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 999,
+    shadowColor: '#315B7E',
+    shadowOffset: { width: 0, height: -5 },
+    shadowOpacity: 0.07,
+    shadowRadius: 12,
+    elevation: 9,
   },
-  tabPillActive: { backgroundColor: colors.navy },
-  tabIcon: { fontSize: 16 },
-  tabLabel: { fontSize: 12, color: colors.muted, fontWeight: '600' },
-  tabLabelActive: { color: '#ffffff', fontWeight: '700' },
+  tabButton: { flex: 1, alignItems: 'center', minHeight: 54, justifyContent: 'center' },
+  tabPill: { alignItems: 'center', justifyContent: 'center', gap: 3 },
+  tabIconWrap: { width: 30, height: 27, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
+  tabIconWrapActive: { backgroundColor: colors.primarySoft },
+  tabLabel: { fontSize: 11, color: colors.muted, fontWeight: '700' },
+  tabLabelActive: { color: colors.primary, fontWeight: '900' },
+  homeIcon: { width: 16, height: 14, borderWidth: 2, borderRadius: 4, marginTop: 3, alignItems: 'center', justifyContent: 'flex-end' },
+  homeDoor: { width: 4, height: 6, borderTopLeftRadius: 2, borderTopRightRadius: 2 },
+  deviceIcon: { width: 13, height: 19, borderWidth: 2, borderRadius: 4, alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 2 },
+  deviceDot: { width: 3, height: 3, borderRadius: 2 },
+  userIcon: { width: 19, height: 20, alignItems: 'center' },
+  userHead: { width: 8, height: 8, borderRadius: 4, borderWidth: 2 },
+  userBody: { width: 17, height: 9, borderTopLeftRadius: 9, borderTopRightRadius: 9, borderWidth: 2, borderBottomWidth: 0, marginTop: 3 },
 });

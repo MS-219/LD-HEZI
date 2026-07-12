@@ -247,7 +247,7 @@ export default function InviteScreen() {
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: colors.bg },
   content: { padding: 16, paddingBottom: 32 },
-  codeCard: { alignItems: 'center', paddingVertical: 22, backgroundColor: '#e7f2fb', borderColor: '#9fd2f5' },
+  codeCard: { alignItems: 'center', paddingVertical: 22, backgroundColor: 'rgba(255,255,255,0.96)', borderColor: colors.border },
   codeLabel: { color: colors.textSecondary, fontSize: 13 },
   code: { fontSize: 32, fontWeight: '800', color: colors.primary, marginTop: 8, letterSpacing: 2 },
   levelName: { color: colors.textSecondary, fontSize: 12, marginTop: 8 },
