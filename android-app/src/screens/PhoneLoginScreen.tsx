@@ -92,8 +92,8 @@ export default function PhoneLoginScreen() {
           </>}
 
           <Button title={loggingIn ? '正在登录...' : '登 录'} onPress={submit} disabled={loggingIn} style={styles.login} />
-          <View style={styles.tipRow}><View style={styles.tipLine} /><Text style={styles.tip}>账号由管理员统一开通</Text><View style={styles.tipLine} /></View>
-          <Text style={styles.firstTip}>首次登录后需修改临时密码</Text>
+          <View style={styles.tipRow}><View style={styles.tipLine} /><Text style={styles.tip}>未注册手机号验证后自动创建账号</Text><View style={styles.tipLine} /></View>
+          <Text style={styles.firstTip}>后台开通的账号仍可使用密码登录</Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

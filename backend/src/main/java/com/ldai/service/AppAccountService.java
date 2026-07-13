@@ -2,6 +2,7 @@ package com.ldai.service;
 
 import com.ldai.entity.AppUser;
 import com.ldai.util.JwtUtil;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -115,22 +116,55 @@ public class AppAccountService {
         return establishSession(user);
     }
 
+    /**
+     * 允许新手机号获取验证码；已存在但被停用的账号仍禁止获取验证码。
+     */
     public void assertSmsLoginAvailable(String phone) {
         AppUser user = appUserService.getByPhone(normalizePhone(phone));
-        if (user == null || user.getPasswordHash() == null || user.getPasswordHash().isBlank()) {
-            throw new AccountException("账号尚未开通，请联系管理员");
-        }
-        ensureEnabled(user);
+        if (user != null) ensureEnabled(user);
     }
 
+    /**
+     * 短信验证码校验成功后登录；手机号首次使用时自动创建账号。
+     */
     @Transactional
     public Map<String, Object> smsLogin(String phone) {
-        AppUser user = appUserService.getByPhone(normalizePhone(phone));
-        if (user == null || user.getPasswordHash() == null || user.getPasswordHash().isBlank()) {
-            throw new AccountException("账号尚未开通，请联系管理员");
-        }
+        phone = normalizePhone(phone);
+        if (!PHONE.matcher(phone).matches()) throw new AccountException("请输入正确的11位手机号");
+
+        AppUser user = appUserService.getByPhone(phone);
+        if (user == null) user = createSmsAccount(phone);
         ensureEnabled(user);
         return establishSession(user);
+    }
+
+    private AppUser createSmsAccount(String phone) {
+        AppUser user = new AppUser();
+        user.setId(generateUniqueId());
+        user.setOpenid("sms_" + UUID.randomUUID().toString().replace("-", ""));
+        user.setPhone(phone);
+        user.setNickname("用户" + phone.substring(7));
+        user.setBalance(BigDecimal.ZERO);
+        user.setQuota(0);
+        user.setLevel(0);
+        user.setLevelManual(false);
+        user.setAccountEnabled(true);
+        user.setMustChangePassword(false);
+        user.setLoginFailCount(0);
+        user.setCreateTime(LocalDateTime.now());
+
+        try {
+            if (appUserService.save(user)) return user;
+        } catch (DuplicateKeyException e) {
+            AppUser existing = appUserService.getByPhone(phone);
+            if (existing != null) return existing;
+            throw e;
+        }
+
+        // 极少数并发首次登录可能已由另一个请求创建账号，重新查询后复用该账号。
+        AppUser existing = appUserService.getByPhone(phone);
+        if (existing != null) return existing;
+        throw new AccountException("账号创建失败，请稍后重试");
     }
 
     @Transactional
