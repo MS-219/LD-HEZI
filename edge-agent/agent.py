@@ -10,7 +10,7 @@ import socket
 CLOUD_URL = "https://api.hz.shandongliandong.com"
 OLLAMA_URL = "http://127.0.0.1:11434"
 # 每个节点的唯一识别码，可以手动写，或者根据 MAC 地址自动生成
-DEVICE_SN = "LD-AGENT-" + str(uuid.uuid4())[:8].upper()
+DEVICE_SN = "CD-AGENT-" + str(uuid.uuid4())[:8].upper()
 HEARTBEAT_INTERVAL = 10 # 秒
 TASK_POLL_INTERVAL = 5 # 秒
 

@@ -1171,7 +1171,7 @@ public class DeviceController {
     }
 
     /**
-     * 生成8位绑定码 (LD + 6位字母数字混合)
+     * 生成8位绑定码 (CD + 6位字母数字混合)
      */
     private String generateBindCode() {
         String chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -1179,14 +1179,14 @@ public class DeviceController {
         String code;
         int attempts = 0;
         do {
-            StringBuilder sb = new StringBuilder("LD");
+            StringBuilder sb = new StringBuilder("CD");
             for (int i = 0; i < 6; i++) {
                 sb.append(chars.charAt(random.nextInt(chars.length())));
             }
             code = sb.toString();
             attempts++;
             if (attempts > 100) {
-                code = "LD" + System.currentTimeMillis() % 1000000;
+                code = "CD" + System.currentTimeMillis() % 1000000;
                 break;
             }
         } while (deviceService.lambdaQuery().eq(Device::getBindCode, code).exists());

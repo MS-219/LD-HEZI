@@ -267,7 +267,7 @@ Page({
           return;
         }
 
-        // 解析 URL 格式的二维码 (如: https://hz.shandongliandong.com/bind?code=LDHG762Y)
+        // 解析 URL 格式的二维码 (如: https://hz.shandongliandong.com/bind?code=CDHG762Y)
         if (code.includes('?code=')) {
           const match = code.match(/[?&]code=([^&]+)/);
           if (match) {

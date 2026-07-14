@@ -44,17 +44,17 @@ def load_sn():
         if os.path.exists(SN_FILE):
             with open(SN_FILE, "r", encoding="utf-8") as f:
                 sn = f.read().strip()
-            if sn.startswith("JX-"):
-                sn = "LD-" + sn[3:]
-            return sn or "LD-UNKNOWN"
+            if sn.startswith(("JX-", "LD-")):
+                sn = "CD-" + sn[3:]
+            return sn or "CD-UNKNOWN"
     except Exception:
         pass
-    return "LD-UNKNOWN"
+    return "CD-UNKNOWN"
 
 
 def generate_bind_code(sn):
     digest = hashlib.md5(f"{sn}juxin_salt_2025".encode("utf-8")).hexdigest()
-    return "LD" + digest[:6].upper()
+    return "CD" + digest[:6].upper()
 
 
 def load_status():
@@ -85,8 +85,8 @@ def load_status():
 
     # status.json may still contain the previous prefix during a rolling restart.
     status_sn = str(fallback.get("sn") or sn)
-    if status_sn.startswith("JX-"):
-        status_sn = "LD-" + status_sn[3:]
+    if status_sn.startswith(("JX-", "LD-")):
+        status_sn = "CD-" + status_sn[3:]
     fallback["sn"] = status_sn
     fallback["bindCode"] = generate_bind_code(status_sn)
     return fallback

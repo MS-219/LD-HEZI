@@ -17,8 +17,8 @@ def load_sn(wait_seconds=30):
         if os.path.exists(SN_FILE):
             with open(SN_FILE, "r", encoding="utf-8") as f:
                 sn = f.read().strip()
-            if sn.startswith("JX-"):
-                sn = "LD-" + sn[3:]
+            if sn.startswith(("JX-", "LD-")):
+                sn = "CD-" + sn[3:]
             if sn:
                 return sn
         if time.time() >= deadline:

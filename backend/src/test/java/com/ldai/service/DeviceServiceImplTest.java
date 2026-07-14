@@ -44,7 +44,7 @@ class DeviceServiceImplTest {
     @Test
     void registersNewDeviceWithoutImageLicense() {
         Device device = service.handleHeartbeat(
-                "LD-TEST-NO-LICENSE",
+                "CD-TEST-NO-LICENSE",
                 "192.168.1.61",
                 "3.2",
                 "18.4",
@@ -55,11 +55,39 @@ class DeviceServiceImplTest {
                 "V4.0");
 
         assertNotNull(device);
-        assertEquals("LD-TEST-NO-LICENSE", device.getSn());
+        assertEquals("CD-TEST-NO-LICENSE", device.getSn());
         assertEquals(1, device.getStatus());
         assertEquals("V4.0", device.getImageVersion());
         assertNull(device.getImageLicenseKey());
         verify(deviceMapper).insert(device);
         verify(imageLicenseService, never()).validateNewDeviceLicense(any());
     }
+    @Test
+    void migratesLegacyDeviceToCdPrefix() {
+        Device legacy = new Device();
+        legacy.setId(7L);
+        legacy.setSn("LD-ABCDEF123456");
+        legacy.setBindCode("LD123456");
+        legacy.setStatus(1);
+
+        when(deviceMapper.selectOne(any())).thenReturn(null, legacy);
+
+        Device device = service.handleHeartbeat(
+                "CD-ABCDEF123456",
+                "192.168.1.61",
+                "3.2",
+                "18.4",
+                null,
+                "V4.0",
+                "fingerprint",
+                "Test CPU",
+                "V4.0");
+
+        assertNotNull(device);
+        assertEquals(7L, device.getId());
+        assertEquals("CD-ABCDEF123456", device.getSn());
+        assertEquals("CD", device.getBindCode().substring(0, 2));
+        verify(deviceMapper).updateById(device);
+    }
+
 }

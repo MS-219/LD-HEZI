@@ -60,23 +60,28 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
             }
         }
 
-        // 2. 平滑迁移旧版 JX 设备号：LD Agent 首次上报时复用原设备记录，避免重复创建设备。
-        if (device == null && sn != null && sn.startsWith("LD-")) {
-            String legacySn = "JX-" + sn.substring(3);
-            Device legacyDevice = this.lambdaQuery()
-                    .eq(Device::getSn, legacySn)
-                    .last("LIMIT 1")
-                    .one();
-            if (legacyDevice != null) {
-                legacyDevice.setSn(sn);
-                device = legacyDevice;
-                log.info("[Heartbeat] 设备号前缀迁移: {} -> {}", legacySn, sn);
+        // 2. 平滑迁移旧版 LD/JX 设备号：CD Agent 首次上报时复用原设备记录，避免重复创建设备。
+        if (device == null && sn != null && sn.startsWith("CD-")) {
+            String suffix = sn.substring(3);
+            for (String legacyPrefix : new String[]{"LD-", "JX-"}) {
+                String legacySn = legacyPrefix + suffix;
+                Device legacyDevice = this.lambdaQuery()
+                        .eq(Device::getSn, legacySn)
+                        .last("LIMIT 1")
+                        .one();
+                if (legacyDevice != null) {
+                    legacyDevice.setSn(sn);
+                    legacyDevice.setBindCode(generateBindCodeFromSn(sn));
+                    device = legacyDevice;
+                    log.info("[Heartbeat] 设备号前缀迁移: {} -> {}", legacySn, sn);
+                    break;
+                }
             }
         }
 
-        // 兼容仍在运行的旧版 JX Agent：如果数据库已经迁移为 LD，则继续复用该设备。
-        if (device == null && sn != null && sn.startsWith("JX-")) {
-            String migratedSn = "LD-" + sn.substring(3);
+        // 兼容仍在运行的旧版 LD/JX Agent：如果数据库已经迁移为 CD，则继续复用该设备。
+        if (device == null && sn != null && (sn.startsWith("LD-") || sn.startsWith("JX-"))) {
+            String migratedSn = "CD-" + sn.substring(3);
             device = this.lambdaQuery()
                     .eq(Device::getSn, migratedSn)
                     .last("LIMIT 1")
@@ -333,9 +338,9 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
             StringBuilder sb = new StringBuilder();
             for (byte b : bytes)
                 sb.append(String.format("%02x", b));
-            return "LD" + sb.toString().substring(0, 6).toUpperCase();
+            return "CD" + sb.toString().substring(0, 6).toUpperCase();
         } catch (Exception e) {
-            return "LD" + Integer.toHexString(sn.hashCode()).toUpperCase();
+            return "CD" + Integer.toHexString(sn.hashCode()).toUpperCase();
         }
     }
 }

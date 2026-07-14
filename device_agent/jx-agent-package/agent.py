@@ -62,9 +62,9 @@ def generate_device_sn():
     if components:
         seed = "|".join(components)
         digest = hashlib.md5(seed.encode("utf-8")).hexdigest().upper()
-        return "LD-" + digest[:12]
+        return "CD-" + digest[:12]
 
-    return "LD-R-" + time.strftime("%m%d%H%M%S")
+    return "CD-R-" + time.strftime("%m%d%H%M%S")
 
 
 def load_device_sn():
@@ -73,8 +73,8 @@ def load_device_sn():
         with open(path, "r", encoding="utf-8") as f:
             sn = f.read().strip()
             if sn:
-                if sn.startswith("JX-"):
-                    sn = "LD-" + sn[3:]
+                if sn.startswith(("JX-", "LD-")):
+                    sn = "CD-" + sn[3:]
                     with open(path, "w", encoding="utf-8") as output:
                         output.write(sn)
                 return sn
@@ -91,7 +91,7 @@ DEVICE_SN = load_device_sn()
 
 def generate_bind_code(sn):
     digest = hashlib.md5(f"{sn}juxin_salt_2025".encode("utf-8")).hexdigest()
-    return "LD" + digest[:6].upper()
+    return "CD" + digest[:6].upper()
 
 
 def load_image_version():
