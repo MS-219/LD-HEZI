@@ -234,7 +234,7 @@ def build_link(status, frame, width):
     rows = [
         (link_animation(frame, online, width - 6), "92" if online else "91"),
         (f"   HEARTBEAT       {heartbeat_age(status.get('lastHeartbeatTime'))}", "97"),
-        (f"   CONTROL PLANE   hz.shandongliandong.com", "94"),
+        ("   CHANNEL         SECURE / PERSISTENT", "94"),
         (f"   MESSAGE         {fit(message, width - 23)}", color),
         (f"   ACTIVE TASK     {status.get('currentTask') or 'IDLE'}", "93"),
         (f"   LAST RESULT     {status.get('lastTaskStatus') or 'WAITING'}", "90"),
@@ -250,7 +250,7 @@ def build_telemetry(status, frame, width):
     rows = [
         (f"CPU   {cpu:5.1f}%  {bar(cpu, bar_width)}  {sparkline(cpu, frame, spark_width, 0.2)}", "96"),
         (f"MEM   {memory:5.1f}%  {bar(memory, bar_width)}  {sparkline(memory, frame, spark_width, 1.7)}", "95"),
-        (f"MODEL  {fit(status.get('cpuModel') or 'Unknown CPU', width - 11)}", "90"),
+        (f"HEALTH  {'STABLE' if max(cpu, memory) < 85 else 'HIGH LOAD'}", "92" if max(cpu, memory) < 85 else "93"),
     ]
     return box("Live Telemetry", rows, width, "95")
 
