@@ -252,7 +252,7 @@ export default function DeviceScreen() {
       <InputDialog
         visible={showBind}
         title="添加设备"
-        placeholder="请输入设备绑定码（如 JXHG762Y）"
+        placeholder="请输入设备绑定码（如 LDHG762Y）"
         onCancel={() => setShowBind(false)}
         onConfirm={startBind}
       />

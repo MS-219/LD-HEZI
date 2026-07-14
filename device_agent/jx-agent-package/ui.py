@@ -1,32 +1,60 @@
+import hashlib
 import json
+import math
 import os
+import re
+import shutil
 import sys
 import time
-import shutil
-import hashlib
-import re
-from collections import deque
+from datetime import datetime
 
 
 STATUS_FILE = os.getenv("LD_AI_STATUS_FILE", "/opt/ld-ai/runtime/status.json")
 SN_FILE = os.getenv("LD_AI_SN_FILE", "/etc/ld-ai-sn")
 APP_VERSION = "V4.0"
-FRAME = 0
-ROLLING_LOGS = deque(maxlen=24)
-LAST_IMPORTED_LOGS = []
-SCREEN_NAME = "HEZI NODE CONSOLE"
+SCREEN_NAME = "LD CLOUD EDGE"
+ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
+SPARKS = "▁▂▃▄▅▆▇█"
+SPINNERS = ("◢", "◣", "◤", "◥")
+
+
+def style(text, code):
+    return f"\033[{code}m{text}\033[0m"
+
+
+def visible_len(text):
+    return len(ANSI_RE.sub("", str(text)))
+
+
+def pad_ansi(text, width):
+    return str(text) + " " * max(0, width - visible_len(text))
+
+
+def fit(text, width):
+    value = "" if text is None else str(text)
+    if len(value) <= width:
+        return value
+    if width <= 3:
+        return value[:width]
+    return value[: width - 3] + "..."
 
 
 def load_sn():
-    if os.path.exists(SN_FILE):
-        with open(SN_FILE, "r", encoding="utf-8") as f:
-            return f.read().strip()
-    return "JX-UNKNOWN"
+    try:
+        if os.path.exists(SN_FILE):
+            with open(SN_FILE, "r", encoding="utf-8") as f:
+                sn = f.read().strip()
+            if sn.startswith("JX-"):
+                sn = "LD-" + sn[3:]
+            return sn or "LD-UNKNOWN"
+    except Exception:
+        pass
+    return "LD-UNKNOWN"
 
 
 def generate_bind_code(sn):
     digest = hashlib.md5(f"{sn}juxin_salt_2025".encode("utf-8")).hexdigest()
-    return "JX" + digest[:6].upper()
+    return "LD" + digest[:6].upper()
 
 
 def load_status():
@@ -35,234 +63,291 @@ def load_status():
         "sn": sn,
         "bindCode": generate_bind_code(sn),
         "agentVersion": APP_VERSION,
+        "bootTime": "",
         "online": False,
         "lastHeartbeatTime": "",
-        "lastError": "WAITING",
+        "lastError": "WAITING FOR FIRST HEARTBEAT",
         "ip": "127.0.0.1",
+        "cpuLoad": 0,
+        "memLoad": 0,
+        "cpuModel": "Unknown CPU",
         "currentTask": "IDLE",
         "lastTaskStatus": "WAITING",
+        "lastTaskType": "",
         "logs": [],
     }
-    if os.path.exists(STATUS_FILE):
-        try:
+    try:
+        if os.path.exists(STATUS_FILE):
             with open(STATUS_FILE, "r", encoding="utf-8") as f:
                 fallback.update(json.load(f))
-        except Exception:
-            pass
+    except Exception:
+        pass
+
+    # status.json may still contain the previous prefix during a rolling restart.
+    status_sn = str(fallback.get("sn") or sn)
+    if status_sn.startswith("JX-"):
+        status_sn = "LD-" + status_sn[3:]
+    fallback["sn"] = status_sn
+    fallback["bindCode"] = generate_bind_code(status_sn)
     return fallback
 
 
-def clear():
-    sys.stdout.write("\033[H\033[J")
+def safe_number(value, default=0.0):
+    try:
+        return max(0.0, min(100.0, float(value)))
+    except (TypeError, ValueError):
+        return default
 
 
-def color(text, code):
-    return f"\033[{code}m{text}\033[0m"
+def bar(value, width=24):
+    value = safe_number(value)
+    filled = int(round(width * value / 100.0))
+    return "█" * filled + "░" * max(0, width - filled)
 
 
-def fit(text, width):
-    text = "" if text is None else str(text)
-    if len(text) <= width:
-        return text
-    if width <= 3:
-        return text[:width]
-    return text[: width - 3] + "..."
-
-
-def pad(text, width):
-    text = fit(text, width)
-    return text + " " * max(0, width - len(text))
-
-
-def line(width, left="", right=""):
-    if not left and not right:
-        return "-" * width
-    middle = max(2, width - len(left) - len(right) - 2)
-    return f"{left}{'-' * middle}{right}"
-
-
-def metric_card(label, value, width, accent="1;36"):
-    body = f"{label:<11} {value}"
-    return color(pad(body, width), accent)
+def sparkline(base, frame, count=18, phase=0.0):
+    base = safe_number(base)
+    values = []
+    for index in range(count):
+        wave = math.sin((frame + index) * 0.47 + phase) * 8
+        ripple = math.sin((frame - index) * 0.19 + phase * 2) * 4
+        value = max(0.0, min(100.0, base + wave + ripple))
+        spark_index = min(len(SPARKS) - 1, int(value / 100 * len(SPARKS)))
+        values.append(SPARKS[spark_index])
+    return "".join(values)
 
 
 def sanitize_log(text):
-    text = "" if text is None else str(text)
-    text = re.sub(r"https?://[^\s]+", "[REDACTED]", text)
-    text = re.sub(r"host='[^']+'", "host='[REDACTED]'", text)
-    text = re.sub(r"port=\d+", "port=***", text)
-    text = text.replace("HTTPSConnectionPool", "EDGE-LINK")
-    text = text.replace("HTTPConnectionPool", "EDGE-LINK")
-    return text
+    value = "" if text is None else str(text)
+    value = re.sub(r"https?://[^\s]+", "[cloud]", value)
+    value = re.sub(r"host='[^']+'", "host='cloud'", value)
+    value = re.sub(r"port=\d+", "port=*", value)
+    return value.replace("HTTPSConnectionPool", "EDGE-LINK").replace("HTTPConnectionPool", "EDGE-LINK")
 
 
-def build_fake_log(sn, frame):
-    tasks = ["BOOT ", "SCAN ", "TRACE", "FLOW ", "AUTH ", "QUEUE", "ROUTE", "LOAD ", "TASK ", "SYNC "]
-    task = tasks[frame % len(tasks)]
-    target = sn[3:11].replace("-", "") if len(sn) >= 11 else sn.replace("-", "")
-    return f"{time.strftime('%H:%M:%S')} | {task} | lane={target:<8} | seq={(frame * 1103515245) & 0xFFFF:04X} | accepted"
+def heartbeat_age(value):
+    if not value:
+        return "not received"
+    try:
+        stamp = datetime.strptime(str(value), "%Y-%m-%d %H:%M:%S")
+        seconds = max(0, int((datetime.now() - stamp).total_seconds()))
+        if seconds < 60:
+            return f"{seconds}s ago"
+        if seconds < 3600:
+            return f"{seconds // 60}m ago"
+        return f"{seconds // 3600}h ago"
+    except Exception:
+        return str(value)
 
 
-def build_matrix_line(sn, frame):
-    core = sn[3:11].replace("-", "") if len(sn) >= 11 else sn.replace("-", "")
-    left = f"{(frame * 2654435761) & 0xFFFFFFFF:08X}"
-    right = f"{(frame * 40503 + 97) & 0xFFFFFF:06X}"
-    tags = ["UPLK", "CTRL", "SPAN", "WORK", "NODE", "MESH"]
-    return f"{time.strftime('%H:%M:%S')} | {tags[frame % len(tags)]} | {left[:6]}:{core}:{right[-4:]} | telemetry"
+def uptime_text(value):
+    if not value:
+        return "--"
+    try:
+        boot = datetime.strptime(str(value), "%Y-%m-%d %H:%M:%S")
+        seconds = max(0, int((datetime.now() - boot).total_seconds()))
+        days, seconds = divmod(seconds, 86400)
+        hours, seconds = divmod(seconds, 3600)
+        minutes = seconds // 60
+        if days:
+            return f"{days}d {hours:02d}h {minutes:02d}m"
+        return f"{hours:02d}h {minutes:02d}m"
+    except Exception:
+        return "--"
 
 
-def build_activity_lines(sn, frame):
-    core = sn[3:11].replace("-", "") if len(sn) >= 11 else sn.replace("-", "")
-    values = [
-        ("uplink", 30 + (frame * 7) % 68),
-        ("queue ", 25 + (frame * 11) % 72),
-        ("route ", 20 + (frame * 13) % 74),
-        ("cache ", 18 + (frame * 17) % 76),
-    ]
-    lines = []
-    for label, pct in values:
-        bars = int(pct / 4)
-        bar = "=" * bars + "." * (25 - bars)
-        lines.append(f"{label} [{bar}] {pct:>3}%  bus:{(frame * 4099 + pct) & 0xFFFF:04X}  node:{core}")
+def box(title, rows, width, accent="96"):
+    inner = max(1, width - 2)
+    title_text = f" {fit(title.upper(), inner - 2)} "
+    top_fill = max(0, inner - len(title_text))
+    lines = [style("╭" + title_text + "─" * top_fill + "╮", accent)]
+    for row in rows:
+        if isinstance(row, tuple):
+            text, color = row
+        else:
+            text, color = row, "97"
+        content = fit(text, inner - 2)
+        lines.append(style("│", accent) + " " + style(content.ljust(inner - 2), color) + " " + style("│", accent))
+    lines.append(style("╰" + "─" * inner + "╯", accent))
     return lines
 
 
-def build_signal_rows(frame, online):
-    seed = frame if online else 0
-    rows = [
-        ("cpu lane", 35 + (seed * 9) % 55),
-        ("net io", 20 + (seed * 13) % 70),
-        ("job ring", 18 + (seed * 17) % 75),
-    ]
-    rendered = []
-    for name, pct in rows:
-        bars = int(pct / 10)
-        meter = "|" * bars + "." * (10 - bars)
-        rendered.append(f"{name:<8} {meter} {pct:>3}%")
-    return rendered
+def join_columns(left, right, gap=2):
+    height = max(len(left), len(right))
+    left_width = max((visible_len(line) for line in left), default=0)
+    lines = []
+    for index in range(height):
+        left_line = left[index] if index < len(left) else ""
+        right_line = right[index] if index < len(right) else ""
+        lines.append(pad_ansi(left_line, left_width) + " " * gap + right_line)
+    return lines
 
 
-def refresh_logs(status, sn, frame, online):
-    global LAST_IMPORTED_LOGS
-    status_logs = [sanitize_log(line) for line in list(status.get("logs") or [])]
-    if status_logs != LAST_IMPORTED_LOGS:
-        existing = set(ROLLING_LOGS)
-        for line in status_logs[-6:]:
-            if line and line not in existing:
-                ROLLING_LOGS.append(line)
-                existing.add(line)
-        LAST_IMPORTED_LOGS = status_logs
-
-    if online:
-        if frame % 2 == 0:
-            ROLLING_LOGS.append(build_fake_log(sn, frame))
-        if frame % 3 == 0:
-            ROLLING_LOGS.append(build_matrix_line(sn, frame))
-        if frame % 5 == 0:
-            ROLLING_LOGS.append(
-                f"{time.strftime('%H:%M:%S')} | TASK  | now={status.get('currentTask', 'IDLE')} | last={status.get('lastTaskStatus', 'WAITING')}"
-            )
+def packet_lane(sn, frame, width):
+    digest = hashlib.sha256(f"{sn}:{frame // 2}".encode("utf-8")).hexdigest().upper()
+    tokens = [digest[index:index + 4] for index in range(0, min(len(digest), 36), 4)]
+    lane = "  ".join(tokens)
+    shift = frame % max(1, len(lane))
+    moving = lane[shift:] + "  " + lane[:shift]
+    return fit(moving, width)
 
 
-def render_header(width, online):
-    pulse = ("ON " if online else "STBY") if FRAME % 2 else ("RUN" if online else "IDLE")
-    title = f" {SCREEN_NAME} "
-    right = f" {APP_VERSION} / {pulse} "
-    print(color(line(width, title, right), "1;36"))
+def link_animation(frame, online, width):
+    if not online:
+        return fit("CLOUD  x----x----x  NODE   link unavailable", width)
+    track_width = max(12, width - 28)
+    position = frame % track_width
+    track = ["─"] * track_width
+    track[position] = "◆"
+    if position > 0:
+        track[position - 1] = "╼"
+    return fit("CLOUD  " + "".join(track) + "  NODE", width)
 
 
-def render_identity(width, sn, bind_code, ip, online, last_error):
-    left_width = min(54, max(42, width // 2 - 3))
-    right_width = width - left_width - 3
-    state = "ONLINE" if online else "OFFLINE"
-    state_color = "1;32" if online else "1;31"
-    reason = "ready" if online else fit(last_error, right_width - 18)
-    left_rows = [
-        metric_card("serial", sn, left_width, "1;37"),
-        metric_card("pair key", bind_code, left_width, "1;35"),
-        metric_card("network", ip, left_width, "1;34"),
-    ]
-    right_rows = [
-        f"{color('state', '0;37'):<17} {color(state, state_color)}",
-        f"{color('message', '0;37'):<17} {fit(reason, right_width - 13)}",
-        f"{color('action', '0;37'):<17} enter pair key in the client app",
-    ]
-    print(color("NODE IDENTITY", "1;30") + "   " + color("CONTROL LINK", "1;30"))
-    for left, right in zip(left_rows, right_rows):
-        print(f"{left}   {fit(right, right_width)}")
-
-
-def render_logs(width, visible_logs):
-    print()
-    print(color(line(width, " EVENT STREAM ", ""), "1;30"))
-    if not visible_logs:
-        visible_logs = [f"{time.strftime('%H:%M:%S')} | BOOT  | waiting for first heartbeat"]
-    for line_text in visible_logs[-10:]:
-        print(color("  >", "1;32") + " " + fit(line_text, width - 5))
-    for _ in range(max(0, 10 - len(visible_logs[-10:]))):
-        print(" ")
-
-
-def render_runtime(width, status, sn, frame, online):
-    task_line = status.get("currentTask") or "IDLE"
-    result_line = status.get("lastTaskStatus") or "WAITING"
-    heartbeat_line = status.get("lastHeartbeatTime") or "-"
-    version_line = status.get("agentVersion", APP_VERSION)
-    print()
-    print(color(line(width, " WORKLOAD TELEMETRY ", ""), "1;30"))
-    activity_lines = build_activity_lines(sn, frame if online else 0)
-    signal_rows = build_signal_rows(frame, online)
-    left_width = min(62, max(46, width - 36))
-    right_width = width - left_width - 3
-    for index, activity in enumerate(activity_lines):
-        right = signal_rows[index] if index < len(signal_rows) else ""
-        print(f"  {color(pad(activity, left_width), '0;36')}   {color(fit(right, right_width), '0;32')}")
-    print()
-    print(color(line(width, " SESSION SNAPSHOT ", ""), "1;30"))
-    result_color = "1;32" if result_line == "COMPLETED" else "1;37"
-    print(f"  task      {color(fit(task_line, 34), '1;33')}   result {color(fit(result_line, 24), result_color)}")
-    print(f"  heartbeat {fit(heartbeat_line, 34)}   build  {color(version_line, '1;35')}")
-
-
-def render(frame):
-    global FRAME
-    FRAME = frame
-
-    status = load_status()
+def build_identity(status, frame, width):
     sn = status.get("sn") or load_sn()
     bind_code = status.get("bindCode") or generate_bind_code(sn)
-    ip = status.get("ip") or "127.0.0.1"
+    online = bool(status.get("online"))
+    state = "ONLINE / SYNCHRONIZED" if online else "OFFLINE / RETRYING"
+    state_color = "92" if online else "91"
+    pulse = SPINNERS[frame % len(SPINNERS)]
+    rows = [
+        (f"{pulse}  DEVICE SERIAL    {sn}", "97;1"),
+        (f"   PAIRING KEY     {bind_code}", "95;1"),
+        (f"   LOCAL ADDRESS   {status.get('ip') or '--'}", "94"),
+        (f"   AGENT BUILD     {status.get('agentVersion') or APP_VERSION}", "96"),
+        (f"   SYSTEM UPTIME   {uptime_text(status.get('bootTime'))}", "90"),
+        (f"   LINK STATE      {state}", state_color + ";1"),
+    ]
+    return box("Node Identity", rows, width, "96")
+
+
+def build_link(status, frame, width):
     online = bool(status.get("online"))
     last_error = status.get("lastError") or "UNKNOWN"
+    if online:
+        message = "Cloud control channel is healthy"
+        color = "92"
+    else:
+        message = sanitize_log(last_error)
+        color = "91"
+    rows = [
+        (link_animation(frame, online, width - 6), "92" if online else "91"),
+        (f"   HEARTBEAT       {heartbeat_age(status.get('lastHeartbeatTime'))}", "97"),
+        (f"   CONTROL PLANE   hz.shandongliandong.com", "94"),
+        (f"   MESSAGE         {fit(message, width - 23)}", color),
+        (f"   ACTIVE TASK     {status.get('currentTask') or 'IDLE'}", "93"),
+        (f"   LAST RESULT     {status.get('lastTaskStatus') or 'WAITING'}", "90"),
+    ]
+    return box("Control Link", rows, width, "94")
 
-    width = max(96, shutil.get_terminal_size((120, 32)).columns)
-    refresh_logs(status, sn, frame, online)
-    visible_logs = list(ROLLING_LOGS)[-10:]
 
-    clear()
-    render_header(width, online)
-    print()
-    render_identity(width, sn, bind_code, ip, online, last_error)
-    render_logs(width, visible_logs)
-    render_runtime(width, status, sn, frame, online)
-    print()
-    print(color(line(width, "", " local display only "), "1;30"))
-    sys.stdout.flush()
+def build_telemetry(status, frame, width):
+    cpu = safe_number(status.get("cpuLoad"))
+    memory = safe_number(status.get("memLoad"))
+    bar_width = max(12, min(30, width - 45))
+    spark_width = max(10, min(22, width - bar_width - 24))
+    rows = [
+        (f"CPU   {cpu:5.1f}%  {bar(cpu, bar_width)}  {sparkline(cpu, frame, spark_width, 0.2)}", "96"),
+        (f"MEM   {memory:5.1f}%  {bar(memory, bar_width)}  {sparkline(memory, frame, spark_width, 1.7)}", "95"),
+        (f"MODEL  {fit(status.get('cpuModel') or 'Unknown CPU', width - 11)}", "90"),
+    ]
+    return box("Live Telemetry", rows, width, "95")
+
+
+def build_datastream(status, frame, width):
+    sn = status.get("sn") or load_sn()
+    online = bool(status.get("online"))
+    scan_width = max(12, width - 18)
+    marker = frame % scan_width
+    scan = ["·"] * scan_width
+    scan[marker] = "█"
+    if marker > 0:
+        scan[marker - 1] = "▓"
+    if marker > 1:
+        scan[marker - 2] = "▒"
+    rows = [
+        ("SCAN   " + "".join(scan), "92" if online else "90"),
+        ("BUS    " + packet_lane(sn, frame, width - 9), "96"),
+        (f"MODE   {'ACTIVE TELEMETRY' if online else 'LOCAL STANDBY'}", "92" if online else "93"),
+    ]
+    return box("Data Stream", rows, width, "92")
+
+
+def build_events(status, frame, width):
+    logs = [sanitize_log(item) for item in (status.get("logs") or []) if str(item).strip()]
+    logs = logs[-4:]
+    while len(logs) < 4:
+        logs.insert(0, "system ready / waiting for workload")
+    rows = []
+    for index, item in enumerate(logs):
+        marker = ">" if index == len(logs) - 1 and frame % 2 else "·"
+        rows.append((f"{marker} {fit(item, width - 7)}", "97" if index == len(logs) - 1 else "90"))
+    return box("Event Timeline", rows, width, "90")
+
+
+def render_frame(status, frame, terminal_width):
+    width = max(78, min(160, terminal_width - 1 if terminal_width > 79 else terminal_width))
+    online = bool(status.get("online"))
+    state = "ONLINE" if online else "OFFLINE"
+    state_color = "92;1" if online else "91;1"
+    clock = time.strftime("%Y-%m-%d  %H:%M:%S")
+    spinner = SPINNERS[frame % len(SPINNERS)]
+
+    title_left = f" {SCREEN_NAME}  //  NODE OPERATING CONSOLE "
+    title_right = f" {spinner} {state}  {clock}  {APP_VERSION} "
+    if len(title_left) + len(title_right) > width:
+        title_left = f" {SCREEN_NAME} "
+    fill = max(0, width - len(title_left) - len(title_right))
+    lines = [style(title_left, "97;1") + style("─" * fill, "96") + style(title_right, state_color)]
+    subtitle = fit("  EDGE COMPUTE FABRIC  /  secure control  /  live telemetry  /  autonomous workload", width)
+    lines.append(style(subtitle[:21], "96;1") + style(subtitle[21:], "90"))
+    lines.append("")
+
+    if width >= 108:
+        gap = 2
+        left_width = (width - gap) // 2
+        right_width = width - gap - left_width
+        lines.extend(join_columns(build_identity(status, frame, left_width), build_link(status, frame, right_width), gap))
+        lines.append("")
+        lines.extend(join_columns(build_telemetry(status, frame, left_width), build_datastream(status, frame, right_width), gap))
+    else:
+        lines.extend(build_identity(status, frame, width))
+        lines.append("")
+        lines.extend(build_link(status, frame, width))
+        lines.append("")
+        lines.extend(build_telemetry(status, frame, width))
+        lines.append("")
+        lines.extend(build_datastream(status, frame, width))
+
+    lines.append("")
+    lines.extend(build_events(status, frame, width))
+    footer = " Pair the node with the LD mobile app using the pairing key above "
+    side = max(0, (width - len(footer)) // 2)
+    lines.append(style("─" * side + footer + "─" * max(0, width - side - len(footer)), "90"))
+    return "\n".join(lines)
 
 
 def main():
     frame = 0
-    while True:
-        try:
+    once = os.getenv("LD_AI_UI_ONCE", "0") == "1"
+    sys.stdout.write("\033[?25l\033[2J")
+    sys.stdout.flush()
+    try:
+        while True:
             frame += 1
-            render(frame)
-            time.sleep(0.25)
-        except KeyboardInterrupt:
-            break
-        except Exception as exc:
-            clear()
-            print(f"{SCREEN_NAME} screen error: {exc}")
-            time.sleep(1)
+            columns = shutil.get_terminal_size((120, 34)).columns
+            output = render_frame(load_status(), frame, columns)
+            sys.stdout.write("\033[H" + output + "\033[J")
+            sys.stdout.flush()
+            if once:
+                break
+            time.sleep(0.4)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        sys.stdout.write("\033[0m\033[?25h\n")
+        sys.stdout.flush()
 
 
 if __name__ == "__main__":

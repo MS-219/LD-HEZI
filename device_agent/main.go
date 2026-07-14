@@ -26,7 +26,7 @@ const (
 
 // Global variables
 var (
-	deviceSN  = "JX-UNKNOWN"
+	deviceSN  = "LD-UNKNOWN"
 	bindCode  = ""
 	deviceIP  = "0.0.0.0"
 	isOnline  = false
@@ -101,6 +101,10 @@ func getDeviceSN() string {
 	if data, err := os.ReadFile(path); err == nil {
 		sn := strings.TrimSpace(string(data))
 		if sn != "" {
+			if strings.HasPrefix(sn, "JX-") {
+				sn = "LD-" + strings.TrimPrefix(sn, "JX-")
+				_ = os.WriteFile(path, []byte(sn), 0644)
+			}
 			return sn
 		}
 	}
@@ -133,10 +137,10 @@ func getDeviceSN() string {
 		// 使用 MD5 混合 UUID 和 MAC 地址，确保唯一性
 		seed := strings.Join(components, "|")
 		hash := md5.Sum([]byte(seed))
-		finalSN = "JX-" + strings.ToUpper(hex.EncodeToString(hash[:])[:12])
+		finalSN = "LD-" + strings.ToUpper(hex.EncodeToString(hash[:])[:12])
 	} else {
 		// 万一啥都读不到，用时间戳兜底
-		finalSN = "JX-R-" + time.Now().Format("0102150405")
+		finalSN = "LD-R-" + time.Now().Format("0102150405")
 	}
 
 	// 3. 将生成的 SN 存入本地文件，永久锁定
@@ -174,7 +178,7 @@ func addLog(msg string) {
 func generateBindCode(sn string) string {
 	hash := md5.Sum([]byte(sn + "juxin_salt_2025"))
 	hexStr := hex.EncodeToString(hash[:])
-	return "JX" + strings.ToUpper(hexStr[:6])
+	return "LD" + strings.ToUpper(hexStr[:6])
 }
 
 func drawUI() {

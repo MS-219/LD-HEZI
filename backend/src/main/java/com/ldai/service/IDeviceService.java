@@ -13,7 +13,7 @@ public interface IDeviceService extends IService<Device> {
     Device handleHeartbeat(String sn, String ip, String cpuUsage, String memoryUsage);
 
     /**
-     * 处理设备心跳，并在新设备首次接入时校验镜像授权。
+     * 处理设备心跳；镜像授权参数仅用于兼容旧版 Agent，不再作为设备接入条件。
      */
     Device handleHeartbeat(String sn, String ip, String cpuUsage, String memoryUsage,
                            String imageLicenseKey, String imageVersion, String hardwareFingerprint,

@@ -60,6 +60,29 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
             }
         }
 
+        // 2. 平滑迁移旧版 JX 设备号：LD Agent 首次上报时复用原设备记录，避免重复创建设备。
+        if (device == null && sn != null && sn.startsWith("LD-")) {
+            String legacySn = "JX-" + sn.substring(3);
+            Device legacyDevice = this.lambdaQuery()
+                    .eq(Device::getSn, legacySn)
+                    .last("LIMIT 1")
+                    .one();
+            if (legacyDevice != null) {
+                legacyDevice.setSn(sn);
+                device = legacyDevice;
+                log.info("[Heartbeat] 设备号前缀迁移: {} -> {}", legacySn, sn);
+            }
+        }
+
+        // 兼容仍在运行的旧版 JX Agent：如果数据库已经迁移为 LD，则继续复用该设备。
+        if (device == null && sn != null && sn.startsWith("JX-")) {
+            String migratedSn = "LD-" + sn.substring(3);
+            device = this.lambdaQuery()
+                    .eq(Device::getSn, migratedSn)
+                    .last("LIMIT 1")
+                    .one();
+        }
+
         // 2. 如果精确匹配失败，尝试通过 MAC 地址核心部分模糊匹配
         if (device == null && sn != null && sn.contains("_")) {
             String macPart = sn.substring(sn.lastIndexOf("_") + 1);
@@ -77,19 +100,9 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
         }
 
         if (device == null) {
-            String licenseError = imageLicenseService.validateNewDeviceLicense(normalizedLicenseKey);
-            if (licenseError != null) {
-                log.warn("[Heartbeat] 拒绝新设备接入: SN={}, IP={}, reason={}", sn, ip, licenseError);
-                throw new IllegalArgumentException(licenseError);
-            }
-            validLicense = imageLicenseService.lambdaQuery()
-                    .eq(ImageLicense::getLicenseKey, normalizedLicenseKey)
-                    .eq(ImageLicense::getStatus, "active")
-                    .one();
-            if (validLicense == null) {
-                log.warn("[Heartbeat] 拒绝新设备接入: SN={}, IP={}, reason=镜像授权状态异常", sn, ip);
-                throw new IllegalArgumentException("镜像授权状态异常，禁止新设备接入");
-            }
+            // 镜像授权已取消：新设备首次上报时直接自动注册。
+            // 旧版 Agent 如果仍携带有效授权码，则仅保留为兼容信息，不再作为接入条件。
+            validLicense = findActiveImageLicense(normalizedLicenseKey);
             // 3. 自动注册新设备
             device = new Device();
             device.setSn(sn);
@@ -102,7 +115,9 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
             device.setHashrate(0);
             device.setCpuUsage(cpuUsage);
             device.setMemoryUsage(memoryUsage);
-            device.setImageLicenseKey(normalizedLicenseKey);
+            if (validLicense != null) {
+                device.setImageLicenseKey(normalizedLicenseKey);
+            }
             device.setImageVersion(trimToNull(imageVersion));
             this.save(device);
         } else {
@@ -132,18 +147,12 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
             device.setIp(ip);
             device.setCpuUsage(cpuUsage);
             device.setMemoryUsage(memoryUsage);
-            if (normalizedLicenseKey != null) {
-                ImageLicense license = imageLicenseService.lambdaQuery()
-                        .eq(ImageLicense::getLicenseKey, normalizedLicenseKey)
-                        .eq(ImageLicense::getStatus, "active")
-                        .one();
-                if (license != null) {
-                    validLicense = license;
-                    device.setImageLicenseKey(normalizedLicenseKey);
-                    if (trimToNull(imageVersion) != null) {
-                        device.setImageVersion(trimToNull(imageVersion));
-                    }
-                }
+            validLicense = findActiveImageLicense(normalizedLicenseKey);
+            if (validLicense != null) {
+                device.setImageLicenseKey(normalizedLicenseKey);
+            }
+            if (trimToNull(imageVersion) != null) {
+                device.setImageVersion(trimToNull(imageVersion));
             }
             updateDeviceIpInfo(device, rawLocation);
         }
@@ -160,6 +169,16 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
                     cpuModel);
         }
         return device;
+    }
+
+    private ImageLicense findActiveImageLicense(String normalizedLicenseKey) {
+        if (normalizedLicenseKey == null) {
+            return null;
+        }
+        return imageLicenseService.lambdaQuery()
+                .eq(ImageLicense::getLicenseKey, normalizedLicenseKey)
+                .eq(ImageLicense::getStatus, "active")
+                .one();
     }
 
     /**
@@ -314,9 +333,9 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceMapper, Device> impleme
             StringBuilder sb = new StringBuilder();
             for (byte b : bytes)
                 sb.append(String.format("%02x", b));
-            return "JX" + sb.toString().substring(0, 6).toUpperCase();
+            return "LD" + sb.toString().substring(0, 6).toUpperCase();
         } catch (Exception e) {
-            return "JX" + Integer.toHexString(sn.hashCode()).toUpperCase();
+            return "LD" + Integer.toHexString(sn.hashCode()).toUpperCase();
         }
     }
 }

@@ -14,8 +14,11 @@ WS_BASE = os.getenv("LD_AI_TERMINAL_WS", "wss://hz.shandongliandong.com/ws/devic
 def load_sn():
     if os.path.exists(SN_FILE):
         with open(SN_FILE, "r", encoding="utf-8") as f:
-            return f.read().strip()
-    return "JX-UNKNOWN"
+            sn = f.read().strip()
+        if sn.startswith("JX-"):
+            sn = "LD-" + sn[3:]
+        return sn or "LD-UNKNOWN"
+    return "LD-UNKNOWN"
 
 
 class TerminalGuard:

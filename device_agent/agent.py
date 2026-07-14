@@ -16,7 +16,6 @@ AGENT_VERSION = "V4.0"
 CLOUD_URL = os.getenv("LD_AI_CLOUD_URL", "https://hz.shandongliandong.com")
 OLLAMA_URL = os.getenv("LD_AI_OLLAMA_URL", "http://127.0.0.1:11434")
 SN_FILE = os.getenv("LD_AI_SN_FILE", "/etc/ld-ai-sn")
-IMAGE_LICENSE_FILE = os.getenv("LD_AI_IMAGE_LICENSE_FILE", "/etc/ld-ai-image-license")
 IMAGE_VERSION_FILE = os.getenv("LD_AI_IMAGE_VERSION_FILE", "/etc/ld-ai-image-version")
 HEARTBEAT_INTERVAL = int(os.getenv("LD_AI_HEARTBEAT_INTERVAL", "60"))
 TASK_POLL_INTERVAL = int(os.getenv("LD_AI_TASK_POLL_INTERVAL", "60"))
@@ -63,9 +62,9 @@ def generate_device_sn():
     if components:
         seed = "|".join(components)
         digest = hashlib.md5(seed.encode("utf-8")).hexdigest().upper()
-        return "JX-" + digest[:12]
+        return "LD-" + digest[:12]
 
-    return "JX-R-" + time.strftime("%m%d%H%M%S")
+    return "LD-R-" + time.strftime("%m%d%H%M%S")
 
 
 def load_device_sn():
@@ -74,6 +73,10 @@ def load_device_sn():
         with open(path, "r", encoding="utf-8") as f:
             sn = f.read().strip()
             if sn:
+                if sn.startswith("JX-"):
+                    sn = "LD-" + sn[3:]
+                    with open(path, "w", encoding="utf-8") as output:
+                        output.write(sn)
                 return sn
 
     sn = generate_device_sn()
@@ -88,20 +91,7 @@ DEVICE_SN = load_device_sn()
 
 def generate_bind_code(sn):
     digest = hashlib.md5(f"{sn}juxin_salt_2025".encode("utf-8")).hexdigest()
-    return "JX" + digest[:6].upper()
-
-
-def load_image_license():
-    env_license = os.getenv("LD_AI_IMAGE_LICENSE", "").strip()
-    if env_license:
-        return env_license
-    try:
-        if os.path.exists(IMAGE_LICENSE_FILE):
-            with open(IMAGE_LICENSE_FILE, "r", encoding="utf-8") as f:
-                return f.read().strip()
-    except Exception:
-        pass
-    return ""
+    return "LD" + digest[:6].upper()
 
 
 def load_image_version():
@@ -222,7 +212,6 @@ def report_status():
     cpu_load = psutil.cpu_percent()
     mem_load = psutil.virtual_memory().percent
     cpu_model = get_cpu_model()
-    image_license = load_image_license()
     image_version = load_image_version()
     hardware_fingerprint = get_hardware_fingerprint()
 
@@ -233,7 +222,6 @@ def report_status():
         "mem_load": mem_load,
         "cpu_model": cpu_model,
         "agent_version": AGENT_VERSION,
-        "image_license": image_license,
         "image_version": image_version,
         "hardware_fingerprint": hardware_fingerprint,
         "status": 1,
@@ -250,7 +238,6 @@ def report_status():
             "memLoad": round(mem_load, 1),
             "cpuModel": cpu_model,
             "imageVersion": image_version,
-            "imageAuthorized": bool(image_license),
         })
     try:
         res = requests.post(url, json=payload, timeout=5)
@@ -446,7 +433,7 @@ def heartbeat_loop(stop_event):
 
 
 def main():
-    print(f"JX AI Edge Agent start: {DEVICE_SN} version={AGENT_VERSION}")
+    print(f"LD AI Edge Agent start: {DEVICE_SN} version={AGENT_VERSION}")
     push_log("AGENT STARTED")
     stop_event = threading.Event()
     heartbeat_thread = threading.Thread(

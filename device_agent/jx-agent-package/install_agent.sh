@@ -107,7 +107,6 @@ WorkingDirectory=/opt/ld-ai
 Environment=LD_AI_CLOUD_URL=https://hz.shandongliandong.com
 Environment=LD_AI_OLLAMA_URL=http://127.0.0.1:11434
 Environment=LD_AI_HEARTBEAT_INTERVAL=60
-Environment=LD_AI_IMAGE_LICENSE_FILE=/etc/ld-ai-image-license
 Environment=LD_AI_IMAGE_VERSION_FILE=/etc/ld-ai-image-version
 
 [Install]

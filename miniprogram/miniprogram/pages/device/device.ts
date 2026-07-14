@@ -267,7 +267,7 @@ Page({
           return;
         }
 
-        // 解析 URL 格式的二维码 (如: https://hz.shandongliandong.com/bind?code=JXHG762Y)
+        // 解析 URL 格式的二维码 (如: https://hz.shandongliandong.com/bind?code=LDHG762Y)
         if (code.includes('?code=')) {
           const match = code.match(/[?&]code=([^&]+)/);
           if (match) {
@@ -281,7 +281,7 @@ Page({
           }
         }
 
-        // 清理：如果是纯绑定码格式 (JX开头 + 6位字母数字)
+        // 清理：如果是纯绑定码格式 (LD开头 + 6位字母数字)
         code = code.trim().toUpperCase();
 
         // 先查询设备信息（使用绑定码查询）
