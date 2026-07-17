@@ -10,7 +10,7 @@
         <div class="factory-actions">
           <el-button :loading="factoryQrLoading" @click="fetchFactoryQrCodes">刷新</el-button>
           <el-button type="primary" :disabled="factoryDevices.length === 0" @click="exportQrCodes">
-            打印二维码
+            打印设备标签
           </el-button>
         </div>
       </div>
@@ -108,7 +108,7 @@
             <el-button type="info" size="small" @click="showOfflineLogs">离线记录</el-button>
             <el-button type="primary" size="small" @click="refreshList" :loading="loading">刷新</el-button>
             <el-button type="warning" size="small" @click="exportSnList" :loading="exporting">导出CSV</el-button>
-            <el-button size="small" @click="exportQrCodes">导出二维码</el-button>
+            <el-button size="small" @click="exportQrCodes">打印设备标签</el-button>
           </el-col>
         </el-row>
       </el-card>
@@ -1205,8 +1205,22 @@ const exportSnList = async () => {
   }
 }
 
-// 导出二维码（可打印页面）- 分层显示
+const serializeForInlineScript = (value) => JSON.stringify(value)
+  .replace(/</g, '\\u003c')
+  .replace(/\u2028/g, '\\u2028')
+  .replace(/\u2029/g, '\\u2029')
+
+// 生成 A4 设备标签册。窗口必须在点击事件内同步打开，避免被浏览器拦截。
 const exportQrCodes = async () => {
+  const printWindow = window.open('', '_blank')
+  if (!printWindow) {
+    ElMessage.error('浏览器已阻止预览窗口，请允许本站打开弹窗')
+    return
+  }
+
+  printWindow.document.title = '设备标签生成中'
+  printWindow.document.body.innerHTML = '<div style="font-family:Arial,sans-serif;padding:48px;color:#334155;text-align:center">正在整理设备标签...</div>'
+
   try {
     let devices = factoryDevices.value
     if (!isFactoryUser.value || devices.length === 0) {
@@ -1214,6 +1228,7 @@ const exportQrCodes = async () => {
         params: isFactoryUser.value ? { unboundOnly: true } : undefined
       })
       if (res.data.code !== 200) {
+        printWindow.close()
         ElMessage.error('获取设备列表失败')
         return
       }
@@ -1225,158 +1240,352 @@ const exportQrCodes = async () => {
     }
 
     if (devices.length === 0) {
+      printWindow.close()
       ElMessage.warning('暂无设备数据')
       return
     }
 
+    devices = [...devices].sort((left, right) => {
+      const leftBound = left.bound === '已绑定' ? 1 : 0
+      const rightBound = right.bound === '已绑定' ? 1 : 0
+      return leftBound - rightBound
+    })
+
     const boundDevices = devices.filter(d => d.bound === '已绑定')
     const unboundDevices = devices.filter(d => d.bound !== '已绑定')
-    const isFactoryPrint = isFactoryUser.value
-    const headerText = isFactoryPrint ? `共 ${devices.length} 台未绑定设备` : `共 ${devices.length} 台设备`
-    const summaryHtml = isFactoryPrint
-      ? `<span class="summary-item unbound">未绑定: ${devices.length} 台</span>`
-      : `<span class="summary-item unbound">未绑定: ${unboundDevices.length} 台</span><span class="summary-item bound">已绑定: ${boundDevices.length} 台</span>`
+    const generatedAt = new Date()
+    const padNumber = (value) => String(value).padStart(2, '0')
+    const batchNo = [
+      generatedAt.getFullYear(),
+      padNumber(generatedAt.getMonth() + 1),
+      padNumber(generatedAt.getDate()),
+      '-',
+      padNumber(generatedAt.getHours()),
+      padNumber(generatedAt.getMinutes())
+    ].join('')
+    const generatedAtText = generatedAt.toLocaleString('zh-CN', { hour12: false })
+    const printDevices = devices.map((device, index) => ({
+      index: index + 1,
+      sn: device.sn || '',
+      bindCode: getDisplayCode(device),
+      bound: device.bound === '已绑定'
+    }))
 
-    // 打开新窗口生成二维码打印页
-    const printWindow = window.open('', '_blank')
-    if (!printWindow) {
-      ElMessage.error('请允许弹出窗口')
-      return
-    }
-
-    // 生成打印页面 HTML - 使用 qrcode-generator 库（更好的浏览器兼容性）
     const html = `
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-  <title>全球云智算 - 设备二维码</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HEZI NODE - 设备标签</title>
   <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"><\/script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    .header { text-align: center; margin-bottom: 30px; }
-    .header h1 { font-size: 24px; color: #333; }
-    .header p { color: #666; margin-top: 10px; }
-    .section { margin-bottom: 40px; }
-    .section-title { 
-      font-size: 20px; 
-      font-weight: bold; 
-      padding: 10px 20px; 
-      margin-bottom: 20px; 
-      border-radius: 8px;
-      page-break-before: always;
+    :root {
+      --ink: #171a1c;
+      --muted: #667077;
+      --line: #cbd2d6;
+      --canvas: #e9eef0;
+      --paper: #ffffff;
+      --teal: #117c75;
+      --yellow: #f1b82d;
+      --danger: #b7443e;
     }
-    .section-title:first-of-type { page-break-before: auto; }
-    .section-title.unbound { background: #fef3c7; color: #d97706; }
-    .section-title.bound { background: #d1fae5; color: #059669; }
-    .qr-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-    .qr-item { 
-      border: 2px dashed #ccc; 
-      padding: 15px; 
-      text-align: center; 
-      page-break-inside: avoid;
-      border-radius: 8px;
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      background: var(--canvas);
+      color: var(--ink);
+      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
     }
-    .qr-item.bound { border-color: #10b981; background: #f0fdf4; }
-    .qr-item.unbound { border-color: #f59e0b; background: #fffbeb; }
-    .qr-item img { margin: 10px auto; display: block; }
-    .qr-code { font-size: 18px; font-weight: bold; color: #0b62aa; margin-top: 10px; }
-    .qr-sn { font-size: 10px; color: #999; word-break: break-all; margin-top: 5px; }
-    .qr-status { font-size: 12px; margin-top: 5px; }
-    .qr-status.bound { color: #10b981; }
-    .qr-status.unbound { color: #f59e0b; }
-    .print-btn { 
-      position: fixed; top: 10px; right: 10px; 
-      padding: 10px 20px; background: #0b62aa; color: white; 
-      border: none; border-radius: 5px; cursor: pointer; 
-      z-index: 100;
+    button, input { font: inherit; }
+    .preview-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      min-height: 72px;
+      background: rgba(255, 255, 255, 0.96);
+      border-bottom: 1px solid #d8dee1;
+      backdrop-filter: blur(10px);
     }
-    .print-btn:hover { background: #0b62aa; }
-    .summary { display: flex; gap: 20px; justify-content: center; margin-top: 10px; }
-    .summary-item { padding: 5px 15px; border-radius: 20px; font-size: 14px; }
-    .summary-item.bound { background: #d1fae5; color: #059669; }
-    .summary-item.unbound { background: #fef3c7; color: #d97706; }
-    .loading { text-align: center; padding: 50px; color: #666; }
+    .toolbar-inner {
+      width: min(1120px, calc(100% - 32px));
+      min-height: 72px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .toolbar-title { min-width: 0; }
+    .toolbar-title strong { display: block; font-size: 17px; }
+    .toolbar-title span { display: block; margin-top: 5px; color: var(--muted); font-size: 13px; }
+    .print-action {
+      min-height: 42px;
+      padding: 0 18px;
+      color: #fff;
+      background: var(--teal);
+      border: 1px solid var(--teal);
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .print-action:hover { background: #0d6963; }
+    .print-action:focus-visible { outline: 3px solid rgba(17, 124, 117, 0.25); outline-offset: 2px; }
+    .document-stage { padding: 28px 20px 48px; overflow-x: auto; }
+    .sheet {
+      width: 210mm;
+      height: 297mm;
+      margin: 0 auto 28px;
+      padding: 12mm 12mm 9mm;
+      display: flex;
+      flex-direction: column;
+      background: var(--paper);
+      box-shadow: 0 18px 50px rgba(25, 39, 45, 0.16);
+      page-break-after: always;
+      overflow: hidden;
+    }
+    .sheet:last-child { page-break-after: auto; }
+    .sheet-header {
+      min-height: 25mm;
+      padding-bottom: 5mm;
+      margin-bottom: 6mm;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12mm;
+      border-bottom: 2px solid var(--ink);
+    }
+    .brand-lockup { display: flex; align-items: stretch; gap: 4mm; }
+    .brand-mark {
+      width: 5mm;
+      min-height: 17mm;
+      background: var(--teal);
+      border-bottom: 7mm solid var(--yellow);
+    }
+    .brand-kicker { margin: 0 0 1.5mm; color: var(--teal); font-size: 9px; font-weight: 800; }
+    .brand-title { margin: 0; font-size: 22px; line-height: 1.1; font-weight: 800; }
+    .brand-subtitle { margin-top: 2mm; color: var(--muted); font-size: 10px; }
+    .sheet-meta { display: grid; grid-template-columns: auto auto; gap: 1.5mm 5mm; font-size: 9px; }
+    .sheet-meta dt { color: var(--muted); }
+    .sheet-meta dd { margin: 0; text-align: right; font-family: "SFMono-Regular", Consolas, monospace; font-weight: 700; }
+    .label-grid {
+      min-height: 0;
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-rows: repeat(3, minmax(0, 1fr));
+      gap: 5mm;
+    }
+    .device-label {
+      position: relative;
+      min-width: 0;
+      padding: 4mm 4mm 3mm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1.2px solid var(--ink);
+      border-top: 4px solid var(--yellow);
+      border-radius: 4px;
+      overflow: hidden;
+      break-inside: avoid;
+    }
+    .device-label.bound { border-top-color: var(--teal); }
+    .label-head {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 2mm;
+      font-size: 8px;
+    }
+    .label-number { font-family: "SFMono-Regular", Consolas, monospace; font-weight: 800; }
+    .label-status { display: inline-flex; align-items: center; gap: 1.5mm; color: #795b09; font-weight: 700; }
+    .label-status::before { content: ""; width: 2mm; height: 2mm; background: var(--yellow); border-radius: 50%; }
+    .device-label.bound .label-status { color: var(--teal); }
+    .device-label.bound .label-status::before { background: var(--teal); }
+    .qr-frame {
+      width: 34mm;
+      height: 34mm;
+      margin: 2.2mm auto 1.6mm;
+      padding: 1.4mm;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+    .qr-frame img { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+    .qr-error { color: var(--danger); font-size: 9px; }
+    .bind-code {
+      width: 100%;
+      color: var(--ink);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 15px;
+      line-height: 1.2;
+      font-weight: 800;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+    .device-sn {
+      width: 100%;
+      margin-top: 1.4mm;
+      color: var(--muted);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 7.5px;
+      line-height: 1.35;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+    .label-foot {
+      width: 100%;
+      margin-top: auto;
+      padding-top: 2mm;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2mm;
+      border-top: 1px solid #e3e7e9;
+      color: var(--muted);
+      font-size: 7px;
+    }
+    .label-foot strong { color: var(--ink); font-size: 8px; }
+    .sheet-footer {
+      min-height: 8mm;
+      padding-top: 3mm;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      color: var(--muted);
+      font-size: 8px;
+    }
+    .sheet-footer strong { color: var(--ink); }
+    .error-state {
+      width: min(520px, calc(100% - 32px));
+      margin: 80px auto;
+      padding: 28px;
+      background: #fff;
+      border: 1px solid #d7dde0;
+      border-left: 5px solid var(--danger);
+      border-radius: 6px;
+    }
+    .error-state h1 { margin: 0 0 10px; font-size: 18px; }
+    .error-state p { margin: 0; color: var(--muted); line-height: 1.6; }
+    @page { size: A4 portrait; margin: 0; }
     @media print {
-      .print-btn { display: none; }
-      .qr-grid { grid-template-columns: repeat(4, 1fr); }
+      html, body { width: 210mm; min-height: 297mm; background: #fff; }
+      body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .preview-toolbar { display: none; }
+      .document-stage { padding: 0; overflow: visible; }
+      .sheet { margin: 0; box-shadow: none; }
     }
   </style>
 </head>
 <body>
-  <button class="print-btn" onclick="window.print()">🖨️ 打印</button>
-  <div class="header">
-    <h1>🔲 全球云智算 - 设备二维码</h1>
-    <p>${headerText} | 生成时间: ${new Date().toLocaleString()}</p>
-    <div class="summary">
-      ${summaryHtml}
+  <header class="preview-toolbar">
+    <div class="toolbar-inner">
+      <div class="toolbar-title">
+        <strong>设备标签预览</strong>
+        <span>${devices.length} 台设备 · A4 纵向 · 每页 9 枚标签</span>
+      </div>
+      <button class="print-action" type="button" onclick="window.print()" aria-label="打印设备标签">打印设备标签</button>
     </div>
-  </div>
-  
-  <div id="loadingDiv" class="loading">正在生成二维码，请稍候...</div>
-  <div class="section" id="unboundSection"></div>
-  <div class="section" id="boundSection"></div>
-  
+  </header>
+  <main id="printDocument" class="document-stage"></main>
   <script>
-    const unboundDevices = ${JSON.stringify(unboundDevices)};
-    const boundDevices = ${JSON.stringify(boundDevices)};
+    var devices = ${serializeForInlineScript(printDevices)};
+    var pageSize = 9;
+    var totalPages = Math.ceil(devices.length / pageSize);
+    var batchNo = ${serializeForInlineScript(batchNo)};
+    var generatedAt = ${serializeForInlineScript(generatedAtText)};
+    var unboundCount = ${unboundDevices.length};
+    var boundCount = ${boundDevices.length};
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
     
     function generateQRCode(text) {
       try {
         var qr = qrcode(0, 'M');
         qr.addData(text);
         qr.make();
-        return qr.createDataURL(4, 0);
+        return qr.createDataURL(6, 0);
       } catch (e) {
         console.error('QR生成失败:', e);
         return null;
       }
     }
-    
-    function renderDevices(devices, containerId, statusClass, sectionTitle) {
-      if (devices.length === 0) return;
-      
-      const container = document.getElementById(containerId);
-      container.innerHTML = '<div class="section-title ' + statusClass + '">' + sectionTitle + ' (' + devices.length + ' 台)</div><div class="qr-grid" id="grid-' + containerId + '"></div>';
-      const grid = document.getElementById('grid-' + containerId);
-      
-      devices.forEach(function(device, index) {
-        const div = document.createElement('div');
-        const displayCode = (device.bindCode || device.sn.slice(-8)).toUpperCase();
-        
-        const qrDataUrl = generateQRCode(displayCode);
-        const qrImg = qrDataUrl ? '<img src="' + qrDataUrl + '" width="120" height="120" alt="QR"/>' : '<div style="width:120px;height:120px;background:#eee;display:flex;align-items:center;justify-content:center;margin:10px auto;">生成失败</div>';
-        
-        div.className = 'qr-item ' + statusClass;
-        div.innerHTML = 
-          '<div>设备 #' + (index + 1) + '</div>' +
-          qrImg +
-          '<div class="qr-code">' + displayCode + '</div>' +
-          '<div class="qr-sn">SN: ' + device.sn + '</div>' +
-          '<div class="qr-status ' + statusClass + '">' + (statusClass === 'bound' ? '✓ 已绑定' : '○ 未绑定') + '</div>';
-        grid.appendChild(div);
-      });
+
+    function renderLabel(device) {
+      var statusClass = device.bound ? 'bound' : 'unbound';
+      var statusText = device.bound ? '已绑定' : '待绑定';
+      var qrDataUrl = generateQRCode(device.bindCode);
+      var qrMarkup = qrDataUrl
+        ? '<img src="' + qrDataUrl + '" alt="设备绑定二维码">'
+        : '<span class="qr-error">二维码生成失败</span>';
+
+      return '<article class="device-label ' + statusClass + '">' +
+        '<div class="label-head"><span class="label-number">NODE ' + String(device.index).padStart(3, '0') + '</span><span class="label-status">' + statusText + '</span></div>' +
+        '<div class="qr-frame">' + qrMarkup + '</div>' +
+        '<div class="bind-code">' + escapeHtml(device.bindCode) + '</div>' +
+        '<div class="device-sn">SN ' + escapeHtml(device.sn) + '</div>' +
+        '<div class="label-foot"><strong>HEZI NODE</strong><span>扫码绑定设备</span></div>' +
+        '</article>';
     }
-    
-    window.onload = function() {
-      document.getElementById('loadingDiv').style.display = 'none';
+
+    function renderPages() {
+      var root = document.getElementById('printDocument');
       if (typeof qrcode === 'undefined') {
-        alert('二维码库加载失败，请检查网络或刷新重试');
+        root.innerHTML = '<section class="error-state"><h1>二维码组件加载失败</h1><p>请检查网络连接后刷新此页面，再重新打印设备标签。</p></section>';
         return;
       }
-      renderDevices(unboundDevices, 'unboundSection', 'unbound', '📦 未绑定设备');
-      renderDevices(boundDevices, 'boundSection', 'bound', '✅ 已绑定设备');
+
+      var pages = [];
+      for (var pageIndex = 0; pageIndex < totalPages; pageIndex += 1) {
+        var pageDevices = devices.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
+        var labels = pageDevices.map(renderLabel).join('');
+        pages.push(
+          '<section class="sheet">' +
+            '<header class="sheet-header">' +
+              '<div class="brand-lockup"><div class="brand-mark"></div><div>' +
+                '<p class="brand-kicker">HEZI NODE LABEL SYSTEM</p>' +
+                '<h1 class="brand-title">盒子节点出厂标签</h1>' +
+                '<p class="brand-subtitle">设备身份与入网绑定凭证</p>' +
+              '</div></div>' +
+              '<dl class="sheet-meta">' +
+                '<dt>标签批次</dt><dd>' + escapeHtml(batchNo) + '</dd>' +
+                '<dt>本批设备</dt><dd>' + devices.length + ' 台</dd>' +
+                '<dt>待绑定 / 已绑定</dt><dd>' + unboundCount + ' / ' + boundCount + '</dd>' +
+                '<dt>生成时间</dt><dd>' + escapeHtml(generatedAt) + '</dd>' +
+              '</dl>' +
+            '</header>' +
+            '<div class="label-grid">' + labels + '</div>' +
+            '<footer class="sheet-footer"><span><strong>HEZI NODE</strong> · DEVICE ACTIVATION LABELS</span><span>PAGE ' + (pageIndex + 1) + ' / ' + totalPages + '</span></footer>' +
+          '</section>'
+        );
+      }
+      root.innerHTML = pages.join('');
     }
+
+    window.addEventListener('load', renderPages);
   <\/script>
 </body>
 </html>`;
 
+    printWindow.document.open()
     printWindow.document.write(html)
     printWindow.document.close()
-    ElMessage.success('二维码页面已生成，请打印')
+    ElMessage.success(`已生成 ${devices.length} 枚设备标签`)
   } catch (e) {
     console.error(e)
-    ElMessage.error('生成二维码失败')
+    if (!printWindow.closed) {
+      printWindow.close()
+    }
+    ElMessage.error('生成设备标签失败')
   }
 }
 
