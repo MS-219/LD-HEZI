@@ -5,7 +5,6 @@ import com.ldai.common.Result;
 import com.ldai.entity.ApiMerchant;
 import com.ldai.entity.Device;
 import com.ldai.entity.DeviceCommand;
-import com.ldai.entity.ImageLicense;
 import com.ldai.entity.SysUser;
 import com.ldai.service.IDeviceCommandService;
 import com.ldai.service.IDeviceService;
@@ -45,9 +44,6 @@ public class DeviceController {
 
     @Autowired
     private com.ldai.service.ISysUserService sysUserService;
-
-    @Autowired
-    private com.ldai.service.IImageLicenseService imageLicenseService;
 
     /**
      * 验证管理员权限的辅助方法
@@ -807,22 +803,6 @@ public class DeviceController {
         String role = com.ldai.util.JwtUtil.getRole(rawToken);
         if (Boolean.TRUE.equals(unboundOnly) || "factory".equals(role)) {
             query.isNull(Device::getUserId);
-        }
-        if ("factory".equals(role)) {
-            String username = com.ldai.util.JwtUtil.getUsername(rawToken);
-            java.util.List<String> licenseKeys = imageLicenseService.lambdaQuery()
-                    .eq(ImageLicense::getFactoryUsername, username)
-                    .list()
-                    .stream()
-                    .map(ImageLicense::getLicenseKey)
-                    .filter(key -> key != null && !key.isBlank())
-                    .toList();
-            if (licenseKeys.isEmpty()) {
-                return Result.success(Map.of(
-                        "total", 0,
-                        "list", java.util.List.of()));
-            }
-            query.in(Device::getImageLicenseKey, licenseKeys);
         }
 
         query.orderByDesc(Device::getCreateTime);
